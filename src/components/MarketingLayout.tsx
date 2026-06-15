@@ -33,7 +33,7 @@ export default function MarketingLayout({
               <Link href="/login" className="text-sm font-bold text-brandtext hover:text-accent transition-colors hidden sm:block">
                 Log in
               </Link>
-              <Link href="/register" className="bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-[0_4px_14px_0_rgba(21,62,117,0.39)] hover:shadow-[0_6px_20px_rgba(21,62,117,0.23)] hover:-translate-y-0.5 transition-all">
+              <Link href="/register" className="hidden md:block bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-[0_4px_14px_0_rgba(21,62,117,0.39)] hover:shadow-[0_6px_20px_rgba(21,62,117,0.23)] hover:-translate-y-0.5 transition-all">
                 Start Free Trial
               </Link>
             </div>
