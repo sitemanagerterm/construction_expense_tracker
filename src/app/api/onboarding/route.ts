@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // Use a transaction to ensure both Tenant and User are updated atomically
-    const tenant = await prisma.$transaction(async (tx) => {
+    const tenant = await prisma.$transaction(async (tx: any) => {
       // Create the Tenant
       const newTenant = await tx.tenant.create({
         data: {
