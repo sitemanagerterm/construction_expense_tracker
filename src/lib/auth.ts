@@ -8,8 +8,8 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID || "mock_client_id",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock_client_secret",
     }),
     CredentialsProvider({
       name: "Mobile & PIN",
@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         
         // Find staff user by mobile number
         const user = await prisma.user.findFirst({
-          where: { mobile: credentials.mobile, role: "STAFF" }
+          where: { mobileNumber: credentials.mobile, role: "STAFF" }
         });
 
         // Basic check for MVP (In production, use proper hashed PIN check)
