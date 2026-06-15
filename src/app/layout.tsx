@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   description: "Track Every Rupee. Stop Profit Drain. The Ultimate Construction Expense Tracker.",
   manifest: "/manifest.json",
   icons: {
-    icon: '/mysitebook-icon.png',
-    apple: '/mysitebook-icon.png',
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
 };
 
