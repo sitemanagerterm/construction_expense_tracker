@@ -1,593 +1,643 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { FaBuilding, FaHardHat, FaCheckCircle, FaChartPie, FaMobileAlt, FaMicrophone, FaCamera, FaFileInvoiceDollar, FaSync, FaHistory, FaArrowRight } from "react-icons/fa";
-import LanguageSelector from "@/components/LanguageSelector";
-import { useLanguage } from "@/context/LanguageContext";
+import { 
+  FaPlay, 
+  FaLock,
+  FaCheckCircle,
+  FaBuilding,
+  FaHardHat,
+  FaChartPie,
+  FaFileInvoiceDollar,
+  FaSync,
+  FaHistory,
+  FaUserFriends,
+  FaMobileAlt,
+  FaChevronDown
+} from "react-icons/fa";
 
 export default function Home() {
-  const { t } = useLanguage();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    if (faqOpen === index) setFaqOpen(null);
+    else setFaqOpen(index);
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-brandbg text-brandtext font-sans overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-white font-sans text-[#111827]">
       
-      {/* Premium Full-Width Sticky Header */}
-      <header className="fixed top-0 w-full z-50 bg-white border-b border-gray-100 shadow-sm transition-all">
+      {/* 1. HEADER */}
+      <header className="fixed top-0 w-full z-50 bg-[#0A192F] border-b border-white/10 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24">
-            {/* Logo - Fixed natural scaling */}
-            <Link href="/" className="flex items-center group shrink-0">
-              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+          <div className="flex justify-between items-center h-20">
+            {/* Logo */}
+            <Link href="/" className="flex items-center shrink-0">
+              <img src="/mysitebook-logo-transparent.png" alt="MySiteBook" className="h-10 w-auto object-contain" />
             </Link>
             
-            <nav className="hidden lg:flex space-x-10 items-center">
-              <Link href="#how-it-works" className="text-sm font-bold text-brandtext hover:text-accent transition-colors">How it Works</Link>
-              <Link href="#features" className="text-sm font-bold text-brandtext hover:text-accent transition-colors">Features</Link>
-              <Link href="#pricing" className="text-sm font-bold text-brandtext hover:text-accent transition-colors">Pricing</Link>
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex space-x-8 items-center text-white/90">
+              <Link href="#features" className="text-sm font-semibold hover:text-white transition-colors">Features</Link>
+              <Link href="#how-it-works" className="text-sm font-semibold hover:text-white transition-colors">How It Works</Link>
+              <Link href="#pricing" className="text-sm font-semibold hover:text-white transition-colors">Pricing</Link>
+              <div className="relative group">
+                <button className="flex items-center space-x-1 text-sm font-semibold hover:text-white transition-colors">
+                  <span>Resources</span>
+                  <FaChevronDown className="w-3 h-3 opacity-70" />
+                </button>
+                {/* Simple dropdown hover (CSS only for now) */}
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 hidden group-hover:block border border-gray-100">
+                  <Link href="/blog" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Blog</Link>
+                  <Link href="/help" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Help Center</Link>
+                </div>
+              </div>
+              <Link href="/about" className="text-sm font-semibold hover:text-white transition-colors">About Us</Link>
             </nav>
             
-            <div className="flex items-center space-x-4 sm:space-x-6 shrink-0">
-              <LanguageSelector />
-              <div className="h-5 w-px bg-gray-200 hidden sm:block"></div>
-              <Link href="/login" className="text-sm font-bold text-brandtext hover:text-accent transition-colors hidden sm:block">
-                Log in
+            {/* CTA Buttons */}
+            <div className="hidden lg:flex items-center space-x-4 shrink-0">
+              <Link href="/login" className="flex items-center text-sm font-semibold text-[#F97316] border border-[#F97316] px-5 py-2 rounded-full hover:bg-[#F97316]/10 transition-all">
+                <FaLock className="mr-2 w-3 h-3" /> Log In
               </Link>
-              <Link href="/register" className="hidden md:block bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-[0_4px_14px_0_rgba(21,62,117,0.39)] hover:shadow-[0_6px_20px_rgba(21,62,117,0.23)] hover:-translate-y-0.5 transition-all">
+              <Link href="/register" className="bg-[#F9B233] text-[#0A192F] px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#FFC145] transition-all shadow-lg">
                 Start Free Trial
               </Link>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="lg:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-2">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Navigation Dropdown */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-[#0A192F] border-t border-white/10 pb-4">
+            <div className="px-4 space-y-2 pt-2">
+              <Link href="#features" className="block text-white/90 font-semibold py-2">Features</Link>
+              <Link href="#how-it-works" className="block text-white/90 font-semibold py-2">How It Works</Link>
+              <Link href="#pricing" className="block text-white/90 font-semibold py-2">Pricing</Link>
+              <Link href="/login" className="block text-[#F97316] font-semibold py-2">Log In</Link>
+              <Link href="/register" className="block text-[#F9B233] font-semibold py-2">Start Free Trial</Link>
+            </div>
+          </div>
+        )}
       </header>
 
-      <main className="flex-grow">
+      <main className="flex-grow pt-20">
         
-        {/* SECTION 2: Hero */}
-        <section className="relative pt-36 pb-20 overflow-hidden bg-slate-900 text-white">
-          {/* Subtle Ambient Background */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
-            <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl mix-blend-multiply opacity-70"></div>
-            <div className="absolute top-40 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl mix-blend-multiply opacity-70"></div>
-            <div className="absolute inset-0 z-0 opacity-[0.03]" style={{ backgroundImage: "url('/construction-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}></div>
-          </div>
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            
-            {/* Refined Heading */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1] text-white drop-shadow-sm max-w-5xl mx-auto">
-              Track Every <span className="text-accent">Rupee.</span><br className="hidden md:block"/>
-              Manage Every <span className="text-accent">Project.</span><br className="hidden md:block"/>
-              Control Every <span className="text-accent">Site.</span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-slate-300 font-light tracking-wide max-w-4xl mx-auto mb-12 leading-snug">
-              Expense tracking, material procurement, receipt scanning, and project reporting built exclusively for the modern construction business.
-            </p>
-            
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-20 mb-14">
-              <Link href="/register" className="w-full sm:w-auto bg-accent text-white px-7 py-3.5 rounded-full font-semibold text-base shadow-[0_8px_25px_rgb(249,115,22,0.3)] hover:shadow-[0_8px_35px_rgb(249,115,22,0.5)] hover:-translate-y-1 transition-all flex items-center justify-center border border-accent/50">
-                Start Free Trial <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </Link>
-              <Link href="#how-it-works" className="w-full sm:w-auto bg-white/10 text-white hover:bg-white/20 border border-white/20 px-7 py-3.5 rounded-full font-medium text-base shadow-sm hover:shadow-md transition-all flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-4 h-4 mr-2 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"></path></svg>
-                Watch Demo
-              </Link>
-            </div>
+        {/* 2. HERO SECTION */}
+        <section className="relative bg-[#0A192F] text-white pt-16 pb-32 lg:pt-24 lg:pb-40 overflow-hidden">
+          {/* Background Glow */}
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#F9B233]/5 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/4"></div>
 
-            {/* Social Proof Elements - B2B Scrolling Logo Marquee */}
-            <div className="w-full max-w-5xl mx-auto overflow-hidden mt-10 mb-8 relative">
-              <p className="text-xs font-black text-white/60 uppercase tracking-widest mb-8 text-center relative z-20">Trusted on 5,000+ Active Sites By</p>
-              
-              {/* Fade Edges for Marquee */}
-              <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-900 to-transparent z-10 pointer-events-none mt-10"></div>
-              <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-900 to-transparent z-10 pointer-events-none mt-10"></div>
-              
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes marquee-scroll {
-                  0% { transform: translateX(0); }
-                  100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                  animation: marquee-scroll 35s linear infinite;
-                  width: max-content;
-                }
-                .animate-marquee:hover {
-                  animation-play-state: paused;
-                }
-              `}} />
-              
-              {/* Scrolling Container */}
-              <div className="flex animate-marquee opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                {/* Set 1 */}
-                <div className="flex items-center gap-16 md:gap-24 px-8 md:px-12">
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3L12 2z"/></svg><span className="font-black text-2xl tracking-tighter text-white">BUILD<span className="text-accent">PRO</span></span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg><span className="font-black text-2xl tracking-tighter text-white">Structura</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span className="font-black text-2xl tracking-tighter text-white">APEX</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v20c5.07-.5 9-4.79 9-10s-3.93-9.5-9-10z"/></svg><span className="font-black text-2xl tracking-tighter text-blue-300">GlobalBuild</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg><span className="font-black text-2xl tracking-tighter text-orange-400">ELEVATE</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h18v18H3zM5 5v14h14V5z"/></svg><span className="font-black text-2xl tracking-tighter text-slate-300">Nirman</span></div>
-                </div>
-                {/* Set 2 (Duplicated for Seamless Loop) */}
-                <div className="flex items-center gap-16 md:gap-24 px-8 md:px-12">
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3L12 2z"/></svg><span className="font-black text-2xl tracking-tighter text-white">BUILD<span className="text-accent">PRO</span></span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg><span className="font-black text-2xl tracking-tighter text-white">Structura</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span className="font-black text-2xl tracking-tighter text-white">APEX</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v20c5.07-.5 9-4.79 9-10s-3.93-9.5-9-10z"/></svg><span className="font-black text-2xl tracking-tighter text-blue-300">GlobalBuild</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg><span className="font-black text-2xl tracking-tighter text-orange-400">ELEVATE</span></div>
-                  <div className="flex items-center gap-2"><svg className="w-8 h-8 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h18v18H3zM5 5v14h14V5z"/></svg><span className="font-black text-2xl tracking-tighter text-slate-300">Nirman</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 2.5: Live Site Feed Visualization (Sleek Dashboard UI) */}
-        <section className="relative py-24 bg-white overflow-hidden border-t border-gray-100">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-brandbg/50 rounded-l-[100px] pointer-events-none"></div>
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center gap-16">
-              
-              {/* Left Column: Copy & Value Prop */}
-              <div className="w-full lg:w-5/12">
-                <div className="inline-flex items-center space-x-2 bg-green-50 px-3 py-1.5 rounded-full mb-6 border border-green-100">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                  </span>
-                  <span className="text-xs font-bold text-green-700 uppercase tracking-wider">Live Sync Technology</span>
-                </div>
-                
-                <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6 text-gray-900 leading-[1.1]">
-                  The real-time pulse of your projects.
-                </h2>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                  Stop waiting for end-of-week ledger updates. Watch expenses, invoices, and material deliveries flow into your centralized dashboard instantly from the site.
-                </p>
-                
-                <ul className="space-y-4 mb-8">
-                  {[
-                    "Instantly verify hardware store bills with AI.",
-                    "Catch budget overruns before money is spent.",
-                    "Eliminate WhatsApp groups and missing receipts."
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5 mr-3">
-                        <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                      </div>
-                      <span className="text-gray-700 font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left Content */}
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center space-x-2 border border-white/20 bg-white/5 px-4 py-1.5 rounded-full mb-6">
+                <FaHardHat className="text-[#F9B233] w-4 h-4" />
+                <span className="text-xs font-bold text-[#F9B233] uppercase tracking-wider">Built For Indian Contractors</span>
               </div>
               
-              {/* Right Column: Premium Dashboard Widget Mockup */}
-              <div className="w-full lg:w-7/12 relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-[2.5rem] transform rotate-2"></div>
-                <div className="relative bg-white rounded-3xl shadow-[0_20px_60px_rgba(21,62,117,0.12)] border border-gray-200/60 overflow-hidden transform transition-all hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(21,62,117,0.15)]">
-                  {/* Widget Header */}
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                      </span>
-                      <h3 className="font-bold text-gray-900 text-sm">Live Site Activity</h3>
-                    </div>
-                    <div className="text-xs font-bold text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-                      Today
-                    </div>
+              <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-[1.1] text-white">
+                Complete Control of <br />
+                Your <span className="text-[#F9B233]">Project Finances</span>
+              </h1>
+              
+              <p className="text-lg lg:text-xl text-white/80 font-light tracking-wide mb-10 leading-relaxed">
+                Track project value, credits, expenses and know your profit or loss in real time.
+              </p>
+
+              {/* 4 Icons Row */}
+              <div className="grid grid-cols-4 gap-4 mb-10 border-b border-white/10 pb-8">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
+                    <FaChartPie className="w-5 h-5 text-white" />
                   </div>
-                  
-                  {/* Widget Body (Feed) */}
-                  <div className="p-6 md:p-8">
-                    <div className="relative border-l-2 border-gray-100 ml-3 space-y-8">
-                      
-                      {/* Feed Item 1: Expense */}
-                      <div className="relative pl-6 md:pl-8">
-                        <div className="absolute -left-[17px] top-1 bg-accent/10 border-2 border-white w-8 h-8 rounded-full flex items-center justify-center text-accent shadow-sm">
-                          <span className="font-bold text-sm">₹</span>
-                        </div>
-                        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
-                            <p className="font-bold text-gray-900">Expense Logged <span className="text-gray-400 font-medium text-xs ml-2">Just now</span></p>
-                            <span className="text-expense font-black text-lg mt-1 md:mt-0">₹45,500</span>
-                          </div>
-                          <p className="text-sm text-gray-500 mb-3">Rajesh Kumar (Site Supervisor) logged an expense for heavy machinery rental.</p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="text-[11px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md">Site A - Phase 2</span>
-                            <span className="text-[11px] font-bold bg-accent/10 text-accent px-2 py-1 rounded-md">Machinery</span>
-                          </div>
-                        </div>
-                      </div>
+                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Know Profit<br/>Instantly</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
+                    <FaFileInvoiceDollar className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Track Every<br/>Expense</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
+                    <FaBuilding className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Monitor<br/>Materials</span>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
+                    <FaSync className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Manage<br/>Payments</span>
+                </div>
+              </div>
+              
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                <Link href="/register" className="w-full sm:w-auto bg-[#F9B233] text-[#0A192F] px-8 py-3.5 rounded-full font-extrabold text-base hover:bg-[#FFC145] transition-all shadow-lg flex items-center justify-center">
+                  Start 3 Months Free Trial &rarr;
+                </Link>
+                <Link href="#how-it-works" className="w-full sm:w-auto bg-transparent border border-white/30 text-white hover:bg-white/5 px-8 py-3.5 rounded-full font-semibold text-base transition-all flex items-center justify-center">
+                  <FaPlay className="mr-2 w-3 h-3" /> Watch Demo
+                </Link>
+              </div>
 
-                      {/* Feed Item 2: Invoice */}
-                      <div className="relative pl-6 md:pl-8">
-                        <div className="absolute -left-[17px] top-1 bg-purple-100 border-2 border-white w-8 h-8 rounded-full flex items-center justify-center text-purple-600 shadow-sm">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        </div>
-                        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
-                            <p className="font-bold text-gray-900">Invoice Scanned <span className="text-gray-400 font-medium text-xs ml-2">12 mins ago</span></p>
-                            <span className="text-expense font-black text-lg mt-1 md:mt-0">₹12,400</span>
-                          </div>
-                          <p className="text-sm text-gray-500 mb-3">AI successfully extracted data from an uploaded hardware store bill.</p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="text-[11px] font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded-md">Verified</span>
-                            <span className="text-[11px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md">Cement & Sand</span>
-                          </div>
-                        </div>
-                      </div>
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center gap-6 text-sm text-white/70 font-medium">
+                <span className="flex items-center"><FaCheckCircle className="text-white/50 mr-2" /> 1 Project FREE Forever</span>
+                <span className="flex items-center"><FaCheckCircle className="text-white/50 mr-2" /> No Credit Card Required</span>
+                <span className="flex items-center"><FaCheckCircle className="text-white/50 mr-2" /> Cancel Anytime</span>
+              </div>
+            </div>
 
-                      {/* Feed Item 3: Voice Log */}
-                      <div className="relative pl-6 md:pl-8">
-                        <div className="absolute -left-[17px] top-1 bg-green-100 border-2 border-white w-8 h-8 rounded-full flex items-center justify-center text-green-600 shadow-sm">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                        </div>
-                        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex justify-between items-start mb-1">
-                            <p className="font-bold text-gray-900">Voice Log Added <span className="text-gray-400 font-medium text-xs ml-2">45 mins ago</span></p>
-                          </div>
-                          <p className="text-sm text-gray-700 italic border-l-2 border-gray-200 pl-3 my-2 text-brandtext-secondary">"Paid ₹500 for auto transport to the city site."</p>
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            <span className="text-[11px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded-md flex items-center"><svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg> Logged as ₹500 Transport</span>
-                          </div>
-                        </div>
-                      </div>
+            {/* Right Content (Mockups) */}
+            <div className="relative mt-12 lg:mt-0 flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-lg lg:max-w-xl">
+                {/* Laptop Mockup Placeholder */}
+                <div className="bg-[#0f284e] border-4 border-gray-800 rounded-t-2xl shadow-2xl overflow-hidden aspect-[16/10] relative flex items-center justify-center">
+                  <img src="/dashboard-mockup.png" alt="Dashboard" className="w-full h-full object-cover opacity-80" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F] to-transparent opacity-40"></div>
+                </div>
+                {/* Laptop Base */}
+                <div className="w-full h-4 bg-gray-400 rounded-b-xl"></div>
+                <div className="w-[120%] -ml-[10%] h-3 bg-gray-300 rounded-b-full shadow-xl"></div>
 
+                {/* Mobile Mockup Placeholder Overlay */}
+                <div className="absolute -bottom-10 -left-6 w-32 md:w-40 bg-white border-4 border-gray-900 rounded-[2rem] shadow-2xl aspect-[9/19] overflow-hidden z-20">
+                  <div className="w-full h-full bg-gray-100 flex flex-col">
+                    <div className="bg-primary text-white p-3 text-xs font-bold text-center">MySiteBook</div>
+                    <div className="p-3">
+                      <div className="text-[10px] text-gray-500 font-bold uppercase">Current Profit</div>
+                      <div className="text-sm font-black text-green-600">₹1,80,000</div>
+                      <div className="mt-3 space-y-2">
+                        <div className="bg-white rounded shadow-sm p-2 text-[10px] flex justify-between"><span className="text-gray-500">Value</span><span className="font-bold text-gray-900">₹15,00,000</span></div>
+                        <div className="bg-white rounded shadow-sm p-2 text-[10px] flex justify-between"><span className="text-gray-500">Credits</span><span className="font-bold text-gray-900">₹10,00,000</span></div>
+                        <div className="bg-white rounded shadow-sm p-2 text-[10px] flex justify-between"><span className="text-gray-500">Expenses</span><span className="font-bold text-gray-900">₹8,20,000</span></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
             </div>
+
           </div>
         </section>
 
-        {/* SECTION 3: Problem vs Solution */}
-        <section id="how-it-works" className="py-24 bg-surface border-y border-gray-100 relative overflow-hidden">
-          {/* Subtle background decoration */}
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gray-50 rounded-full blur-[100px] -z-10 translate-x-1/3 -translate-y-1/3"></div>
-          
+        {/* 3. STATS BAR */}
+        <section className="bg-[#051020] text-white py-10 border-y border-white/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-              
-              {/* LEFT: The Problem */}
-              <div className="relative">
-                <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6 text-primary">
-                  The old way is <span className="text-expense">costing you money.</span>
-                </h2>
-                <p className="text-xl text-brandtext-secondary mb-12 font-medium leading-relaxed">
-                  Construction sites leak cash when advances aren't tracked and receipts get lost in the mud.
-                </p>
-                
-                <div className="space-y-8">
-                  <div className="flex items-start group">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center shrink-0 mt-1 border border-red-100 group-hover:bg-red-100 transition-colors">
-                      <span className="text-expense font-black text-xl">✕</span>
-                    </div>
-                    <div className="ml-5">
-                      <h4 className="text-xl font-bold text-brandtext mb-1">Paper Ledgers & WhatsApp</h4>
-                      <p className="text-brandtext-secondary leading-relaxed">Messy, easily manipulated, and nearly impossible to audit at the end of the project.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start group">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center shrink-0 mt-1 border border-red-100 group-hover:bg-red-100 transition-colors">
-                      <span className="text-expense font-black text-xl">✕</span>
-                    </div>
-                    <div className="ml-5">
-                      <h4 className="text-xl font-bold text-brandtext mb-1">Lost & Damaged Receipts</h4>
-                      <p className="text-brandtext-secondary leading-relaxed">Supervisors forget to hand over hardware store bills, directly destroying your profit margins.</p>
-                    </div>
-                  </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
+              <div className="flex items-center justify-center space-x-4 px-4">
+                <FaUserFriends className="w-10 h-10 text-[#F9B233]" />
+                <div>
+                  <div className="text-2xl font-black">5,000+</div>
+                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Contractors Trust Us</div>
                 </div>
               </div>
-
-              {/* RIGHT: The Solution */}
-              <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden transform transition-transform hover:scale-[1.02] duration-500">
-                {/* Dark card inner glow effect */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-[80px] pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#0B203E]/40 rounded-full blur-[80px] pointer-events-none"></div>
-                
-                <h3 className="text-3xl font-black text-white mb-8 relative z-10 flex items-center">
-                  <span className="bg-accent w-2 h-8 rounded-full mr-4"></span>
-                  The MySiteBook Solution
-                </h3>
-                
-                <div className="space-y-5 relative z-10">
-                  <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm hover:bg-white/10 transition-colors flex items-start">
-                    <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center shrink-0 mr-4 border border-accent/30">
-                      <FaMicrophone className="text-accent text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold text-white mb-1">Voice Logging (AI)</h4>
-                      <p className="text-gray-400 text-sm leading-relaxed">Speak in English, Hindi, or Tamil. Our AI instantly translates and logs the structured expense.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm hover:bg-white/10 transition-colors flex items-start">
-                    <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center shrink-0 mr-4 border border-accent/30">
-                      <FaCamera className="text-accent text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold text-white mb-1">Instant Receipt OCR</h4>
-                      <p className="text-gray-400 text-sm leading-relaxed">Snap a photo of any muddy bill. We extract the vendor, amount, and date automatically.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm hover:bg-white/10 transition-colors flex items-start">
-                    <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center shrink-0 mr-4 border border-green-500/30">
-                      <FaCheckCircle className="text-green-400 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold text-white mb-1">Immutable Audit Trail</h4>
-                      <p className="text-gray-400 text-sm leading-relaxed">Every rupee is tracked to a specific user, time, and GPS location. Zero tampering possible.</p>
-                    </div>
-                  </div>
+              <div className="flex items-center justify-center space-x-4 px-4">
+                <FaBuilding className="w-10 h-10 text-[#F9B233]" />
+                <div>
+                  <div className="text-2xl font-black">25,000+</div>
+                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Projects Managed</div>
                 </div>
               </div>
-              
+              <div className="flex items-center justify-center space-x-4 px-4">
+                <FaFileInvoiceDollar className="w-10 h-10 text-[#F9B233]" />
+                <div>
+                  <div className="text-2xl font-black">10L+</div>
+                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Bills Stored</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-center space-x-4 px-4">
+                <div className="w-10 h-10 rounded-full border-2 border-[#F9B233] flex items-center justify-center text-[#F9B233] font-bold text-xl">₹</div>
+                <div>
+                  <div className="text-2xl font-black">₹500Cr+</div>
+                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Expenses Tracked</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* SECTION 4: Bento Grid Features */}
-        <section id="features" className="py-24 bg-brandbg">
+        {/* 4. VISUAL CARDS SECTION (From Image) */}
+        <section className="bg-[#F8FAFC] py-20 lg:py-28">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              
+              {/* Card 1: Track Every Rupee */}
+              <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col">
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-bold text-gray-900">Track Every Rupee</h3>
+                  <p className="text-sm text-gray-500 font-medium">Never lose money again</p>
+                </div>
+                
+                <div className="relative pl-8 space-y-8 flex-grow">
+                  {/* Vertical Line */}
+                  <div className="absolute left-[15px] top-4 bottom-4 w-px bg-gray-200"></div>
+                  
+                  {/* Item 1 */}
+                  <div className="relative">
+                    <div className="absolute -left-[35px] top-1 w-10 h-10 bg-blue-50 border-4 border-white rounded-full flex items-center justify-center z-10 text-blue-500 shadow-sm"><FaBuilding className="w-4 h-4"/></div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase">Project Value</p>
+                      <p className="text-2xl font-black text-gray-900">₹15,00,000</p>
+                    </div>
+                  </div>
+                  
+                  {/* Item 2 */}
+                  <div className="relative">
+                    <div className="absolute -left-[35px] top-1 w-10 h-10 bg-green-50 border-4 border-white rounded-full flex items-center justify-center z-10 text-green-500 shadow-sm"><FaCheckCircle className="w-4 h-4"/></div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase">Credits Received</p>
+                      <p className="text-2xl font-black text-gray-900">₹10,00,000</p>
+                    </div>
+                  </div>
+                  
+                  {/* Item 3 */}
+                  <div className="relative">
+                    <div className="absolute -left-[35px] top-1 w-10 h-10 bg-red-50 border-4 border-white rounded-full flex items-center justify-center z-10 text-red-500 shadow-sm"><FaFileInvoiceDollar className="w-4 h-4"/></div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase">Total Expenses</p>
+                      <p className="text-2xl font-black text-gray-900">₹8,20,000</p>
+                    </div>
+                  </div>
+                  
+                  {/* Item 4 */}
+                  <div className="relative pt-4 border-t border-gray-100">
+                    <div className="absolute -left-[35px] top-5 w-10 h-10 bg-green-500 border-4 border-white rounded-full flex items-center justify-center z-10 text-white shadow-sm font-bold">₹</div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase">Current Profit</p>
+                      <p className="text-3xl font-black text-green-600">₹1,80,000</p>
+                      <p className="text-xs font-medium text-gray-500 mt-1">12% of Project Value</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Material Tracking */}
+              <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col">
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-bold text-gray-900">Material Tracking</h3>
+                  <p className="text-sm text-gray-500 font-medium">Know what you buy, use and have</p>
+                </div>
+                
+                <div className="space-y-6 flex-grow">
+                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center"><div className="w-8 h-8 bg-[#D2B48C] rounded flex items-center justify-center mr-3 text-white font-bold text-xs">C</div> <span className="font-bold text-gray-800 text-sm">Cement</span></div>
+                    <span className="font-bold text-gray-600 text-sm">250 Bags</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center"><div className="w-8 h-8 bg-gray-700 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">S</div> <span className="font-bold text-gray-800 text-sm">Steel</span></div>
+                    <span className="font-bold text-gray-600 text-sm">4.2 Ton</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center"><div className="w-8 h-8 bg-yellow-600 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">S</div> <span className="font-bold text-gray-800 text-sm">Sand</span></div>
+                    <span className="font-bold text-gray-600 text-sm">18 Loads</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center"><div className="w-8 h-8 bg-red-700 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">B</div> <span className="font-bold text-gray-800 text-sm">Bricks</span></div>
+                    <span className="font-bold text-gray-600 text-sm">12,500 Nos</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center"><div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">J</div> <span className="font-bold text-gray-800 text-sm">Jalli</span></div>
+                    <span className="font-bold text-gray-600 text-sm">12 Loads</span>
+                  </div>
+                </div>
+                
+                <button className="mt-6 w-full py-3 rounded-xl font-bold text-[#F9B233] bg-[#F9B233]/10 hover:bg-[#F9B233]/20 transition-colors text-sm">
+                  View All Materials
+                </button>
+              </div>
+
+              {/* Card 3: Expense Breakdown */}
+              <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col">
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-bold text-gray-900">Expense Breakdown</h3>
+                  <p className="text-sm text-gray-500 font-medium">Where your money is going</p>
+                </div>
+                
+                <div className="flex-grow flex flex-col items-center justify-center pb-6">
+                  {/* CSS Donut Chart representation */}
+                  <div className="relative w-40 h-40 rounded-full flex items-center justify-center" 
+                       style={{ background: 'conic-gradient(#153E75 0% 60%, #16A34A 60% 85%, #F59E0B 85% 95%, #E5E7EB 95% 100%)' }}>
+                    <div className="w-28 h-28 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                      <span className="text-xl font-black text-gray-900">₹8,20,000</span>
+                      <span className="text-[9px] text-gray-500 font-bold uppercase">Total Expenses</span>
+                    </div>
+                  </div>
+                  
+                  {/* Chart Legend */}
+                  <div className="w-full mt-8 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#153E75] mr-2"></span><span className="text-sm font-bold text-gray-700">Materials</span></div>
+                      <div className="text-right"><span className="text-sm font-black text-gray-900">60%</span><div className="text-[10px] text-gray-400 font-medium">₹4,92,000</div></div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#16A34A] mr-2"></span><span className="text-sm font-bold text-gray-700">Labour</span></div>
+                      <div className="text-right"><span className="text-sm font-black text-gray-900">25%</span><div className="text-[10px] text-gray-400 font-medium">₹2,05,000</div></div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#F59E0B] mr-2"></span><span className="text-sm font-bold text-gray-700">Transport</span></div>
+                      <div className="text-right"><span className="text-sm font-black text-gray-900">10%</span><div className="text-[10px] text-gray-400 font-medium">₹82,000</div></div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-gray-300 mr-2"></span><span className="text-sm font-bold text-gray-700">Other</span></div>
+                      <div className="text-right"><span className="text-sm font-black text-gray-900">5%</span><div className="text-[10px] text-gray-400 font-medium">₹41,000</div></div>
+                    </div>
+                  </div>
+                </div>
+
+                <button className="w-full py-3 rounded-xl font-bold text-[#F9B233] bg-[#F9B233]/10 hover:bg-[#F9B233]/20 transition-colors text-sm">
+                  View All Expenses
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* 5. TESTIMONIAL SECTION */}
+        <section className="bg-white py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-10 relative z-20">
+          <div className="bg-[#0A192F] rounded-[2rem] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center gap-10">
+            {/* Image Placeholder */}
+            <div className="w-32 h-32 md:w-48 md:h-48 shrink-0 bg-blue-900 rounded-full border-4 border-[#F9B233] overflow-hidden flex items-center justify-center">
+               <div className="text-center text-white/50 text-xs px-4">Contractor Image Placeholder</div>
+            </div>
+            
+            {/* Quote */}
+            <div className="flex-grow text-center md:text-left relative">
+              <div className="absolute -top-6 -left-6 text-6xl text-white/10 font-serif">"</div>
+              <p className="text-xl md:text-2xl text-white font-medium italic mb-6 leading-relaxed relative z-10">
+                "MySiteBook has changed the way we manage our projects. Now I know my profit in real time, not after the project is over."
+              </p>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
+                <div>
+                  <p className="text-white font-bold text-lg">- Rajesh Kumar</p>
+                  <p className="text-white/60 text-sm">Civil Contractor, Coimbatore</p>
+                </div>
+                <div className="text-center md:text-right">
+                  <div className="flex justify-center md:justify-end text-[#F9B233] mb-1">
+                    ★ ★ ★ ★ ★
+                  </div>
+                  <p className="text-white/60 text-xs font-semibold uppercase tracking-wider">Trusted by contractors across India</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. HOW IT WORKS (From User Copy) */}
+        <section id="how-it-works" className="py-24 bg-white border-b border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Everything you need.</h2>
-              <p className="text-xl text-brandtext-secondary">Designed specifically for the reality of the construction site.</p>
+              <h2 className="text-sm font-black text-accent uppercase tracking-widest mb-2">How It Works</h2>
+              <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">Four Simple Steps</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Feature 1 */}
-              <div className="col-span-1 lg:col-span-2 bg-surface rounded-[2rem] p-8 border border-gray-200 shadow-card flex flex-col justify-between overflow-hidden group hover:border-accent hover:shadow-[0_8px_30px_rgb(249,115,22,0.1)] transition-all">
-                <div>
-                  <div className="w-14 h-14 bg-accent-50 rounded-2xl flex items-center justify-center mb-6 text-accent text-2xl">
-                    <FaMicrophone />
-                  </div>
-                  <h3 className="text-2xl font-black text-brandtext mb-2">Voice Entry</h3>
-                  <p className="text-brandtext-secondary font-medium mb-8">Site managers just press a button and speak. Our AI transcribes and logs the expense instantly.</p>
-                </div>
+            <div className="grid md:grid-cols-4 gap-8">
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl font-black mb-6">1</div>
+                <h4 className="text-xl font-bold text-gray-900 mb-3">Create a Project</h4>
+                <p className="text-gray-600 font-medium">Enter project details including project name, client details, and total project value.</p>
               </div>
-
-              {/* Feature 2 */}
-              <div className="col-span-1 bg-surface rounded-[2rem] p-8 border border-gray-200 shadow-card hover:border-success hover:shadow-modal transition-all">
-                <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 text-success text-2xl">
-                  <FaCamera />
-                </div>
-                <h3 className="text-2xl font-black text-brandtext mb-2">Receipt OCR</h3>
-                <p className="text-brandtext-secondary font-medium">Snap a photo. We extract the amount.</p>
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl font-black mb-6">2</div>
+                <h4 className="text-xl font-bold text-gray-900 mb-3">Track Credits</h4>
+                <p className="text-gray-600 font-medium">Record all payments received from your client securely.</p>
               </div>
-
-              {/* Feature 3 */}
-              <div className="col-span-1 bg-surface rounded-[2rem] p-8 border border-gray-200 shadow-card hover:border-warning hover:shadow-modal transition-all">
-                <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 text-warning text-2xl">
-                  <FaSync />
-                </div>
-                <h3 className="text-2xl font-black text-brandtext mb-2">Offline Sync</h3>
-                <p className="text-brandtext-secondary font-medium">Works perfectly even with no signal.</p>
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl font-black mb-6">3</div>
+                <h4 className="text-xl font-bold text-gray-900 mb-3">Log Expenses</h4>
+                <p className="text-gray-600 font-medium">Add expenses as they happen. Labour, materials, transport, rentals, and more.</p>
               </div>
-
-              {/* Feature 4 */}
-              <div className="col-span-1 bg-surface rounded-[2rem] p-8 border border-gray-200 shadow-card hover:border-expense hover:shadow-modal transition-all">
-                <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-6 text-expense text-2xl">
-                  <FaFileInvoiceDollar />
-                </div>
-                <h3 className="text-2xl font-black text-brandtext mb-2">Expense Track</h3>
-                <p className="text-brandtext-secondary font-medium">Categorize every single rupee spent.</p>
-              </div>
-
-              {/* Feature 5 */}
-              <div className="col-span-1 bg-surface rounded-[2rem] p-8 border border-gray-200 shadow-card hover:border-success hover:shadow-modal transition-all">
-                <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 text-success text-2xl">
-                  <FaChartPie />
-                </div>
-                <h3 className="text-2xl font-black text-brandtext mb-2">Income Track</h3>
-                <p className="text-brandtext-secondary font-medium">Log advances from the Principal.</p>
-              </div>
-
-              {/* Feature 6 */}
-              <div className="col-span-1 lg:col-span-2 bg-surface rounded-[2rem] p-8 border border-gray-200 shadow-card hover:border-primary hover:shadow-modal transition-all">
-                <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600 text-2xl">
-                  <FaHistory />
-                </div>
-                <h3 className="text-2xl font-black text-brandtext mb-2">Immutable Audit History</h3>
-                <p className="text-brandtext-secondary font-medium">Every edit is logged. See exactly who changed what, when, and why. Total accountability.</p>
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black mb-6">4</div>
+                <h4 className="text-xl font-bold text-gray-900 mb-3">Monitor Profit</h4>
+                <p className="text-gray-600 font-medium">MySiteBook automatically calculates project profitability and financial performance.</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* SECTION 7: Language Support */}
-        <section className="py-16 md:py-20 relative overflow-hidden bg-slate-900 border-y border-slate-800">
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-slate-900 pointer-events-none"></div>
-          
-          <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
-              <div className="text-center lg:text-left">
-                <p className="text-accent font-bold uppercase tracking-widest text-sm mb-2">Available Now</p>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-4">Built for Indian Contractors.</h2>
-                <p className="text-gray-400 text-lg max-w-lg mx-auto lg:mx-0">Manage your sites, expenses, and ledgers in the language you are most comfortable with.</p>
-              </div>
-              
-              <div className="flex flex-wrap justify-center lg:justify-end gap-4 md:gap-6">
-                <span className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm text-xl font-bold border border-white/10 shadow-lg text-white flex items-center group cursor-default hover:bg-accent/20 hover:border-accent/40 transition-all">
-                  <span className="w-2.5 h-2.5 rounded-full bg-accent mr-3"></span>
-                  English
-                </span>
-                <span className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm text-xl font-bold border border-white/10 shadow-lg text-white flex items-center group cursor-default hover:bg-accent/20 hover:border-accent/40 transition-all">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-400 mr-3"></span>
-                  தமிழ்
-                </span>
-                <span className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm text-xl font-bold border border-white/10 shadow-lg text-white flex items-center group cursor-default hover:bg-accent/20 hover:border-accent/40 transition-all">
-                  <span className="w-2.5 h-2.5 rounded-full bg-green-400 mr-3"></span>
-                  हिन्दी
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 8: Pricing */}
-        <section id="pricing" className="py-24 lg:py-32 bg-brandbg relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* 7. DETAILED FEATURES (From User Copy) */}
+        <section id="features" className="py-24 bg-[#F8FAFC]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-5xl md:text-6xl font-black tracking-tight mb-6">Simple, transparent pricing.</h2>
-              <p className="text-xl text-brandtext-secondary font-medium">Stop paying per-user. Get full access for your entire team with one flat rate after your massive 90-day trial.</p>
+              <h2 className="text-sm font-black text-accent uppercase tracking-widest mb-2">Features</h2>
+              <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Everything You Need To Control Project Finances</h3>
+              <p className="text-lg text-gray-600 font-medium">MySiteBook is designed specifically for contractors who want complete visibility over their project finances.</p>
             </div>
             
-            <div className="max-w-5xl mx-auto bg-surface rounded-[3rem] shadow-modal border border-gray-200 overflow-hidden flex flex-col md:flex-row transform transition-all hover:-translate-y-1 hover:shadow-2xl">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                { title: 'Project Value Tracking', desc: 'Set the total project value and monitor progress from day one.' },
+                { title: 'Credit Tracking', desc: 'Track every payment received from clients and identify outstanding amounts instantly.' },
+                { title: 'Expense Management', desc: 'Record all project expenses including labour, materials, transport, equipment, and miscellaneous costs.' },
+                { title: 'Profit & Loss Dashboard', desc: "Know your project's financial health in real time without waiting until completion." },
+                { title: 'Material Tracking', desc: 'Monitor purchases of cement, steel, sand, bricks, and other construction materials.' },
+                { title: 'Bill Storage', desc: 'Store receipts and invoices securely for future reference.' },
+                { title: 'Multi-Project Management', desc: 'Manage multiple construction projects from a single dashboard.' },
+                { title: 'Team Access', desc: 'Allow site engineers and supervisors to log expenses from anywhere.' },
+                { title: 'Reports & Analytics', desc: 'Generate detailed financial reports and project summaries.' }
+              ].map((f, i) => (
+                <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary mb-4">
+                    <FaCheckCircle />
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">{f.title}</h4>
+                  <p className="text-gray-600 font-medium leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 8. PRICING SECTION (From Image & User Copy) */}
+        <section id="pricing" className="py-24 bg-white border-y border-gray-100">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Simple Pricing. Maximum Value.</h2>
+            <p className="text-xl text-gray-600 font-medium mb-16">Start with a special launch offer. Upgrade only when you need more power.</p>
+            
+            <div className="bg-[#F8FAFC] rounded-[3rem] p-8 md:p-12 border border-gray-200 shadow-xl flex flex-col md:flex-row items-center gap-10">
               
-              {/* Pricing Left Side */}
-              <div className="p-10 md:p-16 md:w-1/2 bg-slate-900 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/40 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
+              {/* Left: Price */}
+              <div className="w-full md:w-1/3 text-left">
+                <span className="bg-primary text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block">PRO PLAN</span>
+                <div className="mb-6">
+                  <span className="text-sm font-bold text-gray-500 uppercase">Only</span><br/>
+                  <span className="text-6xl font-black text-gray-900">₹999</span>
+                  <span className="text-gray-500 font-semibold ml-2">/month</span>
+                </div>
                 
-                <div className="relative z-10">
-                  <div className="inline-block bg-accent/20 text-accent font-bold px-4 py-1.5 rounded-full text-sm uppercase tracking-wider mb-6 border border-accent/30">
-                    Unlimited Plan
+                <ul className="space-y-3 text-sm font-semibold text-gray-700">
+                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Unlimited Projects</li>
+                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Unlimited Expense Entries</li>
+                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Profit & Loss Reports</li>
+                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Material Tracking</li>
+                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Bill Storage</li>
+                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Priority Support</li>
+                </ul>
+              </div>
+
+              {/* Middle: Badges */}
+              <div className="w-full md:w-1/3 flex flex-col gap-6 justify-center items-center border-y md:border-y-0 md:border-x border-gray-200 py-8 md:py-0 md:px-8">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mb-3">
+                    <FaBuilding />
                   </div>
-                  <h3 className="text-4xl font-black mb-4">Everything you need.</h3>
-                  <p className="text-gray-400 mb-8">Full access to Admin, Owner, and Staff PWA portals. No limits on data.</p>
-                  
-                  <div className="mb-8">
-                    <span className="text-gray-500 line-through text-2xl mr-2">₹1,999</span>
-                    <div className="flex items-baseline">
-                      <span className="text-6xl font-black tracking-tighter">₹999</span>
-                      <span className="text-gray-400 ml-2 font-medium">/ month</span>
-                    </div>
-                    <p className="text-accent font-bold mt-3 text-sm flex items-center">
-                      <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                      ₹0 for your first 90 days!
-                    </p>
+                  <span className="font-bold text-gray-900 text-lg">1 Project<br/>FREE Forever</span>
+                </div>
+                <div className="text-2xl font-black text-gray-300">+</div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-2xl mb-3">
+                    <FaPlay />
                   </div>
+                  <span className="font-bold text-gray-900 text-lg">3 Months<br/>FREE Trial</span>
                 </div>
               </div>
 
-              {/* Features Right Side */}
-              <div className="p-10 md:p-14 md:w-1/2 bg-surface">
-                <p className="font-bold text-brandtext uppercase tracking-wider mb-6">What's Included:</p>
-                <ul className="space-y-4 mb-10">
-                  {['Unlimited Construction Sites', 'Unlimited Expense Logging', 'Real-time Material Tracking', 'Staff PWA Portals', 'Immutable Audit Logs', 'Priority Support'].map((feature, i) => (
-                    <li key={i} className="flex items-center text-brandtext-secondary font-medium">
-                      <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4 shrink-0">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                      </div>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+              {/* Right: CTA */}
+              <div className="w-full md:w-1/3 flex flex-col justify-center text-left md:pl-8">
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-6">
+                  <p className="text-sm font-bold text-yellow-800 text-center">Special Launch Offer</p>
+                  <p className="text-xs text-yellow-700 text-center mt-1 font-medium">Get 90 Days FREE Trial on the Pro Plan.</p>
+                </div>
                 
-                <Link href="/register" className="block w-full bg-accent text-white text-center py-4 rounded-xl font-black text-xl hover:bg-accent-600 shadow-[0_8px_20px_rgb(242,101,34,0.3)] transition-all transform hover:-translate-y-1">
-                  Start 90-Day Free Trial
+                <Link href="/register" className="w-full bg-[#F9B233] text-[#0A192F] py-4 rounded-full font-black text-lg hover:bg-[#FFC145] transition-all shadow-lg text-center mb-6">
+                  Start 3 Months Free Trial
                 </Link>
-                <p className="text-center text-xs text-brandtext-secondary mt-4 font-medium">No credit card required for trial.</p>
+                
+                <ul className="space-y-3 text-sm font-semibold text-gray-600">
+                  <li className="flex items-center"><FaCheckCircle className="text-gray-400 mr-2"/> No Credit Card Required</li>
+                  <li className="flex items-center"><FaCheckCircle className="text-gray-400 mr-2"/> Cancel Anytime</li>
+                </ul>
               </div>
 
             </div>
           </div>
         </section>
 
-        {/* SECTION 9: Final CTA */}
-        <section className="py-32 bg-primary relative overflow-hidden">
-          <div className="absolute inset-0 bg-slate-900 pointer-events-none">
-            {/* Subtle geometric dot grid background */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#ffffff 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
-          </div>
-          
-          <div className="max-w-5xl mx-auto px-4 relative z-10 text-center">
-            <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-8 tracking-tight drop-shadow-lg">Ready to take total control?</h2>
-            <p className="text-xl md:text-2xl text-blue-100/90 mb-12 max-w-3xl mx-auto font-light tracking-wide leading-snug">Join top Indian contractors who have eliminated ledger leaks, tracked every material, and stopped profit drain.</p>
+        {/* 9. FAQS (From User Copy) */}
+        <section className="py-24 bg-[#F8FAFC]">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-sm font-black text-accent uppercase tracking-widest mb-2">FAQs</h2>
+              <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Frequently Asked Questions</h3>
+            </div>
             
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
-              <Link href="/register" className="w-full sm:w-auto inline-flex items-center justify-center bg-accent text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 hover:bg-accent-600 transition-all shadow-[0_10px_40px_rgb(242,101,34,0.4)] border border-accent/50">
-                Start Free Trial
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </Link>
-              <Link href="#how-it-works" className="w-full sm:w-auto inline-flex items-center justify-center bg-white/10 text-white px-8 py-4 rounded-full font-medium text-lg hover:bg-white/20 transition-all border border-white/20 backdrop-blur-sm">
-                See How It Works
-              </Link>
+            <div className="space-y-4">
+              {[
+                { q: 'Is MySiteBook suitable for small contractors?', a: 'Yes. It is designed for both individual contractors and growing construction companies.' },
+                { q: 'Do I need accounting knowledge?', a: 'No. MySiteBook is designed to be simple and easy to use.' },
+                { q: 'Can I use it on mobile?', a: 'Yes. It works on mobile, tablet, and desktop devices.' },
+                { q: 'How is profit calculated?', a: 'Profit is calculated using Project Value minus Total Expenses.' },
+                { q: 'Is there a free plan?', a: 'Yes. One project is free forever.' },
+                { q: 'Can I cancel anytime?', a: 'Yes. There are no long-term contracts.' }
+              ].map((faq, i) => (
+                <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all">
+                  <button 
+                    onClick={() => toggleFaq(i)} 
+                    className="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none"
+                  >
+                    <span className="font-bold text-gray-900">{faq.q}</span>
+                    <FaChevronDown className={`text-gray-400 transition-transform ${faqOpen === i ? 'rotate-180' : ''}`} />
+                  </button>
+                  {faqOpen === i && (
+                    <div className="px-6 pb-5 pt-0">
+                      <p className="text-gray-600 font-medium">{faq.a}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
       </main>
 
-      {/* Premium Full-Scale Footer */}
-      <footer className="bg-surface pt-24 pb-12 border-t border-gray-200">
+      {/* 10. FOOTER (From Image & Copy) */}
+      <footer className="bg-[#0A192F] text-white pt-20 pb-8 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+            
+            {/* Branding */}
             <div className="lg:col-span-2">
-              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-12 w-auto mb-6" />
-              <p className="text-brandtext-secondary font-medium max-w-sm mb-8 leading-relaxed">
-                The #1 construction ledger for Indian contractors. Track every rupee, manage every project, and control every site from a single ecosystem.
+              <img src="/mysitebook-logo-transparent.png" alt="MySiteBook" className="h-12 w-auto mb-6 brightness-0 invert" />
+              <p className="text-white/60 font-medium max-w-sm mb-8 leading-relaxed text-sm">
+                The all-in-one finance management solution for construction contractors. Track every rupee, know every profit.
               </p>
-              {/* Socials */}
+              {/* Socials Placeholder */}
               <div className="flex space-x-4">
-                <Link href="#" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-brandtext hover:bg-accent hover:text-white cursor-pointer transition-colors">
-                  <span className="sr-only">X</span>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </Link>
-                <Link href="#" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-brandtext hover:bg-accent hover:text-white cursor-pointer transition-colors">
-                  <span className="sr-only">LinkedIn</span>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                  </svg>
-                </Link>
-                <Link href="#" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-brandtext hover:bg-accent hover:text-white cursor-pointer transition-colors">
-                  <span className="sr-only">Facebook</span>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd"/>
-                  </svg>
-                </Link>
+                {['f', 'ig', 'yt', 'in'].map((s, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10 hover:text-white cursor-pointer transition-colors">
+                    <span className="text-xs uppercase font-bold">{s}</span>
+                  </div>
+                ))}
               </div>
             </div>
             
+            {/* Links Columns */}
             <div>
-              <h4 className="text-brandtext font-black mb-6 uppercase tracking-wider text-sm">Product</h4>
-              <ul className="space-y-4">
-                <li><Link href="#features" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Features</Link></li>
-                <li><Link href="#how-it-works" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">How it Works</Link></li>
-                <li><Link href="#pricing" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Pricing</Link></li>
-
+              <h4 className="font-bold mb-6 text-sm tracking-wider uppercase text-white/90">Product</h4>
+              <ul className="space-y-4 text-sm font-medium text-white/60">
+                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link href="#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
+                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link href="/updates" className="hover:text-white transition-colors">Updates</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-brandtext font-black mb-6 uppercase tracking-wider text-sm">Resources</h4>
-              <ul className="space-y-4">
-                <li><Link href="/help" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Help Center</Link></li>
-                <li><Link href="/tutorials" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Video Tutorials</Link></li>
-                <li><Link href="/blog" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Contractor Blog</Link></li>
-                <li><Link href="/case-studies" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Case Studies</Link></li>
+              <h4 className="font-bold mb-6 text-sm tracking-wider uppercase text-white/90">Resources</h4>
+              <ul className="space-y-4 text-sm font-medium text-white/60">
+                <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link href="/tutorials" className="hover:text-white transition-colors">Video Tutorials</Link></li>
+                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+                <li><Link href="/faqs" className="hover:text-white transition-colors">FAQs</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-brandtext font-black mb-6 uppercase tracking-wider text-sm">Company</h4>
-              <ul className="space-y-4">
-                <li><Link href="/about" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Terms of Service</Link></li>
+              <h4 className="font-bold mb-6 text-sm tracking-wider uppercase text-white/90">Company</h4>
+              <ul className="space-y-4 text-sm font-medium text-white/60">
+                <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
               </ul>
             </div>
+
           </div>
           
-          <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-brandtext-secondary font-medium text-sm mb-4 md:mb-0">© {new Date().getFullYear()} MySiteBook Technologies. All rights reserved.</p>
-            <div className="flex items-center space-x-2 text-brandtext-secondary text-sm font-medium">
-              <span>Made with</span>
-              <span className="text-expense">❤</span>
-              <span>in India</span>
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-white/40 font-medium text-xs">
+              © {new Date().getFullYear()} MySiteBook Technologies Pvt. Ltd. All rights reserved.
+            </p>
+            <div className="flex flex-col md:flex-row md:items-center gap-4 text-white/60 text-xs font-medium">
+              <span className="flex items-center"><FaMobileAlt className="mr-2" /> +91 12345 67890</span>
+              <span className="hidden md:inline">|</span>
+              <span className="flex items-center">support@mysitebook.com</span>
+              <span className="hidden md:inline">|</span>
+              <span className="flex items-center">Made with <span className="text-red-500 mx-1">❤</span> in India</span>
             </div>
           </div>
+
         </div>
       </footer>
     </div>
