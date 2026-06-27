@@ -19,3 +19,37 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes shine-sweep {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  20% { transform: translateX(300%) skewX(-20deg); }
+  100% { transform: translateX(300%) skewX(-20deg); }
+}
+
+.logo-shine-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: hidden; /* Fallback */
+}
+
+.logo-shine-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: translateX(-150%) skewX(-20deg);
+  animation: shine-sweep 4s infinite ease-in-out;
+  pointer-events: none;
+  /* Make the shine only visible on the non-transparent parts of the image */
+  -webkit-mask-image: url('/mysitebook-horizontal-updated.png');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: left center;
+  mask-image: url('/mysitebook-horizontal-updated.png');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: left center;
+}

@@ -8,54 +8,60 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Master Prompt Design Tokens
+        // Dark Navy & Gold Theme
         primary: {
-          DEFAULT: '#153E75',
-          50: '#E6EBF2',
-          100: '#CDD7E6',
-          200: '#9AB0CC',
-          300: '#6889B3',
-          400: '#356199',
-          500: '#153E75',
-          600: '#11325E',
-          700: '#0C2546',
-          800: '#08192F',
-          900: '#040C17',
+          DEFAULT: '#0A1121', // Dark Navy from template
+          50: '#F0F3F7',
+          100: '#DDE3EB',
+          200: '#B6C4D4',
+          300: '#8FA3BA',
+          400: '#6882A0',
+          500: '#416186',
+          600: '#2E4765',
+          700: '#1D3046',
+          800: '#0F1A28',
+          900: '#0A1121',
         },
-        success: '#16A34A',
-        expense: '#DC2626',
+        success: '#10B981', // Emerald green
+        expense: '#EF4444', // Red
         warning: '#F59E0B',
-        brandbg: '#F8FAFC',
+        brandbg: '#0A1121',
         surface: '#FFFFFF',
         brandtext: {
-          DEFAULT: '#111827',
-          secondary: '#6B7280',
+          DEFAULT: '#334155', // Slate 700 for light bg
+          secondary: '#64748B', // Slate 500
+          light: '#94A3B8', // Slate 400
+          inverse: '#FFFFFF', // White text on dark bg
+          'inverse-muted': '#CBD5E1', // Slate 300 on dark bg
         },
-        // Accent/Orange kept for fallback or specific highlights, but mapped to warning/success generally
         accent: {
-          DEFAULT: '#F97316',
-          50: '#FFF1E8',
-          100: '#FFDDC2',
-          200: '#FFB885',
-          300: '#FF9247',
-          400: '#FF6D0A',
-          500: '#F97316',
-          600: '#CC5800',
-          700: '#994200',
+          DEFAULT: '#F4B63A', // Golden Yellow
+          50: '#FEF8EB',
+          100: '#FDF1D7',
+          200: '#FBE3AF',
+          300: '#F9D487',
+          400: '#F6C55F',
+          500: '#F4B63A',
+          600: '#C3922E',
+          700: '#926D23',
+          800: '#624917',
+          900: '#31240C',
         }
       },
       boxShadow: {
-        'card': '0 2px 8px rgba(0,0,0,.08)',
-        'modal': '0 8px 24px rgba(0,0,0,.12)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.05)',
+        'modal': '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+        'floating': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       },
       borderRadius: {
-        'sm': '8px',
-        'md': '12px',
-        'lg': '16px',
-        'xl': '24px',
+        'sm': '4px',
+        'md': '8px',
+        'lg': '12px',
+        'xl': '16px',
+        '2xl': '24px',
       },
       fontFamily: {
-        sans: ['var(--font-jakarta)', 'sans-serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
       },
     },
   },

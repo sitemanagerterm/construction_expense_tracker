@@ -1,367 +1,354 @@
 "use client";
 
 import React, { useState } from 'react';
-import Image from "next/image";
 import Link from "next/link";
+import { motion, Variants } from "framer-motion";
 import { 
-  FaPlay, 
-  FaLock,
-  FaCheckCircle,
-  FaBuilding,
-  FaHardHat,
-  FaChartPie,
-  FaFileInvoiceDollar,
-  FaSync,
-  FaHistory,
-  FaUserFriends,
-  FaMobileAlt,
-  FaChevronDown
-} from "react-icons/fa";
+  Play, CheckCircle2, Shield, BarChart3, FileText, 
+  Layers, CreditCard, ChevronDown, ArrowRight, Lock,
+  Gift, XCircle, Users, Building2, Receipt, IndianRupee,
+  Phone, Mail, MapPin, Globe, HardHat, Wallet, Home, FolderOpen, Settings, Check
+} from "lucide-react";
+import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaRegEnvelope, FaHardHat } from "react-icons/fa";
 
-export default function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
+// Shared Animation Variants
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
 
-  const toggleFaq = (index: number) => {
-    if (faqOpen === index) setFaqOpen(null);
-    else setFaqOpen(index);
-  };
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
 
+export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-white font-sans text-[#111827]">
+    <div className="min-h-screen bg-primary text-brandtext-inverse font-sans overflow-x-hidden">
       
-      {/* 1. HEADER */}
-      <header className="fixed top-0 w-full z-50 bg-[#0A192F] border-b border-white/10 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 1. Navbar */}
+      <nav className="fixed top-0 w-full z-50 bg-primary/95 backdrop-blur border-b border-gray-800">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
           <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center shrink-0">
-              <img src="/mysitebook-logo-transparent.png" alt="MySiteBook" className="h-10 w-auto object-contain" />
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-12 w-auto" />
             </Link>
             
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex space-x-8 items-center text-white/90">
-              <Link href="#features" className="text-sm font-semibold hover:text-white transition-colors">Features</Link>
-              <Link href="#how-it-works" className="text-sm font-semibold hover:text-white transition-colors">How It Works</Link>
-              <Link href="#pricing" className="text-sm font-semibold hover:text-white transition-colors">Pricing</Link>
-              <div className="relative group">
-                <button className="flex items-center space-x-1 text-sm font-semibold hover:text-white transition-colors">
-                  <span>Resources</span>
-                  <FaChevronDown className="w-3 h-3 opacity-70" />
-                </button>
-                {/* Simple dropdown hover (CSS only for now) */}
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 hidden group-hover:block border border-gray-100">
-                  <Link href="/blog" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Blog</Link>
-                  <Link href="/help" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Help Center</Link>
-                </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="#features" className="text-sm font-medium text-white hover:text-accent transition-colors">Features</Link>
+              <Link href="#how-it-works" className="text-sm font-medium text-white hover:text-accent transition-colors">How It Works</Link>
+              <Link href="#pricing" className="text-sm font-medium text-white hover:text-accent transition-colors">Pricing</Link>
+              <div className="flex items-center space-x-1 cursor-pointer group">
+                <span className="text-sm font-medium text-white group-hover:text-accent transition-colors">Resources</span>
+                <ChevronDown className="w-4 h-4 text-white group-hover:text-accent transition-colors" />
               </div>
-              <Link href="/about" className="text-sm font-semibold hover:text-white transition-colors">About Us</Link>
-            </nav>
+              <Link href="#about" className="text-sm font-medium text-white hover:text-accent transition-colors">About Us</Link>
+            </div>
             
-            {/* CTA Buttons */}
-            <div className="hidden lg:flex items-center space-x-4 shrink-0">
-              <Link href="/login" className="flex items-center text-sm font-semibold text-[#F97316] border border-[#F97316] px-5 py-2 rounded-full hover:bg-[#F97316]/10 transition-all">
-                <FaLock className="mr-2 w-3 h-3" /> Log In
+            <div className="flex items-center space-x-4">
+              <Link href="/login" className="hidden md:flex items-center justify-center border border-accent text-accent hover:bg-accent/10 px-6 py-2 rounded-lg text-sm font-medium transition-all">
+                <Lock className="w-4 h-4 mr-2" /> Log In
               </Link>
-              <Link href="/register" className="bg-[#F9B233] text-[#0A192F] px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#FFC145] transition-all shadow-lg">
+              <Link href="/register" className="bg-accent hover:bg-accent-600 text-primary px-6 py-2 rounded-lg text-sm font-bold transition-all transform hover:scale-105">
                 Start Free Trial
               </Link>
             </div>
-
-            {/* Mobile menu button */}
-            <div className="lg:hidden">
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-2">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-                </svg>
-              </button>
-            </div>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Navigation Dropdown */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#0A192F] border-t border-white/10 pb-4">
-            <div className="px-4 space-y-2 pt-2">
-              <Link href="#features" className="block text-white/90 font-semibold py-2">Features</Link>
-              <Link href="#how-it-works" className="block text-white/90 font-semibold py-2">How It Works</Link>
-              <Link href="#pricing" className="block text-white/90 font-semibold py-2">Pricing</Link>
-              <Link href="/login" className="block text-[#F97316] font-semibold py-2">Log In</Link>
-              <Link href="/register" className="block text-[#F9B233] font-semibold py-2">Start Free Trial</Link>
+      <main className="pt-20">
+        
+        {/* 2. Hero Section */}
+        <section className="relative pt-4 pb-12 lg:pt-8 lg:pb-16 overflow-hidden bg-primary min-h-[calc(100vh-80px)] flex items-center">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              
+              <motion.div 
+                initial="hidden" animate="visible" variants={staggerContainer}
+                className="max-w-2xl w-full"
+              >
+
+                <motion.div variants={fadeInUp} className="inline-flex items-center space-x-2 border border-gray-600 rounded-full px-3 py-1.5 mb-4 lg:mt-0">
+                  <FaHardHat className="text-[#F9B233] w-4 h-4" />
+                  <span className="text-[clamp(0.625rem,1vw,0.75rem)] font-semibold text-accent uppercase tracking-wider">BUILT FOR INDIAN CONTRACTORS</span>
+                </motion.div>
+                
+                <motion.h1 variants={fadeInUp} className="text-[clamp(2.25rem,3.8vw,4rem)] font-bold text-white leading-[1.1] mb-4 tracking-tight">
+                  Complete Control of<br className="hidden sm:block" />
+                  <span className="sm:hidden"> </span><span className="sm:whitespace-nowrap">Your <span className="text-accent">Project Finances</span></span>
+                </motion.h1>
+                
+                <motion.p variants={fadeInUp} className="text-[clamp(1rem,1.5vw,1.125rem)] text-gray-300 mb-6 max-w-lg">
+                  Track project value, credits, expenses and<br className="hidden sm:block" /><span className="sm:hidden"> </span>know your profit or loss in real time.
+                </motion.p>
+                
+                {/* 4 Feature Icons */}
+                <motion.div variants={fadeInUp} className="mb-6 max-w-[24rem]">
+                  <div className="grid grid-cols-2 gap-6 md:flex md:items-center md:justify-between w-full md:gap-0">
+                    
+                    <div className="flex flex-col items-center md:items-start lg:items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-[clamp(1.25rem,2vw,1.5rem)] h-[clamp(1.25rem,2vw,1.5rem)] text-white">
+                        <rect x="2" y="4" width="20" height="14" rx="2" />
+                        <path d="M8 22h8" />
+                        <path d="M12 18v4" />
+                        <path d="M6 14l4-4 3 3 5-5" />
+                        <path d="M14 8h4v4" />
+                      </svg>
+                      <span className="text-[clamp(0.7rem,1.2vw,0.8125rem)] font-normal text-white text-center md:text-left lg:text-center leading-snug">Know Profit<br/>Instantly</span>
+                    </div>
+
+                    <div className="hidden md:block w-[1px] h-10 bg-gray-700/60" />
+
+                    <div className="flex flex-col items-center md:items-start lg:items-center gap-2">
+                      <FileText className="w-[clamp(1.25rem,2vw,1.5rem)] h-[clamp(1.25rem,2vw,1.5rem)] text-white" strokeWidth={1.5} />
+                      <span className="text-[clamp(0.7rem,1.2vw,0.8125rem)] font-normal text-white text-center md:text-left lg:text-center leading-snug">Track Every<br/>Expense</span>
+                    </div>
+
+                    <div className="hidden md:block w-[1px] h-10 bg-gray-700/60" />
+
+                    <div className="flex flex-col items-center md:items-start lg:items-center gap-2">
+                      <Layers className="w-[clamp(1.25rem,2vw,1.5rem)] h-[clamp(1.25rem,2vw,1.5rem)] text-white" strokeWidth={1.5} />
+                      <span className="text-[clamp(0.7rem,1.2vw,0.8125rem)] font-normal text-white text-center md:text-left lg:text-center leading-snug">Monitor<br/>Materials</span>
+                    </div>
+
+                    <div className="hidden md:block w-[1px] h-10 bg-gray-700/60" />
+
+                    <div className="flex flex-col items-center md:items-start lg:items-center gap-2">
+                      <Wallet className="w-[clamp(1.25rem,2vw,1.5rem)] h-[clamp(1.25rem,2vw,1.5rem)] text-white" strokeWidth={1.5} />
+                      <span className="text-[clamp(0.7rem,1.2vw,0.8125rem)] font-normal text-white text-center md:text-left lg:text-center leading-snug">Manage<br/>Payments</span>
+                    </div>
+
+                  </div>
+                </motion.div>
+                
+                {/* CTA Buttons */}
+                <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+                  <Link href="/register" className="flex justify-center items-center bg-accent hover:bg-accent-600 text-primary px-[clamp(1.5rem,2.5vw,2rem)] py-[clamp(0.75rem,1.2vw,0.875rem)] rounded-lg text-[clamp(0.875rem,1.5vw,1rem)] font-bold transition-all w-full sm:w-auto">
+                    Start 3 Months Free Trial <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+                  </Link>
+                  <button className="flex justify-center items-center border border-gray-600 hover:bg-white/10 text-white px-[clamp(1.5rem,2.5vw,2rem)] py-[clamp(0.75rem,1.2vw,0.875rem)] rounded-lg text-[clamp(0.875rem,1.5vw,1rem)] font-medium transition-all w-full sm:w-auto">
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    Watch Demo
+                  </button>
+                </motion.div>
+                
+                {/* Trust Badges */}
+                <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:flex-wrap items-center sm:items-start gap-4 sm:gap-6 text-[clamp(0.6875rem,1.2vw,0.75rem)] text-gray-300 font-medium pb-8 lg:pb-0">
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-4 h-4 text-white" />
+                    <span>1 Project FREE Forever</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-white" />
+                    <span>No Credit Card Required</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <XCircle className="w-4 h-4 text-white" />
+                    <span>Cancel Anytime</span>
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              {/* Image-Based Mockup */}
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
+                className="relative w-full max-w-[1000px] mx-auto flex items-center justify-center lg:justify-end mt-12 lg:mt-0 lg:-mr-12 xl:-mr-24"
+              >
+                <img src="/dashboard-mockup.png" alt="MySiteBook Dashboard Mockup" className="w-full h-auto drop-shadow-2xl scale-[1.05] sm:scale-[1.1] md:scale-[1.15] lg:scale-[1.3] origin-center lg:origin-right hover:scale-[1.07] sm:hover:scale-[1.12] md:hover:scale-[1.17] lg:hover:scale-[1.32] transition-transform duration-700" />
+              </motion.div>
+              
             </div>
           </div>
-        )}
-      </header>
+        </section>
 
-      <main className="flex-grow pt-20">
-        
-        {/* 2. HERO SECTION */}
-        <section className="relative bg-[#0A192F] text-white pt-16 pb-32 lg:pt-24 lg:pb-40 overflow-hidden">
-          {/* Background Glow */}
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#F9B233]/5 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/4"></div>
+        {/* 3. Dark Stats Banner */}
+        <section className="bg-gray-50 pt-8 pb-4 relative z-20">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+            <div className="bg-[#050C1B] rounded-[1.25rem] py-6 md:py-7 px-4 md:px-10 shadow-2xl border border-gray-800/60">
+              <div className="grid grid-cols-2 gap-y-8 gap-x-4 md:flex md:flex-row md:items-center md:justify-between w-full">
+                
+                {/* Item 1 */}
+                <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start">
+                  <Users className="w-7 h-7 md:w-[38px] md:h-[38px] text-accent" strokeWidth={1.5} />
+                  <div className="flex flex-col text-left">
+                    <span className="text-xl md:text-[1.75rem] font-bold text-accent leading-none tracking-tight">5,000+</span>
+                    <span className="text-[9px] md:text-xs text-gray-200 font-normal tracking-wide mt-1 md:mt-1.5">Contractors Trust Us</span>
+                  </div>
+                </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-            
-            {/* Left Content */}
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center space-x-2 border border-white/20 bg-white/5 px-4 py-1.5 rounded-full mb-6">
-                <FaHardHat className="text-[#F9B233] w-4 h-4" />
-                <span className="text-xs font-bold text-[#F9B233] uppercase tracking-wider">Built For Indian Contractors</span>
-              </div>
-              
-              <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-[1.1] text-white">
-                Complete Control of <br />
-                Your <span className="text-[#F9B233]">Project Finances</span>
-              </h1>
-              
-              <p className="text-lg lg:text-xl text-white/80 font-light tracking-wide mb-10 leading-relaxed">
-                Track project value, credits, expenses and know your profit or loss in real time.
-              </p>
+                <div className="hidden md:block w-px h-10 bg-gray-700/60" />
 
-              {/* 4 Icons Row */}
-              <div className="grid grid-cols-4 gap-4 mb-10 border-b border-white/10 pb-8">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
-                    <FaChartPie className="w-5 h-5 text-white" />
+                {/* Item 2 */}
+                <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start">
+                  <Building2 className="w-7 h-7 md:w-[38px] md:h-[38px] text-accent" strokeWidth={1.5} />
+                  <div className="flex flex-col text-left">
+                    <span className="text-xl md:text-[1.75rem] font-bold text-accent leading-none tracking-tight">25,000+</span>
+                    <span className="text-[9px] md:text-xs text-gray-200 font-normal tracking-wide mt-1 md:mt-1.5">Projects Managed</span>
                   </div>
-                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Know Profit<br/>Instantly</span>
                 </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
-                    <FaFileInvoiceDollar className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Track Every<br/>Expense</span>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
-                    <FaBuilding className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Monitor<br/>Materials</span>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl mb-3">
-                    <FaSync className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wide">Manage<br/>Payments</span>
-                </div>
-              </div>
-              
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-                <Link href="/register" className="w-full sm:w-auto bg-[#F9B233] text-[#0A192F] px-8 py-3.5 rounded-full font-extrabold text-base hover:bg-[#FFC145] transition-all shadow-lg flex items-center justify-center">
-                  Start 3 Months Free Trial &rarr;
-                </Link>
-                <Link href="#how-it-works" className="w-full sm:w-auto bg-transparent border border-white/30 text-white hover:bg-white/5 px-8 py-3.5 rounded-full font-semibold text-base transition-all flex items-center justify-center">
-                  <FaPlay className="mr-2 w-3 h-3" /> Watch Demo
-                </Link>
-              </div>
 
-              {/* Trust Badges */}
-              <div className="flex flex-wrap items-center gap-6 text-sm text-white/70 font-medium">
-                <span className="flex items-center"><FaCheckCircle className="text-white/50 mr-2" /> 1 Project FREE Forever</span>
-                <span className="flex items-center"><FaCheckCircle className="text-white/50 mr-2" /> No Credit Card Required</span>
-                <span className="flex items-center"><FaCheckCircle className="text-white/50 mr-2" /> Cancel Anytime</span>
+                <div className="hidden md:block w-px h-10 bg-gray-700/60" />
+
+                {/* Item 3 */}
+                <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start">
+                  <FileText className="w-7 h-7 md:w-[38px] md:h-[38px] text-accent" strokeWidth={1.5} />
+                  <div className="flex flex-col text-left">
+                    <span className="text-xl md:text-[1.75rem] font-bold text-accent leading-none tracking-tight">10L+</span>
+                    <span className="text-[9px] md:text-xs text-gray-200 font-normal tracking-wide mt-1 md:mt-1.5">Bills Stored</span>
+                  </div>
+                </div>
+
+                <div className="hidden md:block w-px h-10 bg-gray-700/60" />
+
+                {/* Item 4 */}
+                <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start">
+                  <div className="w-7 h-7 md:w-[38px] md:h-[38px] rounded-full border-[1.5px] border-accent text-accent flex items-center justify-center text-base md:text-xl font-medium">₹</div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xl md:text-[1.75rem] font-bold text-accent leading-none tracking-tight">₹500Cr+</span>
+                    <span className="text-[9px] md:text-xs text-gray-200 font-normal tracking-wide mt-1 md:mt-1.5">Expenses Tracked</span>
+                  </div>
+                </div>
+
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Right Content (Mockups) */}
-            <div className="relative mt-12 lg:mt-0 flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-lg lg:max-w-xl">
-                {/* Laptop Mockup Placeholder */}
-                <div className="bg-[#0f284e] border-4 border-gray-800 rounded-t-2xl shadow-2xl overflow-hidden aspect-[16/10] relative flex items-center justify-center">
-                  <img src="/dashboard-mockup.png" alt="Dashboard" className="w-full h-full object-cover opacity-80" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F] to-transparent opacity-40"></div>
+        {/* 4. Light 3-Column Features Section */}
+        <section className="pt-6 pb-20 md:pt-10 md:pb-24 bg-gray-50 text-brandtext">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+            <div className="grid lg:grid-cols-3 gap-8">
+              
+              {/* Column 1: Track Every Rupee */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden">
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-800">Track Every Rupee</h3>
+                  <p className="text-xs text-gray-500 font-medium">Never lose money again</p>
                 </div>
-                {/* Laptop Base */}
-                <div className="w-full h-4 bg-gray-400 rounded-b-xl"></div>
-                <div className="w-[120%] -ml-[10%] h-3 bg-gray-300 rounded-b-full shadow-xl"></div>
-
-                {/* Mobile Mockup Placeholder Overlay */}
-                <div className="absolute -bottom-10 -left-6 w-32 md:w-40 bg-white border-4 border-gray-900 rounded-[2rem] shadow-2xl aspect-[9/19] overflow-hidden z-20">
-                  <div className="w-full h-full bg-gray-100 flex flex-col">
-                    <div className="bg-primary text-white p-3 text-xs font-bold text-center">MySiteBook</div>
-                    <div className="p-3">
-                      <div className="text-[10px] text-gray-500 font-bold uppercase">Current Profit</div>
-                      <div className="text-sm font-black text-green-600">₹1,80,000</div>
-                      <div className="mt-3 space-y-2">
-                        <div className="bg-white rounded shadow-sm p-2 text-[10px] flex justify-between"><span className="text-gray-500">Value</span><span className="font-bold text-gray-900">₹15,00,000</span></div>
-                        <div className="bg-white rounded shadow-sm p-2 text-[10px] flex justify-between"><span className="text-gray-500">Credits</span><span className="font-bold text-gray-900">₹10,00,000</span></div>
-                        <div className="bg-white rounded shadow-sm p-2 text-[10px] flex justify-between"><span className="text-gray-500">Expenses</span><span className="font-bold text-gray-900">₹8,20,000</span></div>
+                
+                <div className="relative flex-1 flex flex-col justify-start max-w-[280px] mx-auto w-full pt-2">
+                  {/* Timeline Line */}
+                  <div className="absolute left-6 top-4 bottom-14 w-px border-l border-dashed border-gray-300 z-0"></div>
+                  
+                  <div className="space-y-4 relative z-10 w-full">
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-12 rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0">
+                        <Building2 className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="w-4 border-t border-dashed border-gray-300 relative"><div className="absolute -right-[2px] -top-[3px] border-solid border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[4px] border-l-gray-300"></div></div>
+                      <div className="flex-1 flex flex-col justify-center pb-1">
+                        <div className="text-[10px] font-semibold text-gray-500">Project Value</div>
+                        <div className="text-base font-bold text-gray-800 leading-tight">₹15,00,000</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-12 rounded-full bg-[#F0FDF4] flex items-center justify-center shrink-0">
+                         <CreditCard className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div className="w-4 border-t border-dashed border-gray-300 relative"><div className="absolute -right-[2px] -top-[3px] border-solid border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[4px] border-l-gray-300"></div></div>
+                      <div className="flex-1 flex flex-col justify-center pb-1">
+                        <div className="text-[10px] font-semibold text-gray-500">Credits Received</div>
+                        <div className="text-base font-bold text-gray-800 leading-tight">₹10,00,000</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-12 rounded-full bg-[#FEF2F2] flex items-center justify-center shrink-0">
+                        <Receipt className="w-5 h-5 text-red-500" />
+                      </div>
+                      <div className="w-4 border-t border-dashed border-gray-300 relative"><div className="absolute -right-[2px] -top-[3px] border-solid border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[4px] border-l-gray-300"></div></div>
+                      <div className="flex-1 flex flex-col justify-center pb-1">
+                        <div className="text-[10px] font-semibold text-gray-500">Total Expenses</div>
+                        <div className="text-base font-bold text-gray-800 leading-tight">₹8,20,000</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 bg-[#F0FDF4] p-2 -mx-2 rounded-xl">
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center shrink-0 shadow-sm">
+                        <span className="text-green-600 font-bold text-lg">₹</span>
+                      </div>
+                      <div className="w-4 border-t border-dashed border-green-300 relative"><div className="absolute -right-[2px] -top-[3px] border-solid border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[4px] border-l-green-300"></div></div>
+                      <div className="flex-1 flex flex-col justify-center">
+                        <div className="text-[10px] font-semibold text-gray-800">Current Profit</div>
+                        <div className="text-base font-bold text-green-600 leading-tight">₹1,80,000</div>
+                        <div className="text-[9px] font-medium text-gray-500">12% of Project Value</div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-          </div>
-        </section>
-
-        {/* 3. STATS BAR */}
-        <section className="bg-[#051020] text-white py-10 border-y border-white/5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
-              <div className="flex items-center justify-center space-x-4 px-4">
-                <FaUserFriends className="w-10 h-10 text-[#F9B233]" />
-                <div>
-                  <div className="text-2xl font-black">5,000+</div>
-                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Contractors Trust Us</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center space-x-4 px-4">
-                <FaBuilding className="w-10 h-10 text-[#F9B233]" />
-                <div>
-                  <div className="text-2xl font-black">25,000+</div>
-                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Projects Managed</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center space-x-4 px-4">
-                <FaFileInvoiceDollar className="w-10 h-10 text-[#F9B233]" />
-                <div>
-                  <div className="text-2xl font-black">10L+</div>
-                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Bills Stored</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center space-x-4 px-4">
-                <div className="w-10 h-10 rounded-full border-2 border-[#F9B233] flex items-center justify-center text-[#F9B233] font-bold text-xl">₹</div>
-                <div>
-                  <div className="text-2xl font-black">₹500Cr+</div>
-                  <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Expenses Tracked</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4. VISUAL CARDS SECTION (From Image) */}
-        <section className="bg-[#F8FAFC] py-20 lg:py-28">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-3 gap-8">
-              
-              {/* Card 1: Track Every Rupee */}
-              <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col">
-                <div className="text-center mb-8">
-                  <h3 className="text-xl font-bold text-gray-900">Track Every Rupee</h3>
-                  <p className="text-sm text-gray-500 font-medium">Never lose money again</p>
+              {/* Column 2: Material Tracking */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden">
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-800">Material Tracking</h3>
+                  <p className="text-xs text-gray-500 font-medium">Know what you buy, use and have</p>
                 </div>
                 
-                <div className="relative pl-8 space-y-8 flex-grow">
-                  {/* Vertical Line */}
-                  <div className="absolute left-[15px] top-4 bottom-4 w-px bg-gray-200"></div>
-                  
-                  {/* Item 1 */}
-                  <div className="relative">
-                    <div className="absolute -left-[35px] top-1 w-10 h-10 bg-blue-50 border-4 border-white rounded-full flex items-center justify-center z-10 text-blue-500 shadow-sm"><FaBuilding className="w-4 h-4"/></div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase">Project Value</p>
-                      <p className="text-2xl font-black text-gray-900">₹15,00,000</p>
-                    </div>
-                  </div>
-                  
-                  {/* Item 2 */}
-                  <div className="relative">
-                    <div className="absolute -left-[35px] top-1 w-10 h-10 bg-green-50 border-4 border-white rounded-full flex items-center justify-center z-10 text-green-500 shadow-sm"><FaCheckCircle className="w-4 h-4"/></div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase">Credits Received</p>
-                      <p className="text-2xl font-black text-gray-900">₹10,00,000</p>
-                    </div>
-                  </div>
-                  
-                  {/* Item 3 */}
-                  <div className="relative">
-                    <div className="absolute -left-[35px] top-1 w-10 h-10 bg-red-50 border-4 border-white rounded-full flex items-center justify-center z-10 text-red-500 shadow-sm"><FaFileInvoiceDollar className="w-4 h-4"/></div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase">Total Expenses</p>
-                      <p className="text-2xl font-black text-gray-900">₹8,20,000</p>
-                    </div>
-                  </div>
-                  
-                  {/* Item 4 */}
-                  <div className="relative pt-4 border-t border-gray-100">
-                    <div className="absolute -left-[35px] top-5 w-10 h-10 bg-green-500 border-4 border-white rounded-full flex items-center justify-center z-10 text-white shadow-sm font-bold">₹</div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase">Current Profit</p>
-                      <p className="text-3xl font-black text-green-600">₹1,80,000</p>
-                      <p className="text-xs font-medium text-gray-500 mt-1">12% of Project Value</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2: Material Tracking */}
-              <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col">
-                <div className="text-center mb-8">
-                  <h3 className="text-xl font-bold text-gray-900">Material Tracking</h3>
-                  <p className="text-sm text-gray-500 font-medium">Know what you buy, use and have</p>
+                <div className="flex-1 space-y-1 mb-6 flex flex-col justify-center px-4">
+                  {[
+                    { n: "Cement", q: "250 Bags", icon: "🏢" },
+                    { n: "Steel", q: "4.2 Ton", icon: "🏗️" },
+                    { n: "Sand", q: "18 Loads", icon: "🏜️" },
+                    { n: "Bricks", q: "12,500 Nos", icon: "🧱" },
+                    { n: "Jalli", q: "12 Loads", icon: "🪨" },
+                  ].map((mat, i) => (
+                     <div key={i} className="flex justify-between items-center py-2.5">
+                       <div className="flex items-center gap-4">
+                         <div className="w-6 h-6 flex items-center justify-center text-lg">{mat.icon}</div>
+                         <span className="font-bold text-xs text-gray-800">{mat.n}</span>
+                       </div>
+                       <span className="font-bold text-xs text-gray-700">{mat.q}</span>
+                     </div>
+                  ))}
                 </div>
                 
-                <div className="space-y-6 flex-grow">
-                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                    <div className="flex items-center"><div className="w-8 h-8 bg-[#D2B48C] rounded flex items-center justify-center mr-3 text-white font-bold text-xs">C</div> <span className="font-bold text-gray-800 text-sm">Cement</span></div>
-                    <span className="font-bold text-gray-600 text-sm">250 Bags</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                    <div className="flex items-center"><div className="w-8 h-8 bg-gray-700 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">S</div> <span className="font-bold text-gray-800 text-sm">Steel</span></div>
-                    <span className="font-bold text-gray-600 text-sm">4.2 Ton</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                    <div className="flex items-center"><div className="w-8 h-8 bg-yellow-600 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">S</div> <span className="font-bold text-gray-800 text-sm">Sand</span></div>
-                    <span className="font-bold text-gray-600 text-sm">18 Loads</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                    <div className="flex items-center"><div className="w-8 h-8 bg-red-700 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">B</div> <span className="font-bold text-gray-800 text-sm">Bricks</span></div>
-                    <span className="font-bold text-gray-600 text-sm">12,500 Nos</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                    <div className="flex items-center"><div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center mr-3 text-white font-bold text-xs">J</div> <span className="font-bold text-gray-800 text-sm">Jalli</span></div>
-                    <span className="font-bold text-gray-600 text-sm">12 Loads</span>
-                  </div>
-                </div>
-                
-                <button className="mt-6 w-full py-3 rounded-xl font-bold text-[#F9B233] bg-[#F9B233]/10 hover:bg-[#F9B233]/20 transition-colors text-sm">
+                <button className="w-full py-2.5 border border-[#D97706]/30 text-[#D97706] bg-[#D97706]/5 rounded-lg text-xs font-bold hover:bg-[#D97706]/10 transition-colors mt-auto">
                   View All Materials
                 </button>
               </div>
 
-              {/* Card 3: Expense Breakdown */}
-              <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col">
-                <div className="text-center mb-8">
-                  <h3 className="text-xl font-bold text-gray-900">Expense Breakdown</h3>
-                  <p className="text-sm text-gray-500 font-medium">Where your money is going</p>
+              {/* Column 3: Expense Breakdown */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden">
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-800">Expense Breakdown</h3>
+                  <p className="text-xs text-gray-500 font-medium">Where your money is going</p>
                 </div>
                 
-                <div className="flex-grow flex flex-col items-center justify-center pb-6">
-                  {/* CSS Donut Chart representation */}
-                  <div className="relative w-40 h-40 rounded-full flex items-center justify-center" 
-                       style={{ background: 'conic-gradient(#153E75 0% 60%, #16A34A 60% 85%, #F59E0B 85% 95%, #E5E7EB 95% 100%)' }}>
-                    <div className="w-28 h-28 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
-                      <span className="text-xl font-black text-gray-900">₹8,20,000</span>
-                      <span className="text-[9px] text-gray-500 font-bold uppercase">Total Expenses</span>
+                <div className="flex-1 flex flex-col xl:flex-row items-center justify-center gap-6 w-full mt-2 mb-6">
+                  {/* Chart */}
+                  <div className="relative w-36 h-36 shrink-0 rounded-full flex items-center justify-center shadow-sm"
+                       style={{ background: 'conic-gradient(#3B82F6 0% 60%, #22C55E 60% 85%, #F59E0B 85% 95%, #A855F7 95% 100%)' }}>
+                    <div className="w-24 h-24 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                      <span className="font-bold text-sm text-gray-800">₹8,20,000</span>
+                      <span className="text-[7px] text-gray-500 font-bold uppercase mt-0.5">Total Expenses</span>
                     </div>
                   </div>
                   
-                  {/* Chart Legend */}
-                  <div className="w-full mt-8 space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#153E75] mr-2"></span><span className="text-sm font-bold text-gray-700">Materials</span></div>
-                      <div className="text-right"><span className="text-sm font-black text-gray-900">60%</span><div className="text-[10px] text-gray-400 font-medium">₹4,92,000</div></div>
+                  {/* Legend */}
+                  <div className="flex-1 space-y-4 w-full px-2 xl:px-0">
+                    <div className="flex justify-between items-center w-full">
+                      <span className="flex items-center gap-2 font-semibold text-gray-700 text-xs"><div className="w-2 h-2 rounded-full bg-[#3B82F6]"></div> Materials</span>
+                      <div className="text-right flex flex-col leading-tight"><span className="font-bold text-gray-800 text-xs">60%</span><span className="text-[9px] text-gray-400 font-medium">₹4,92,000</span></div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#16A34A] mr-2"></span><span className="text-sm font-bold text-gray-700">Labour</span></div>
-                      <div className="text-right"><span className="text-sm font-black text-gray-900">25%</span><div className="text-[10px] text-gray-400 font-medium">₹2,05,000</div></div>
+                    <div className="flex justify-between items-center w-full">
+                      <span className="flex items-center gap-2 font-semibold text-gray-700 text-xs"><div className="w-2 h-2 rounded-full bg-[#22C55E]"></div> Labour</span>
+                      <div className="text-right flex flex-col leading-tight"><span className="font-bold text-gray-800 text-xs">25%</span><span className="text-[9px] text-gray-400 font-medium">₹2,05,000</span></div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#F59E0B] mr-2"></span><span className="text-sm font-bold text-gray-700">Transport</span></div>
-                      <div className="text-right"><span className="text-sm font-black text-gray-900">10%</span><div className="text-[10px] text-gray-400 font-medium">₹82,000</div></div>
+                    <div className="flex justify-between items-center w-full">
+                      <span className="flex items-center gap-2 font-semibold text-gray-700 text-xs"><div className="w-2 h-2 rounded-full bg-[#F59E0B]"></div> Transport</span>
+                      <div className="text-right flex flex-col leading-tight"><span className="font-bold text-gray-800 text-xs">10%</span><span className="text-[9px] text-gray-400 font-medium">₹82,000</span></div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-gray-300 mr-2"></span><span className="text-sm font-bold text-gray-700">Other</span></div>
-                      <div className="text-right"><span className="text-sm font-black text-gray-900">5%</span><div className="text-[10px] text-gray-400 font-medium">₹41,000</div></div>
+                    <div className="flex justify-between items-center w-full">
+                      <span className="flex items-center gap-2 font-semibold text-gray-700 text-xs"><div className="w-2 h-2 rounded-full bg-[#A855F7]"></div> Other Expenses</span>
+                      <div className="text-right flex flex-col leading-tight"><span className="font-bold text-gray-800 text-xs">5%</span><span className="text-[9px] text-gray-400 font-medium">₹41,000</span></div>
                     </div>
                   </div>
                 </div>
-
-                <button className="w-full py-3 rounded-xl font-bold text-[#F9B233] bg-[#F9B233]/10 hover:bg-[#F9B233]/20 transition-colors text-sm">
+                
+                <button className="w-full py-2.5 border border-[#D97706]/30 text-[#D97706] bg-[#D97706]/5 rounded-lg text-xs font-bold hover:bg-[#D97706]/10 transition-colors mt-auto">
                   View All Expenses
                 </button>
               </div>
@@ -370,274 +357,196 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 5. TESTIMONIAL SECTION */}
-        <section className="bg-white py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-10 relative z-20">
-          <div className="bg-[#0A192F] rounded-[2rem] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center gap-10">
-            {/* Image Placeholder */}
-            <div className="w-32 h-32 md:w-48 md:h-48 shrink-0 bg-blue-900 rounded-full border-4 border-[#F9B233] overflow-hidden flex items-center justify-center">
-               <div className="text-center text-white/50 text-xs px-4">Contractor Image Placeholder</div>
-            </div>
-            
-            {/* Quote */}
-            <div className="flex-grow text-center md:text-left relative">
-              <div className="absolute -top-6 -left-6 text-6xl text-white/10 font-serif">"</div>
-              <p className="text-xl md:text-2xl text-white font-medium italic mb-6 leading-relaxed relative z-10">
-                "MySiteBook has changed the way we manage our projects. Now I know my profit in real time, not after the project is over."
-              </p>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
-                <div>
-                  <p className="text-white font-bold text-lg">- Rajesh Kumar</p>
-                  <p className="text-white/60 text-sm">Civil Contractor, Coimbatore</p>
-                </div>
-                <div className="text-center md:text-right">
-                  <div className="flex justify-center md:justify-end text-[#F9B233] mb-1">
-                    ★ ★ ★ ★ ★
-                  </div>
-                  <p className="text-white/60 text-xs font-semibold uppercase tracking-wider">Trusted by contractors across India</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 6. HOW IT WORKS (From User Copy) */}
-        <section id="how-it-works" className="py-24 bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-sm font-black text-accent uppercase tracking-widest mb-2">How It Works</h2>
-              <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">Four Simple Steps</h3>
-            </div>
-            
-            <div className="grid md:grid-cols-4 gap-8">
-              <div className="text-center px-4">
-                <div className="w-16 h-16 mx-auto bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl font-black mb-6">1</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">Create a Project</h4>
-                <p className="text-gray-600 font-medium">Enter project details including project name, client details, and total project value.</p>
-              </div>
-              <div className="text-center px-4">
-                <div className="w-16 h-16 mx-auto bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl font-black mb-6">2</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">Track Credits</h4>
-                <p className="text-gray-600 font-medium">Record all payments received from your client securely.</p>
-              </div>
-              <div className="text-center px-4">
-                <div className="w-16 h-16 mx-auto bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl font-black mb-6">3</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">Log Expenses</h4>
-                <p className="text-gray-600 font-medium">Add expenses as they happen. Labour, materials, transport, rentals, and more.</p>
-              </div>
-              <div className="text-center px-4">
-                <div className="w-16 h-16 mx-auto bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black mb-6">4</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">Monitor Profit</h4>
-                <p className="text-gray-600 font-medium">MySiteBook automatically calculates project profitability and financial performance.</p>
-              </div>
+        {/* 5. Dark Testimonial Banner */}
+        <section className="bg-gray-50 pt-2 pb-2 relative -mt-8 md:-mt-12 z-20">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+            <div className="bg-[#0A1629] bg-[url('/banner-bg.png')] bg-cover bg-center bg-blend-overlay rounded-[12px] pr-6 pl-6 lg:pr-12 lg:pl-0 flex flex-col md:flex-row items-center relative shadow-lg">
+               
+               {/* Left: Contractor Image (Absolute to pop out of top and bottom) */}
+               <div className="hidden md:block w-48 md:w-56 lg:w-[280px] h-[220px] md:h-[260px] lg:h-[320px] absolute bottom-0 left-0 lg:left-2 z-30">
+                 <img 
+                   src="/contractor-photo.png" 
+                   alt="Civil Contractor" 
+                   className="w-full h-full object-contain object-bottom drop-shadow-2xl"
+                 />
+               </div>
+               {/* Spacer to push content to the right because the image is absolute */}
+               <div className="hidden md:block w-48 md:w-56 lg:w-[320px] shrink-0"></div>
+               
+               {/* Middle: Quote */}
+               <div className="py-8 md:py-10 md:pl-2 md:pr-4 flex items-start gap-3 max-w-3xl">
+                 <div className="text-4xl lg:text-5xl font-serif text-[#F59E0B] leading-none pt-1 font-bold shrink-0">“</div>
+                 <div>
+                   <p className="text-sm lg:text-[15px] text-white font-medium leading-relaxed mb-3 relative inline-block pr-8 lg:pr-12">
+                     MySiteBook has changed the way we manage<br className="hidden lg:block"/> our projects. Now I know my profit in real time,<br className="hidden lg:block"/> not after the project is over.
+                     {/* Faint closing quote behind text */}
+                     <span className="absolute right-0 -bottom-14 text-6xl lg:text-8xl font-serif text-white/5 leading-none pointer-events-none">”</span>
+                   </p>
+                   <div className="text-[11px] lg:text-xs text-gray-300">
+                     - <span className="text-white font-semibold">Rajesh Kumar</span>, Civil Contractor, Coimbatore
+                   </div>
+                 </div>
+               </div>
+               
+               {/* Divider */}
+               <div className="hidden md:block w-px h-20 bg-gray-700/60 mx-4 lg:mx-8"></div>
+               
+               {/* Right: Stars */}
+               <div className="py-6 md:py-8 shrink-0 text-center md:text-left flex flex-col items-center md:items-start border-t md:border-t-0 border-gray-700/50 w-full md:w-auto">
+                 <div className="flex gap-1 mb-2.5">
+                   {[1,2,3,4,5].map(i => <svg key={i} className="w-4 h-4 text-[#F59E0B] fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>)}
+                 </div>
+                 <div className="text-xs font-semibold text-white mb-0.5">Trusted by contractors</div>
+                 <div className="text-[11px] text-gray-400">across India</div>
+               </div>
             </div>
           </div>
         </section>
 
-        {/* 7. DETAILED FEATURES (From User Copy) */}
-        <section id="features" className="py-24 bg-[#F8FAFC]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-sm font-black text-accent uppercase tracking-widest mb-2">Features</h2>
-              <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Everything You Need To Control Project Finances</h3>
-              <p className="text-lg text-gray-600 font-medium">MySiteBook is designed specifically for contractors who want complete visibility over their project finances.</p>
+        {/* 6. Pricing Section */}
+        <section className="bg-gray-50 pb-8 pt-4" id="pricing">
+          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+            <div className="text-center mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Simple Pricing. Maximum Value.</h2>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[
-                { title: 'Project Value Tracking', desc: 'Set the total project value and monitor progress from day one.' },
-                { title: 'Credit Tracking', desc: 'Track every payment received from clients and identify outstanding amounts instantly.' },
-                { title: 'Expense Management', desc: 'Record all project expenses including labour, materials, transport, equipment, and miscellaneous costs.' },
-                { title: 'Profit & Loss Dashboard', desc: "Know your project's financial health in real time without waiting until completion." },
-                { title: 'Material Tracking', desc: 'Monitor purchases of cement, steel, sand, bricks, and other construction materials.' },
-                { title: 'Bill Storage', desc: 'Store receipts and invoices securely for future reference.' },
-                { title: 'Multi-Project Management', desc: 'Manage multiple construction projects from a single dashboard.' },
-                { title: 'Team Access', desc: 'Allow site engineers and supervisors to log expenses from anywhere.' },
-                { title: 'Reports & Analytics', desc: 'Generate detailed financial reports and project summaries.' }
-              ].map((f, i) => (
-                <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary mb-4">
-                    <FaCheckCircle />
-                  </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">{f.title}</h4>
-                  <p className="text-gray-600 font-medium leading-relaxed">{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 8. PRICING SECTION (From Image & User Copy) */}
-        <section id="pricing" className="py-24 bg-white border-y border-gray-100">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Simple Pricing. Maximum Value.</h2>
-            <p className="text-xl text-gray-600 font-medium mb-16">Start with a special launch offer. Upgrade only when you need more power.</p>
-            
-            <div className="bg-[#F8FAFC] rounded-[3rem] p-8 md:p-12 border border-gray-200 shadow-xl flex flex-col md:flex-row items-center gap-10">
-              
-              {/* Left: Price */}
-              <div className="w-full md:w-1/3 text-left">
-                <span className="bg-primary text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4 inline-block">PRO PLAN</span>
-                <div className="mb-6">
-                  <span className="text-sm font-bold text-gray-500 uppercase">Only</span><br/>
-                  <span className="text-6xl font-black text-gray-900">₹999</span>
-                  <span className="text-gray-500 font-semibold ml-2">/month</span>
-                </div>
-                
-                <ul className="space-y-3 text-sm font-semibold text-gray-700">
-                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Unlimited Projects</li>
-                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Unlimited Expense Entries</li>
-                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Profit & Loss Reports</li>
-                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Material Tracking</li>
-                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Bill Storage</li>
-                  <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-2"/> Priority Support</li>
-                </ul>
-              </div>
-
-              {/* Middle: Badges */}
-              <div className="w-full md:w-1/3 flex flex-col gap-6 justify-center items-center border-y md:border-y-0 md:border-x border-gray-200 py-8 md:py-0 md:px-8">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mb-3">
-                    <FaBuilding />
-                  </div>
-                  <span className="font-bold text-gray-900 text-lg">1 Project<br/>FREE Forever</span>
-                </div>
-                <div className="text-2xl font-black text-gray-300">+</div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-2xl mb-3">
-                    <FaPlay />
-                  </div>
-                  <span className="font-bold text-gray-900 text-lg">3 Months<br/>FREE Trial</span>
-                </div>
-              </div>
-
-              {/* Right: CTA */}
-              <div className="w-full md:w-1/3 flex flex-col justify-center text-left md:pl-8">
-                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-6">
-                  <p className="text-sm font-bold text-yellow-800 text-center">Special Launch Offer</p>
-                  <p className="text-xs text-yellow-700 text-center mt-1 font-medium">Get 90 Days FREE Trial on the Pro Plan.</p>
-                </div>
-                
-                <Link href="/register" className="w-full bg-[#F9B233] text-[#0A192F] py-4 rounded-full font-black text-lg hover:bg-[#FFC145] transition-all shadow-lg text-center mb-6">
-                  Start 3 Months Free Trial
-                </Link>
-                
-                <ul className="space-y-3 text-sm font-semibold text-gray-600">
-                  <li className="flex items-center"><FaCheckCircle className="text-gray-400 mr-2"/> No Credit Card Required</li>
-                  <li className="flex items-center"><FaCheckCircle className="text-gray-400 mr-2"/> Cancel Anytime</li>
-                </ul>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* 9. FAQS (From User Copy) */}
-        <section className="py-24 bg-[#F8FAFC]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-sm font-black text-accent uppercase tracking-widest mb-2">FAQs</h2>
-              <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Frequently Asked Questions</h3>
-            </div>
-            
-            <div className="space-y-4">
-              {[
-                { q: 'Is MySiteBook suitable for small contractors?', a: 'Yes. It is designed for both individual contractors and growing construction companies.' },
-                { q: 'Do I need accounting knowledge?', a: 'No. MySiteBook is designed to be simple and easy to use.' },
-                { q: 'Can I use it on mobile?', a: 'Yes. It works on mobile, tablet, and desktop devices.' },
-                { q: 'How is profit calculated?', a: 'Profit is calculated using Project Value minus Total Expenses.' },
-                { q: 'Is there a free plan?', a: 'Yes. One project is free forever.' },
-                { q: 'Can I cancel anytime?', a: 'Yes. There are no long-term contracts.' }
-              ].map((faq, i) => (
-                <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all">
-                  <button 
-                    onClick={() => toggleFaq(i)} 
-                    className="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none"
-                  >
-                    <span className="font-bold text-gray-900">{faq.q}</span>
-                    <FaChevronDown className={`text-gray-400 transition-transform ${faqOpen === i ? 'rotate-180' : ''}`} />
-                  </button>
-                  {faqOpen === i && (
-                    <div className="px-6 pb-5 pt-0">
-                      <p className="text-gray-600 font-medium">{faq.a}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="bg-white border border-gray-100 rounded-[20px] shadow-sm w-full flex flex-col lg:flex-row items-stretch relative overflow-hidden">
+               
+               {/* Col 1: Price and Features */}
+               <div className="w-full lg:w-[40%] flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-gray-100 py-6 lg:py-8 px-6 lg:px-10">
+                 <div className="text-sm text-gray-800 font-bold mb-1">Only</div>
+                 <div className="flex items-end gap-1 mb-5 inline-flex relative w-fit">
+                   <div className="text-5xl md:text-6xl font-black text-gray-800 leading-none">₹999</div>
+                   <div className="text-xs text-gray-600 font-semibold mb-1.5">/month</div>
+                   {/* Orange underline */}
+                   <div className="absolute -bottom-2 left-1 w-12 h-1 bg-[#F59E0B] rounded-full"></div>
+                 </div>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                   <div className="flex items-center gap-2.5 text-[11px] md:text-xs font-bold text-gray-700 whitespace-nowrap"><Check strokeWidth={3} className="w-4 h-4 text-gray-900 shrink-0" /> Unlimited Projects</div>
+                   <div className="flex items-center gap-2.5 text-[11px] md:text-xs font-bold text-gray-700 whitespace-nowrap"><Check strokeWidth={3} className="w-4 h-4 text-gray-900 shrink-0" /> Material Tracking</div>
+                   
+                   <div className="flex items-center gap-2.5 text-[11px] md:text-xs font-bold text-gray-700 whitespace-nowrap"><Check strokeWidth={3} className="w-4 h-4 text-gray-900 shrink-0" /> Unlimited Expense Entries</div>
+                   <div className="flex items-center gap-2.5 text-[11px] md:text-xs font-bold text-gray-700 whitespace-nowrap"><Check strokeWidth={3} className="w-4 h-4 text-gray-900 shrink-0" /> Bill Storage</div>
+                   
+                   <div className="flex items-center gap-2.5 text-[11px] md:text-xs font-bold text-gray-700 whitespace-nowrap"><Check strokeWidth={3} className="w-4 h-4 text-gray-900 shrink-0" /> Profit & Loss Reports</div>
+                   <div className="flex items-center gap-2.5 text-[11px] md:text-xs font-bold text-gray-700 whitespace-nowrap"><Check strokeWidth={3} className="w-4 h-4 text-gray-900 shrink-0" /> Priority Support</div>
+                 </div>
+               </div>
+               
+               {/* Col 2: Offers */}
+               <div className="w-full lg:w-[32%] flex items-center justify-center gap-4 md:gap-8 border-b lg:border-b-0 lg:border-r border-gray-100 py-6 lg:py-8 px-6 lg:px-8">
+                 <div className="text-center flex flex-col items-center">
+                   <div className="w-16 h-16 bg-[#e6f4ea] rounded-full flex items-center justify-center mb-3">
+                     <svg className="w-8 h-8 text-[#137333]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                       <path d="M1.5 10.5L12 2l10.5 8.5" />
+                       <path d="M4 8.5V22h16V8.5" />
+                       <circle cx="12" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
+                       <rect x="6" y="14" width="5" height="5" />
+                       <path d="M8.5 14v5M6 16.5h5" />
+                       <path d="M14 22v-8h4v8" />
+                     </svg>
+                   </div>
+                   <div className="font-bold text-gray-800 text-sm leading-tight">1 Project<br/>FREE Forever</div>
+                 </div>
+                 
+                 <div className="text-3xl font-black text-gray-900 shrink-0">+</div>
+                 
+                 <div className="text-center flex flex-col items-center">
+                   <div className="w-16 h-16 bg-[#fef0db] rounded-full flex items-center justify-center mb-3">
+                     <Gift strokeWidth={2.5} className="w-8 h-8 text-[#d97706]" />
+                   </div>
+                   <div className="font-bold text-gray-800 text-sm leading-tight">3 Months<br/>FREE Trial</div>
+                 </div>
+               </div>
+               
+               {/* Col 3: CTA Button */}
+               <div className="w-full lg:w-[28%] flex flex-col justify-center items-center lg:items-start py-6 lg:py-8 px-6 lg:px-10">
+                 <Link href="/register" className="w-full text-center bg-[#F4B63A] hover:bg-[#F59E0B] text-gray-900 px-4 md:px-8 py-3.5 rounded-lg text-sm font-bold transition-all mb-5">
+                   Start 3 Months Free Trial
+                 </Link>
+                 <div className="space-y-3 self-center lg:self-start ml-2">
+                   <div className="flex items-center gap-2.5 text-[11.5px] font-bold text-gray-800"><Check strokeWidth={3} className="w-3.5 h-3.5 text-gray-900" /> No Credit Card Required</div>
+                   <div className="flex items-center gap-2.5 text-[11.5px] font-bold text-gray-800"><Check strokeWidth={3} className="w-3.5 h-3.5 text-gray-900" /> Cancel Anytime</div>
+                 </div>
+               </div>
+               
             </div>
           </div>
         </section>
 
       </main>
 
-      {/* 10. FOOTER (From Image & Copy) */}
-      <footer className="bg-[#0A192F] text-white pt-20 pb-8 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
-            
-            {/* Branding */}
-            <div className="lg:col-span-2">
-              <img src="/mysitebook-logo-transparent.png" alt="MySiteBook" className="h-12 w-auto mb-6 brightness-0 invert" />
-              <p className="text-white/60 font-medium max-w-sm mb-8 leading-relaxed text-sm">
-                The all-in-one finance management solution for construction contractors. Track every rupee, know every profit.
+      {/* 7. Footer */}
+      <footer className="bg-[#0A1121] text-gray-300 pt-12 pb-6 border-t border-gray-800">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
+            <div className="col-span-1 md:col-span-2 pr-0 lg:pr-12">
+              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-12 w-auto mb-4" />
+              <p className="text-[14px] text-gray-300 mb-5 font-medium leading-relaxed">
+                The all-in-one finance management<br/>solution for construction contractors.
               </p>
-              {/* Socials Placeholder */}
-              <div className="flex space-x-4">
-                {['f', 'ig', 'yt', 'in'].map((s, i) => (
-                  <div key={i} className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10 hover:text-white cursor-pointer transition-colors">
-                    <span className="text-xs uppercase font-bold">{s}</span>
-                  </div>
-                ))}
+              <div className="flex gap-3.5">
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaFacebook className="w-[15px] h-[15px] text-white" /></a>
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaInstagram className="w-[15px] h-[15px] text-white" /></a>
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaYoutube className="w-[15px] h-[15px] text-white" /></a>
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaLinkedin className="w-[15px] h-[15px] text-white" /></a>
               </div>
             </div>
             
-            {/* Links Columns */}
-            <div>
-              <h4 className="font-bold mb-6 text-sm tracking-wider uppercase text-white/90">Product</h4>
-              <ul className="space-y-4 text-sm font-medium text-white/60">
-                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
-                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="/updates" className="hover:text-white transition-colors">Updates</Link></li>
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">PRODUCT</h4>
+              <ul className="space-y-3 text-[13px] font-medium text-gray-300">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Updates</a></li>
               </ul>
             </div>
-
-            <div>
-              <h4 className="font-bold mb-6 text-sm tracking-wider uppercase text-white/90">Resources</h4>
-              <ul className="space-y-4 text-sm font-medium text-white/60">
-                <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link href="/tutorials" className="hover:text-white transition-colors">Video Tutorials</Link></li>
-                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-                <li><Link href="/faqs" className="hover:text-white transition-colors">FAQs</Link></li>
+            
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">RESOURCES</h4>
+              <ul className="space-y-3 text-[13px] font-medium text-gray-300">
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Video Tutorials</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
               </ul>
             </div>
-
-            <div>
-              <h4 className="font-bold mb-6 text-sm tracking-wider uppercase text-white/90">Company</h4>
-              <ul className="space-y-4 text-sm font-medium text-white/60">
-                <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+            
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">COMPANY</h4>
+              <ul className="space-y-3 text-[13px] font-medium text-gray-300">
+                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
               </ul>
             </div>
-
+            
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">Get in Touch</h4>
+              <ul className="space-y-4 text-sm font-semibold text-white">
+                <li className="flex items-center gap-3">
+                  <FaWhatsapp className="w-5 h-5 text-[#25D366] shrink-0" />
+                  +91 12345 67890
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaPhoneAlt className="w-4 h-4 text-white shrink-0 ml-0.5" />
+                  <span className="ml-0.5">+91 12345 67890</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaRegEnvelope className="w-5 h-5 text-white shrink-0" />
+                  support@mysitebook.com
+                </li>
+              </ul>
+            </div>
           </div>
           
-          {/* Bottom Bar */}
-          <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-white/40 font-medium text-xs">
-              © {new Date().getFullYear()} MySiteBook Technologies Pvt. Ltd. All rights reserved.
-            </p>
-            <div className="flex flex-col md:flex-row md:items-center gap-4 text-white/60 text-xs font-medium">
-              <span className="flex items-center"><FaMobileAlt className="mr-2" /> +91 12345 67890</span>
-              <span className="hidden md:inline">|</span>
-              <span className="flex items-center">support@mysitebook.com</span>
-              <span className="hidden md:inline">|</span>
-              <span className="flex items-center">Made with <span className="text-red-500 mx-1">❤</span> in India</span>
-            </div>
+          <div className="mt-8 pt-5 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-[13px] font-medium text-gray-400">© 2024 MySiteBook Technologies Pvt. Ltd. All rights reserved.</p>
+            <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Made with <span className="text-red-500">❤️</span> in India</p>
           </div>
-
         </div>
       </footer>
     </div>
