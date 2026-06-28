@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { FaBuilding, FaHardHat, FaCheckCircle, FaChartPie, FaMobileAlt, FaMicrophone, FaCamera, FaFileInvoiceDollar, FaSync, FaHistory, FaArrowRight } from "react-icons/fa";
+import { ChevronDown, Lock, Menu, X } from "lucide-react";
+import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaRegEnvelope } from "react-icons/fa";
 
 export default function MarketingLayout({
   children,
@@ -13,39 +14,72 @@ export default function MarketingLayout({
   title: string;
   subtitle?: string;
 }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
-    <div className="flex flex-col min-h-screen bg-brandbg text-brandtext font-sans">
-      {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-white border-b border-gray-100 shadow-sm transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24">
-            <Link href="/" className="flex items-center group shrink-0">
-              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+    <div className="flex flex-col min-h-screen bg-primary text-brandtext-inverse font-sans overflow-x-hidden">
+      
+      {/* 1. Navbar (From page.tsx) */}
+      <nav className="fixed top-0 w-full z-50 bg-primary/95 backdrop-blur border-b border-gray-800">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+          <div className="flex justify-between items-center h-20">
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-14 sm:h-16 w-auto drop-shadow-md" />
             </Link>
             
-            <nav className="hidden lg:flex space-x-10 items-center">
-              <Link href="/#how-it-works" className="text-sm font-bold text-brandtext hover:text-accent transition-colors">How it Works</Link>
-              <Link href="/#features" className="text-sm font-bold text-brandtext hover:text-accent transition-colors">Features</Link>
-              <Link href="/#pricing" className="text-sm font-bold text-brandtext hover:text-accent transition-colors">Pricing</Link>
-            </nav>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="/#features" className="text-sm font-medium text-white hover:text-accent transition-colors">Features</Link>
+              <Link href="/#how-it-works" className="text-sm font-medium text-white hover:text-accent transition-colors">How It Works</Link>
+              <Link href="/#pricing" className="text-sm font-medium text-white hover:text-accent transition-colors">Pricing</Link>
+              <div className="flex items-center space-x-1 cursor-pointer group">
+                <Link href="/resources" className="text-sm font-medium text-white group-hover:text-accent transition-colors">Resources</Link>
+              </div>
+              <Link href="/about" className="text-sm font-medium text-white hover:text-accent transition-colors">About Us</Link>
+            </div>
             
-            <div className="flex items-center space-x-4 sm:space-x-6 shrink-0">
-              <Link href="/login" className="text-sm font-bold text-brandtext hover:text-accent transition-colors hidden sm:block">
-                Log in
+            <div className="flex items-center space-x-4">
+              <Link href="/login" className="hidden md:flex items-center justify-center border border-accent text-accent hover:bg-accent/10 px-6 h-10 rounded-lg text-sm font-medium transition-all">
+                <Lock className="w-4 h-4 mr-2" /> Log In
               </Link>
-              <Link href="/register" className="hidden md:block bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-[0_4px_14px_0_rgba(21,62,117,0.39)] hover:shadow-[0_6px_20px_rgba(21,62,117,0.23)] hover:-translate-y-0.5 transition-all">
+              <Link href="/register" className="bg-accent hover:bg-accent-600 text-primary px-4 sm:px-6 h-10 rounded-lg text-[13px] sm:text-sm font-bold transition-all transform hover:scale-105 flex items-center justify-center border border-transparent whitespace-nowrap">
                 Start Free Trial
               </Link>
+              <button 
+                className="md:hidden text-white p-2"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle mobile menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
-      </header>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-primary border-t border-gray-800">
+            <div className="px-4 pt-2 pb-4 space-y-1">
+              <Link href="/#features" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-white hover:text-accent hover:bg-white/5 rounded-md">Features</Link>
+              <Link href="/#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-white hover:text-accent hover:bg-white/5 rounded-md">How It Works</Link>
+              <Link href="/#pricing" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-white hover:text-accent hover:bg-white/5 rounded-md">Pricing</Link>
+              <Link href="/resources" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-white hover:text-accent hover:bg-white/5 rounded-md">Resources</Link>
+              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-white hover:text-accent hover:bg-white/5 rounded-md">About Us</Link>
+              <div className="mt-4 pt-4 border-t border-gray-800">
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-accent hover:bg-white/5 rounded-md flex items-center">
+                  <Lock className="w-4 h-4 mr-2" /> Log In
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-36 pb-20 overflow-hidden bg-slate-900 text-white">
+      <section className="relative pt-36 pb-20 overflow-hidden bg-primary text-white">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl mix-blend-multiply opacity-70"></div>
-          <div className="absolute top-40 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl mix-blend-multiply opacity-70"></div>
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl mix-blend-multiply opacity-70"></div>
+          <div className="absolute top-40 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl mix-blend-multiply opacity-70"></div>
         </div>
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -61,58 +95,78 @@ export default function MarketingLayout({
       </section>
 
       {/* Main Content Area */}
-      <main className="flex-grow bg-white">
+      <main className="flex-grow bg-white text-gray-900">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-surface pt-24 pb-12 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
-            <div className="lg:col-span-2">
-              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-12 w-auto mb-6" />
-              <p className="text-brandtext-secondary font-medium max-w-sm mb-8 leading-relaxed">
-                The #1 construction ledger for Indian contractors. Track every rupee, manage every project, and control every site from a single ecosystem.
+      {/* 7. Footer (From page.tsx) */}
+      <footer className="bg-[#0A1121] text-gray-300 pt-12 pb-6 border-t border-gray-800">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
+            <div className="col-span-1 md:col-span-2 pr-0 lg:pr-12">
+              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-14 sm:h-16 w-auto mb-6 drop-shadow-md" />
+              <p className="text-[14px] text-gray-300 mb-5 font-medium leading-relaxed">
+                The all-in-one finance management<br/>solution for construction contractors.
               </p>
+              <div className="flex gap-3.5">
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaFacebook className="w-[15px] h-[15px] text-white" /></a>
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaInstagram className="w-[15px] h-[15px] text-white" /></a>
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaYoutube className="w-[15px] h-[15px] text-white" /></a>
+                <a href="#" className="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-gray-800 transition-colors"><FaLinkedin className="w-[15px] h-[15px] text-white" /></a>
+              </div>
             </div>
             
-            <div>
-              <h4 className="text-brandtext font-black mb-6 uppercase tracking-wider text-sm">Product</h4>
-              <ul className="space-y-4">
-                <li><Link href="/#features" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Features</Link></li>
-                <li><Link href="/#how-it-works" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">How it Works</Link></li>
-                <li><Link href="/#pricing" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Pricing</Link></li>
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">PRODUCT</h4>
+              <ul className="space-y-3 text-[13px] font-medium text-gray-300">
+                <li><Link href="/#features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link href="/#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
+                <li><Link href="/#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               </ul>
             </div>
-
-            <div>
-              <h4 className="text-brandtext font-black mb-6 uppercase tracking-wider text-sm">Resources</h4>
-              <ul className="space-y-4">
-                <li><Link href="/help" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Help Center</Link></li>
-                <li><Link href="/tutorials" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Video Tutorials</Link></li>
-                <li><Link href="/blog" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Contractor Blog</Link></li>
-                <li><Link href="/case-studies" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Case Studies</Link></li>
+            
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">RESOURCES</h4>
+              <ul className="space-y-3 text-[13px] font-medium text-gray-300">
+                <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link href="/tutorials" className="hover:text-white transition-colors">Video Tutorials</Link></li>
+                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+                <li><Link href="/#faq" className="hover:text-white transition-colors">FAQs</Link></li>
               </ul>
             </div>
-
-            <div>
-              <h4 className="text-brandtext font-black mb-6 uppercase tracking-wider text-sm">Company</h4>
-              <ul className="space-y-4">
-                <li><Link href="/about" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-brandtext-secondary hover:text-accent font-medium transition-colors">Terms of Service</Link></li>
+            
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">COMPANY</h4>
+              <ul className="space-y-3 text-[13px] font-medium text-gray-300">
+                <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+              </ul>
+            </div>
+            
+            <div className="col-span-1">
+              <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">Get in Touch</h4>
+              <ul className="space-y-4 text-sm font-semibold text-white">
+                <li className="flex items-center gap-3">
+                  <FaWhatsapp className="w-5 h-5 text-[#25D366] shrink-0" />
+                  +91 12345 67890
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaPhoneAlt className="w-4 h-4 text-white shrink-0 ml-0.5" />
+                  <span className="ml-0.5">+91 12345 67890</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaRegEnvelope className="w-5 h-5 text-white shrink-0" />
+                  support@mysitebook.com
+                </li>
               </ul>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-brandtext-secondary font-medium text-sm mb-4 md:mb-0">© {new Date().getFullYear()} MySiteBook Technologies. All rights reserved.</p>
-            <div className="flex items-center space-x-2 text-brandtext-secondary text-sm font-medium">
-              <span>Made with</span>
-              <span className="text-expense">❤</span>
-              <span>in India</span>
-            </div>
+          <div className="mt-8 pt-5 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-[13px] font-medium text-gray-400">© 2026 MySiteBook. All rights reserved.</p>
+            <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Made with <span className="text-red-500">❤️</span> in India</p>
           </div>
         </div>
       </footer>

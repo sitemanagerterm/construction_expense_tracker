@@ -55,7 +55,7 @@ export default function ContactPage() {
             </div>
             
             <div className="relative z-10 mt-16">
-              <img src="/mysitebook-horizontal.png" alt="Logo" className="h-8 opacity-50 grayscale invert object-contain" />
+              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-8 opacity-50 grayscale object-contain" />
             </div>
           </div>
 
