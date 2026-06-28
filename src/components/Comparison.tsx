@@ -40,8 +40,10 @@ export default function Comparison() {
 
         <div className="mt-16 bg-white rounded-[32px] border border-[#E5E7EB] shadow-sm overflow-hidden relative">
           
-          {/* Header Row */}
-          <div className="grid grid-cols-[35%_25%_20%_20%] bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
+          <div className="overflow-x-auto custom-scrollbar">
+            <div className="min-w-[768px]">
+              {/* Header Row */}
+              <div className="grid grid-cols-[40%_20%_20%_20%] bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
             <div className="p-6 md:p-8 font-semibold text-[#111827] text-lg">
               What You Actually Need to Run a Profitable Construction Business
             </div>
@@ -71,7 +73,7 @@ export default function Comparison() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: idx * 0.05 }}
-                className={`grid grid-cols-[35%_25%_20%_20%] group transition-colors duration-300 hover:bg-[#F8FAFC] ${idx !== checklistFeatures.length - 1 ? 'border-b border-[#E5E7EB]' : ''}`}
+                className={`grid grid-cols-[40%_20%_20%_20%] group transition-colors duration-300 hover:bg-[#F8FAFC] ${idx !== checklistFeatures.length - 1 ? 'border-b border-[#E5E7EB]' : ''}`}
               >
                 <div className="p-5 md:p-6 font-medium text-[#111827] flex items-center gap-3">
                   <div className="text-[#6B7280] group-hover:text-[#0B1F4D] transition-colors">{feature.icon}</div>
@@ -114,6 +116,8 @@ export default function Comparison() {
                 </div>
               </motion.div>
             ))}
+          </div>
+            </div>
           </div>
 
         </div>

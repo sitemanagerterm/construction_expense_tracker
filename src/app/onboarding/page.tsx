@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { motion } from "framer-motion";
+import { HardHat, Building2, TrendingUp, IndianRupee } from "lucide-react";
 
 export default function Onboarding() {
   const router = useRouter();
@@ -58,18 +60,55 @@ export default function Onboarding() {
         <div className="absolute inset-0 z-0 opacity-[0.03]" style={{ backgroundImage: "url('/construction-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}></div>
 
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center group bg-white px-5 py-2.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
-            <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-8 md:h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+          <Link href="/" className="inline-flex items-center group">
+            <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-12 md:h-16 w-auto object-contain transition-transform group-hover:scale-105" />
           </Link>
         </div>
 
-        <div className="relative z-10 max-w-lg flex-grow flex flex-col justify-center mt-12">
+        <div className="relative z-10 max-w-lg mt-12">
           <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-sm">
             Just one more step.
           </h1>
           <p className="text-base lg:text-lg text-slate-300 font-light tracking-wide leading-snug">
             We need a few details about your construction business to set up your ledger and invite your team.
           </p>
+        </div>
+
+        {/* Dashboard Preview Mockup */}
+        <div className="relative z-10 flex-grow flex items-center justify-center mt-12 w-full">
+          <div className="relative w-full max-w-md bg-slate-800/80 rounded-2xl border border-white/10 shadow-2xl overflow-hidden backdrop-blur-md flex flex-col">
+            {/* Window Header */}
+            <div className="h-10 border-b border-white/10 flex items-center px-4 gap-2 bg-slate-900/80">
+              <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+            </div>
+            {/* Window Body */}
+            <div className="p-6 flex-grow flex flex-col gap-6">
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-2">
+                  <div className="h-3 w-24 bg-white/20 rounded"></div>
+                  <div className="h-6 w-32 bg-white/40 rounded"></div>
+                </div>
+                <div className="h-8 w-20 bg-accent/20 text-accent text-xs font-bold flex items-center justify-center rounded-full border border-accent/30">+14.2%</div>
+              </div>
+              
+              {/* Bar Chart Mockup */}
+              <div className="flex-grow flex items-end gap-3 h-32 mt-4">
+                <div className="w-full bg-white/10 rounded-t h-[40%] transition-all hover:bg-white/20"></div>
+                <div className="w-full bg-white/10 rounded-t h-[60%] transition-all hover:bg-white/20"></div>
+                <div className="w-full bg-accent rounded-t h-[90%] relative group">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-slate-900 text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">Peak</div>
+                </div>
+                <div className="w-full bg-white/10 rounded-t h-[50%] transition-all hover:bg-white/20"></div>
+                <div className="w-full bg-white/10 rounded-t h-[70%] transition-all hover:bg-white/20"></div>
+                <div className="w-full bg-white/10 rounded-t h-[30%] transition-all hover:bg-white/20"></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Decorative gradients */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-accent/5 to-transparent rounded-full blur-[80px] -z-10"></div>
         </div>
       </div>
 
@@ -80,7 +119,7 @@ export default function Onboarding() {
           <div className="lg:hidden flex flex-col items-center justify-center mb-10 -mx-8 -mt-8 sm:-mx-12 sm:-mt-12 py-10 bg-slate-900 relative overflow-hidden rounded-b-[2rem] shadow-md">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-[40px] translate-x-1/2 -translate-y-1/2"></div>
             <Link href="/" className="inline-block group relative z-10">
-              <img src="/mysitebook-horizontal.png" alt="MySiteBook" className="h-10 sm:h-12 w-auto object-contain" />
+              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-10 sm:h-12 w-auto object-contain" />
             </Link>
           </div>
 
