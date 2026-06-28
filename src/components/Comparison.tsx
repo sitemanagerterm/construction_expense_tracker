@@ -40,8 +40,8 @@ export default function Comparison() {
 
         <div className="mt-16 bg-white rounded-[32px] border border-[#E5E7EB] shadow-sm overflow-hidden relative">
           
-          <div className="overflow-x-auto custom-scrollbar">
-            <div className="min-w-[768px]">
+          <div className="overflow-x-auto custom-scrollbar pb-4">
+            <div style={{ minWidth: '700px' }} className="w-full">
               {/* Header Row */}
               <div className="grid grid-cols-[40%_20%_20%_20%] bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
             <div className="p-6 md:p-8 font-semibold text-[#111827] text-lg">
