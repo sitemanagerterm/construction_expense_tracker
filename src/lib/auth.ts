@@ -25,8 +25,12 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email, role: "SUPER_ADMIN" }
         });
 
-        if (user && user.password === credentials.password) {
-          return user;
+        if (user && user.password) {
+          const bcrypt = require("bcryptjs");
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          if (isValid) {
+            return user;
+          }
         }
         
         return null;

@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../src/lib/prisma'
 import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
 
 async function main() {
   console.log('Seeding Database...')
@@ -19,16 +17,19 @@ async function main() {
 
   // Create Super Admin User
   const saEmail = 'admin@mysitebook.com'
-  const saPassword = await bcrypt.hash('supersecret123', 10)
+  const saPassword = await bcrypt.hash('Admin@123', 10)
 
   const superAdmin = await prisma.user.upsert({
     where: { email: saEmail },
-    update: {},
+    update: {
+      password: saPassword, // Ensure the password gets updated if we re-run seed
+    },
     create: {
       email: saEmail,
       name: 'Super Admin',
       role: 'SUPER_ADMIN',
       tenantId: saTenant.id,
+      password: saPassword,
     },
   })
 
