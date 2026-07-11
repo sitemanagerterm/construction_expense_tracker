@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { motion } from "framer-motion";
@@ -22,6 +23,9 @@ export default function Onboarding() {
     const data = {
       companyName: formData.get('companyName'),
       mobile: formData.get('mobile'),
+      contactPerson: formData.get('contactPerson'),
+      address: formData.get('address'),
+      pincode: formData.get('pincode'),
       businessType: formData.get('businessType'),
     };
 
@@ -60,12 +64,12 @@ export default function Onboarding() {
         <div className="absolute inset-0 z-0 opacity-[0.03]" style={{ backgroundImage: "url('/construction-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}></div>
 
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center group">
-            <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-12 md:h-16 w-auto object-contain transition-transform group-hover:scale-105" />
+          <Link href="/" className="inline-flex items-center group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1 -ml-4">
+            <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[180px] md:w-[240px] h-auto object-contain transition-transform group-hover:scale-105" />
           </Link>
         </div>
 
-        <div className="relative z-10 max-w-lg mt-12">
+        <div className="relative z-10 max-w-lg mt-8">
           <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-sm">
             Just one more step.
           </h1>
@@ -76,39 +80,14 @@ export default function Onboarding() {
 
         {/* Dashboard Preview Mockup */}
         <div className="relative z-10 flex-grow flex items-center justify-center mt-12 w-full">
-          <div className="relative w-full max-w-md bg-slate-800/80 rounded-2xl border border-white/10 shadow-2xl overflow-hidden backdrop-blur-md flex flex-col">
-            {/* Window Header */}
-            <div className="h-10 border-b border-white/10 flex items-center px-4 gap-2 bg-slate-900/80">
-              <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-            </div>
-            {/* Window Body */}
-            <div className="p-6 flex-grow flex flex-col gap-6">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col gap-2">
-                  <div className="h-3 w-24 bg-white/20 rounded"></div>
-                  <div className="h-6 w-32 bg-white/40 rounded"></div>
-                </div>
-                <div className="h-8 w-20 bg-accent/20 text-accent text-xs font-bold flex items-center justify-center rounded-full border border-accent/30">+14.2%</div>
-              </div>
-              
-              {/* Bar Chart Mockup */}
-              <div className="flex-grow flex items-end gap-3 h-32 mt-4">
-                <div className="w-full bg-white/10 rounded-t h-[40%] transition-all hover:bg-white/20"></div>
-                <div className="w-full bg-white/10 rounded-t h-[60%] transition-all hover:bg-white/20"></div>
-                <div className="w-full bg-accent rounded-t h-[90%] relative group">
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-slate-900 text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">Peak</div>
-                </div>
-                <div className="w-full bg-white/10 rounded-t h-[50%] transition-all hover:bg-white/20"></div>
-                <div className="w-full bg-white/10 rounded-t h-[70%] transition-all hover:bg-white/20"></div>
-                <div className="w-full bg-white/10 rounded-t h-[30%] transition-all hover:bg-white/20"></div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Decorative gradients */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-accent/5 to-transparent rounded-full blur-[80px] -z-10"></div>
+          <motion.div 
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="w-full max-w-lg relative"
+          >
+            <div className="absolute inset-0 bg-accent/20 blur-[80px] -z-10 rounded-full"></div>
+            <Image src="/dashboard-mockup.png" alt="MySiteBook Dashboard" width={800} height={600} priority className="w-full h-auto drop-shadow-2xl" />
+          </motion.div>
         </div>
       </div>
 
@@ -117,14 +96,15 @@ export default function Onboarding() {
         <div className="max-w-md w-full">
           {/* Mobile Logo with subtle background */}
           <div className="lg:hidden flex flex-col items-center justify-center mb-10 -mx-8 -mt-8 sm:-mx-12 sm:-mt-12 py-10 bg-slate-900 relative overflow-hidden rounded-b-[2rem] shadow-md">
+            <div className="absolute inset-0 opacity-20 bg-[url('/grid-pattern.svg')]"></div>
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-[40px] translate-x-1/2 -translate-y-1/2"></div>
-            <Link href="/" className="inline-block group relative z-10">
-              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-10 sm:h-12 w-auto object-contain" />
+            <Link href="/" className="inline-block group relative z-10 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1">
+              <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[150px] sm:w-[180px] h-auto object-contain" />
             </Link>
           </div>
 
-          <div className="text-center lg:text-left mb-10">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4 mx-auto">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h2 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight mb-2">Google Sign-In Successful!</h2>
@@ -138,7 +118,7 @@ export default function Onboarding() {
               </div>
             )}
             <div>
-              <label htmlFor="companyName" className="block text-sm font-bold text-gray-700 mb-1.5">Company / Site Owner Name</label>
+              <label htmlFor="companyName" className="block text-sm font-bold text-gray-700 mb-1.5">Company / Site Owner Name <span className="text-red-500">*</span></label>
               <input 
                 id="companyName"
                 name="companyName"
@@ -150,7 +130,7 @@ export default function Onboarding() {
             </div>
             
             <div>
-              <label htmlFor="mobile" className="block text-sm font-bold text-gray-700 mb-1.5">Mobile Number</label>
+              <label htmlFor="mobile" className="block text-sm font-bold text-gray-700 mb-1.5">Mobile Number <span className="text-red-500">*</span></label>
               <input 
                 id="mobile"
                 name="mobile"
@@ -161,23 +141,61 @@ export default function Onboarding() {
                 required
               />
             </div>
+            
+            <div>
+              <label htmlFor="contactPerson" className="block text-sm font-bold text-gray-700 mb-1.5">Contact Person Name <span className="text-red-500">*</span></label>
+              <input 
+                id="contactPerson"
+                name="contactPerson"
+                type="text" 
+                className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white text-gray-900"
+                placeholder="Ramesh Kumar"
+                required
+              />
+            </div>
 
             <div>
-              <label htmlFor="businessType" className="block text-sm font-bold text-gray-700 mb-1.5">Business Type</label>
-              <select 
-                id="businessType"
-                name="businessType"
-                className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white text-gray-900 appearance-none"
+              <label htmlFor="address" className="block text-sm font-bold text-gray-700 mb-1.5">Company Address <span className="text-red-500">*</span></label>
+              <input 
+                id="address"
+                name="address"
+                type="text" 
+                className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white text-gray-900"
+                placeholder="123 Main Street"
                 required
-                defaultValue=""
-              >
-                <option value="" disabled>Select type</option>
-                <option value="general_contractor">General Contractor</option>
-                <option value="builder">Builder / Developer</option>
-                <option value="subcontractor">Subcontractor</option>
-                <option value="architect">Architect / Designer</option>
-                <option value="other">Other</option>
-              </select>
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="pincode" className="block text-sm font-bold text-gray-700 mb-1.5">Pincode <span className="text-red-500">*</span></label>
+                <input 
+                  id="pincode"
+                  name="pincode"
+                  type="text" 
+                  className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white text-gray-900"
+                  placeholder="600001"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="businessType" className="block text-sm font-bold text-gray-700 mb-1.5">Business Type <span className="text-red-500">*</span></label>
+                <select 
+                  id="businessType"
+                  name="businessType"
+                  className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white text-gray-900 appearance-none"
+                  required
+                  defaultValue=""
+                >
+                  <option value="" disabled>Select type</option>
+                  <option value="general_contractor">General Contractor</option>
+                  <option value="builder">Builder / Developer</option>
+                  <option value="subcontractor">Subcontractor</option>
+                  <option value="architect">Architect / Designer</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
             </div>
             
             <button 
@@ -194,3 +212,4 @@ export default function Onboarding() {
     </div>
   );
 }
+

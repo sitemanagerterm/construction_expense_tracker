@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,8 +15,8 @@ export const metadata: Metadata = {
   description: "Track Every Rupee. Stop Profit Drain. The Ultimate Construction Expense Tracker.",
   manifest: "/manifest.json",
   icons: {
-    icon: '/mysitebook-logo-transparent.png',
-    apple: '/mysitebook-logo-transparent.png',
+    icon: '/mysitebook-logo-light.png',
+    apple: '/mysitebook-logo-light.png',
   },
 };
 
@@ -30,6 +31,7 @@ export default function RootLayout({
         <LanguageProvider>
           <Providers>
             {children}
+            <Toaster position="bottom-right" />
           </Providers>
         </LanguageProvider>
       </body>

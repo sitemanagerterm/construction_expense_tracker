@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Lock, Menu, X } from "lucide-react";
-import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaRegEnvelope } from "react-icons/fa";
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { Lock, Menu, X } from "lucide-react";
+import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaRegEnvelope, FaHardHat } from "react-icons/fa";
 
 export default function MarketingLayout({
   children,
@@ -23,8 +25,8 @@ export default function MarketingLayout({
       <nav className="fixed top-0 w-full z-50 bg-primary/95 backdrop-blur border-b border-gray-800">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
           <div className="flex justify-between items-center h-20">
-            <Link href="/" className="flex items-center gap-2">
-              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-14 sm:h-16 w-auto drop-shadow-md" />
+            <Link href="/" className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1">
+              <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[130px] sm:w-[150px] lg:w-[170px] h-auto drop-shadow-md" priority />
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">
@@ -38,14 +40,14 @@ export default function MarketingLayout({
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link href="/login" className="hidden md:flex items-center justify-center border border-accent text-accent hover:bg-accent/10 px-6 h-10 rounded-lg text-sm font-medium transition-all">
+              <Link href="/login" className="hidden md:flex items-center justify-center border border-accent text-accent hover:bg-accent/10 px-6 h-10 rounded-lg text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <Lock className="w-4 h-4 mr-2" /> Log In
               </Link>
-              <Link href="/register" className="bg-accent hover:bg-accent-600 text-primary px-4 sm:px-6 h-10 rounded-lg text-[13px] sm:text-sm font-bold transition-all transform hover:scale-105 flex items-center justify-center border border-transparent whitespace-nowrap">
+              <Link href="/register" className="bg-accent hover:bg-accent-600 text-primary px-4 sm:px-6 h-10 rounded-lg text-[13px] sm:text-sm font-bold transition-all transform hover:scale-105 flex items-center justify-center border border-transparent whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none">
                 Start Free Trial
               </Link>
               <button 
-                className="md:hidden text-white p-2"
+                className="md:hidden text-white p-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle mobile menu"
                 aria-expanded={isMobileMenuOpen}
@@ -104,7 +106,7 @@ export default function MarketingLayout({
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
             <div className="col-span-1 md:col-span-2 pr-0 lg:pr-12">
-              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-14 sm:h-16 w-auto mb-6 drop-shadow-md" />
+              <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[130px] sm:w-[150px] lg:w-[170px] h-auto mb-6 drop-shadow-md" />
               <p className="text-[14px] text-gray-300 mb-5 font-medium leading-relaxed">
                 The all-in-one finance management<br/>solution for construction contractors.
               </p>

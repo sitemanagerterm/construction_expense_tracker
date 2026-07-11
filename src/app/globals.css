@@ -17,7 +17,6 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 @keyframes shine-sweep {
@@ -52,4 +51,14 @@ body {
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: left center;
+}
+
+/* Hide number input spinners but keep native keyboard */
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinners[type=number] {
+  -moz-appearance: textfield;
 }

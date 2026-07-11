@@ -12,6 +12,27 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock_client_secret",
     }),
     CredentialsProvider({
+      id: "super-admin",
+      name: "Super Admin",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+        
+        const user = await prisma.user.findFirst({
+          where: { email: credentials.email, role: "SUPER_ADMIN" }
+        });
+
+        if (user && user.password === credentials.password) {
+          return user;
+        }
+        
+        return null;
+      }
+    }),
+    CredentialsProvider({
       name: "Mobile & PIN",
       credentials: {
         mobile: { label: "Mobile Number", type: "text" },
@@ -27,6 +48,9 @@ export const authOptions: NextAuthOptions = {
 
         // Basic check for MVP (In production, use proper hashed PIN check)
         if (user && user.pin === credentials.pin) {
+          if (user.isBlocked) {
+            throw new Error("Your account has been blocked by the site owner.");
+          }
           return user;
         }
         
@@ -41,13 +65,15 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
-        
-        // Fetch the latest user data from database
+      }
+      
+      // If we trigger an update or if the token is missing tenantId, fetch from DB
+      if (token.id && (trigger === "update" || !token.tenantId)) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
+          where: { id: token.id as string },
           select: { tenantId: true, role: true }
         });
 

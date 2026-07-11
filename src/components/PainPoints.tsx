@@ -7,6 +7,7 @@ import {
   ShieldCheck, Check, ArrowRight, Building2, BarChart3, Wallet, Smartphone 
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const problems = [
   {
@@ -131,7 +132,7 @@ export default function PainPoints() {
               </div>
 
               {/* Logo */}
-              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-12 md:h-14 w-auto mb-8 object-contain object-left" style={{ objectPosition: 'left' }} />
+              <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={200} height={64} className="h-12 md:h-14 w-auto mb-8 object-contain object-left" style={{ objectPosition: 'left' }} />
 
               {/* Headline */}
               <h3 className="text-white text-3xl md:text-4xl font-bold leading-[1.2] mb-8">
@@ -152,7 +153,7 @@ export default function PainPoints() {
 
               {/* CTA Button */}
               <div className="mt-8 relative z-30">
-                <Link href="/register" className="inline-flex items-center justify-center bg-[#F4B400] hover:bg-[#F4B400]/90 text-black px-6 py-4 rounded-xl text-[18px] font-medium transition-all duration-300 w-full sm:w-auto shadow-[0_8px_20px_rgb(244,180,0,0.3)] hover:shadow-[0_8px_25px_rgb(244,180,0,0.4)] hover:-translate-y-1">
+                <Link href="/register" className="inline-flex items-center justify-center bg-[#F4B400] hover:bg-[#F4B400]/90 text-black px-6 py-4 rounded-xl text-[18px] font-medium transition-all duration-300 w-full sm:w-auto shadow-[0_8px_20px_rgb(244,180,0,0.3)] hover:shadow-[0_8px_25px_rgb(244,180,0,0.4)] hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F4B400] focus-visible:outline-none">
                   Start Tracking Your Profit <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </div>
@@ -162,8 +163,8 @@ export default function PainPoints() {
 
               {/* Background Visuals Collage */}
               <div className="absolute bottom-0 -right-4 w-full h-[300px] lg:h-[350px] pointer-events-none z-10 flex items-end justify-end">
-                <img src="/dashboard-mockup.png" alt="Dashboard" className="absolute top-0 -right-10 w-[100%] sm:w-[80%] lg:w-[110%] rotate-[-5deg] opacity-30 blur-[1px] mix-blend-screen" />
-                <img src="/contractor_thumbsup_trans.png?v=3" alt="Contractor" className="absolute bottom-0 right-0 w-[65%] sm:w-[45%] lg:w-[55%] xl:w-[50%] object-contain object-bottom drop-shadow-2xl brightness-110" />
+                <Image src="/dashboard-mockup.png" alt="Dashboard" width={800} height={600} className="absolute top-0 -right-10 w-[100%] sm:w-[80%] lg:w-[110%] rotate-[-5deg] opacity-30 blur-[1px] mix-blend-screen h-auto" />
+                <Image src="/contractor_thumbsup_trans.png" alt="Contractor" width={600} height={800} className="absolute bottom-0 right-0 w-[65%] sm:w-[45%] lg:w-[55%] xl:w-[50%] object-contain object-bottom drop-shadow-2xl brightness-110 h-auto" />
               </div>
               
               {/* Subtle overlay gradient to ensure text readability over visuals */}

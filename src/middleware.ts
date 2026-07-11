@@ -9,9 +9,16 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register');
   const isDashboardPage = request.nextUrl.pathname.startsWith('/dashboard');
   const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding');
+  const isExpiredPage = request.nextUrl.pathname.startsWith('/expired');
+
+  const isDashboardExpired = request.nextUrl.pathname === '/dashboard/expired';
+
+  if (isDashboardExpired) {
+    return NextResponse.redirect(new URL('/expired', request.url));
+  }
 
   if (!token) {
-    if (isDashboardPage || isOnboardingPage) {
+    if (isDashboardPage || isOnboardingPage || isExpiredPage) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
     return NextResponse.next();
@@ -28,7 +35,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isDashboardPage && !hasTenant) {
+  if ((isDashboardPage || isExpiredPage) && !hasTenant) {
     // If they try to access dashboard without a tenant (company), force onboarding
     return NextResponse.redirect(new URL('/onboarding', request.url));
   }
@@ -46,6 +53,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/onboarding/:path*',
+    '/expired/:path*',
     '/login',
     '/register'
   ],

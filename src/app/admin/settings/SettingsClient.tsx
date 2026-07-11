@@ -1,0 +1,180 @@
+"use client";
+
+import React, { useState } from "react";
+import { updatePlatformSettings } from "@/app/actions/admin";
+import toast from "react-hot-toast";
+
+export default function SettingsClient({ initialSettings }: { initialSettings: any }) {
+  const [supportPhone, setSupportPhone] = useState(initialSettings.supportPhone || "");
+  const [supportEmail, setSupportEmail] = useState(initialSettings.supportEmail || "");
+  const [offlinePaymentInstructions, setOfflinePaymentInstructions] = useState(initialSettings.offlinePaymentInstructions || "");
+  
+  // Payment Gateway State
+  const [activeGateway, setActiveGateway] = useState(initialSettings.activeGateway || "OFFLINE");
+  const [razorpayKeyId, setRazorpayKeyId] = useState(initialSettings.razorpayKeyId || "");
+  const [razorpayKeySecret, setRazorpayKeySecret] = useState(initialSettings.razorpayKeySecret || "");
+  const [stripePublicKey, setStripePublicKey] = useState(initialSettings.stripePublicKey || "");
+  const [stripeSecretKey, setStripeSecretKey] = useState(initialSettings.stripeSecretKey || "");
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const toastId = toast.loading("Saving settings...");
+
+    const result = await updatePlatformSettings({
+      supportPhone,
+      supportEmail,
+      offlinePaymentInstructions,
+      activeGateway,
+      razorpayKeyId,
+      razorpayKeySecret,
+      stripePublicKey,
+      stripeSecretKey
+    });
+
+    if (result.success) {
+      toast.success("Settings saved successfully!", { id: toastId });
+    } else {
+      toast.error(result.error || "Failed to save settings", { id: toastId });
+    }
+    
+    setIsSaving(false);
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        
+        {/* Support Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-slate-50 border-b border-slate-200 p-5">
+            <h3 className="text-lg font-bold text-slate-900">Support Contact Details</h3>
+            <p className="text-sm text-slate-500 mt-1">This information will be displayed to Tenants when their subscription expires.</p>
+          </div>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Support Phone Number</label>
+              <input 
+                type="text" 
+                value={supportPhone} 
+                onChange={(e) => setSupportPhone(e.target.value)}
+                placeholder="+1 234 567 8900"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Support Email Address</label>
+              <input 
+                type="email" 
+                value={supportEmail} 
+                onChange={(e) => setSupportEmail(e.target.value)}
+                placeholder="support@mysitebook.com"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Gateways Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-slate-50 border-b border-slate-200 p-5">
+            <h3 className="text-lg font-bold text-slate-900">Payment Gateway Configuration</h3>
+            <p className="text-sm text-slate-500 mt-1">Configure how tenants can pay for their subscription renewals online or offline.</p>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            <div className="max-w-md">
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Active Payment Method</label>
+              <select 
+                value={activeGateway}
+                onChange={(e) => setActiveGateway(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 font-medium transition-all outline-none"
+              >
+                <option value="OFFLINE">Offline Payments Only (Manual Verification)</option>
+                <option value="RAZORPAY">Razorpay (India / Global)</option>
+                <option value="STRIPE">Stripe (Global)</option>
+              </select>
+            </div>
+
+            {activeGateway === "OFFLINE" && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300 bg-amber-50/50 p-5 rounded-xl border border-amber-100">
+                <label className="block text-sm font-semibold text-amber-900 mb-1.5">Offline Payment Instructions</label>
+                <p className="text-xs text-amber-700/80 mb-3">Provide bank transfer details, UPI IDs, or address for offline payments.</p>
+                <textarea 
+                  value={offlinePaymentInstructions} 
+                  onChange={(e) => setOfflinePaymentInstructions(e.target.value)}
+                  rows={4}
+                  placeholder="Please transfer the subscription amount to Account No: XXXXXXXX, IFSC: XXXXXXX"
+                  className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none resize-none"
+                />
+              </div>
+            )}
+
+            {activeGateway === "RAZORPAY" && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Razorpay Key ID</label>
+                  <input 
+                    type="text" 
+                    value={razorpayKeyId} 
+                    onChange={(e) => setRazorpayKeyId(e.target.value)}
+                    placeholder="rzp_test_..."
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Razorpay Key Secret</label>
+                  <input 
+                    type="password" 
+                    value={razorpayKeySecret} 
+                    onChange={(e) => setRazorpayKeySecret(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeGateway === "STRIPE" && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stripe Publishable Key</label>
+                  <input 
+                    type="text" 
+                    value={stripePublicKey} 
+                    onChange={(e) => setStripePublicKey(e.target.value)}
+                    placeholder="pk_test_..."
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stripe Secret Key</label>
+                  <input 
+                    type="password" 
+                    value={stripeSecretKey} 
+                    onChange={(e) => setStripeSecretKey(e.target.value)}
+                    placeholder="sk_test_..."
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button 
+            type="submit"
+            disabled={isSaving}
+            className="px-8 py-3 text-sm font-bold text-slate-900 bg-accent hover:bg-accent-400 rounded-xl transition-all disabled:opacity-50 shadow-sm hover:shadow active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          >
+            {isSaving ? "Saving Settings..." : "Save Settings"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

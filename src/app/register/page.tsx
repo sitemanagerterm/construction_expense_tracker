@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaGoogle } from 'react-icons/fa';
 import { signIn } from 'next-auth/react';
 import { motion } from "framer-motion";
@@ -19,12 +20,12 @@ export default function Register() {
         <div className="absolute inset-0 z-0 opacity-[0.03]" style={{ backgroundImage: "url('/construction-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}></div>
 
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center group">
-            <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-12 md:h-16 w-auto object-contain transition-transform group-hover:scale-105" />
+          <Link href="/" className="inline-flex items-center group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1 -ml-4">
+            <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[150px] md:w-[190px] h-auto object-contain transition-transform group-hover:scale-105" />
           </Link>
         </div>
 
-        <div className="relative z-10 max-w-lg mt-12">
+        <div className="relative z-10 max-w-lg mt-8">
           <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-sm">
             Build your business.<br/>We'll handle the math.
           </h1>
@@ -38,10 +39,10 @@ export default function Register() {
           <motion.div 
             animate={{ y: [0, -15, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="relative w-full max-w-lg"
+            className="w-full max-w-lg relative"
           >
             <div className="absolute inset-0 bg-accent/20 blur-[80px] -z-10 rounded-full"></div>
-            <img src="/dashboard-mockup.png" alt="MySiteBook Dashboard" className="w-full h-auto drop-shadow-2xl" />
+            <Image src="/dashboard-mockup.png" alt="MySiteBook Dashboard" width={800} height={600} priority className="w-full h-auto drop-shadow-2xl" />
           </motion.div>
         </div>
       </div>
@@ -52,8 +53,8 @@ export default function Register() {
           {/* Mobile Logo with subtle background */}
           <div className="lg:hidden flex flex-col items-center justify-center mb-10 -mx-8 -mt-8 sm:-mx-12 sm:-mt-12 py-10 bg-slate-900 relative overflow-hidden rounded-b-[2rem] shadow-md">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-[40px] translate-x-1/2 -translate-y-1/2"></div>
-            <Link href="/" className="inline-block group relative z-10">
-              <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-10 sm:h-12 w-auto object-contain" />
+            <Link href="/" className="inline-block group relative z-10 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1">
+              <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[130px] sm:w-[160px] h-auto object-contain" />
             </Link>
           </div>
 

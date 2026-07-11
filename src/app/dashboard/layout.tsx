@@ -1,0 +1,59 @@
+import React from "react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import Sidebar from "@/components/dashboard/Sidebar";
+import MobileNav from "@/components/dashboard/MobileNav";
+import TopHeader from "@/components/dashboard/TopHeader";
+import { prisma } from "@/lib/prisma";
+import { TenantPreferencesProvider } from "@/components/providers/TenantProvider";
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    redirect("/login");
+  }
+
+  // Require Onboarding if they don't have a tenant ID (except for STAFF who might not have completed it but should have a tenant)
+  if (!session.user.tenantId) {
+    redirect("/onboarding");
+  }
+
+  // Fetch tenant preferences and expiry
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: session.user.tenantId },
+    select: { language: true, currency: true, subscriptionExpiry: true }
+  });
+
+  if (tenant?.subscriptionExpiry && new Date(tenant.subscriptionExpiry) < new Date()) {
+    redirect("/expired");
+  }
+
+  return (
+    <TenantPreferencesProvider language={tenant?.language || "en"} currency={tenant?.currency || "INR"}>
+      <div className="flex h-screen bg-slate-50 overflow-hidden text-gray-900 font-sans">
+        {/* Desktop Sidebar */}
+        <Sidebar user={session.user} />
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Mobile Top Header */}
+          <TopHeader user={session.user} />
+
+          {/* Scrollable Main Content */}
+          <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+            {children}
+          </main>
+
+          {/* Mobile Bottom Navigation */}
+          <MobileNav user={session.user} />
+        </div>
+      </div>
+    </TenantPreferencesProvider>
+  );
+}
