@@ -338,7 +338,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
           >
             <div>
               <p className="text-accent-700 text-[10px] font-bold mb-1 uppercase tracking-wider">{t('total_expenses')}</p>
-              <p className="text-xl font-bold text-accent-700">{formatCurrency(totalExpenses, currency)}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-accent-700">{formatCurrency(totalExpenses, currency)}</p>
             </div>
             <div className="text-accent-600 group-hover:text-accent-800 transition-colors shrink-0">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path></svg>
@@ -348,16 +348,16 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
             <p className={`text-[11px] font-bold mb-1 uppercase tracking-wider ${remainingBalance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
               {remainingBalance < 0 ? 'Project Loss' : 'Project Profit'}
             </p>
-            <div className="flex items-end gap-2">
-              <p className={`text-xl font-bold ${remainingBalance < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
-                {formatCurrency(Math.abs(remainingBalance), currency)}
+            <div className="flex items-end justify-between">
+              <p className={`text-2xl sm:text-3xl font-bold ${remainingBalance < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
+                {remainingBalance < 0 ? '-' : '+'}{formatCurrency(Math.abs(remainingBalance), currency)}
               </p>
               {project.budget > 0 && (
                 <div className={`flex items-center gap-0.5 pb-0.5 text-sm font-bold ${remainingBalance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                   {remainingBalance < 0 ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
                   )}
                   <span>{Math.abs((remainingBalance / project.budget) * 100).toFixed(1)}%</span>
                 </div>

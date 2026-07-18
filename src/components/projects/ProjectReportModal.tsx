@@ -218,9 +218,14 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
                 {isProfit ? '+' : ''}{formatCurrency(profitLoss, currency)}
               </p>
               {projectValue > 0 && (
-                <p className={`text-lg font-bold ${isProfit ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {plPercentage}%
-                </p>
+                <div className={`flex items-center gap-0.5 pb-1 text-lg font-bold ${isProfit ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {isProfit ? (
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                  ) : (
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
+                  )}
+                  <span>{plPercentage}%</span>
+                </div>
               )}
             </div>
           </div>
