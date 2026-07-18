@@ -66,3 +66,21 @@ export async function updateTenantSettings(data: TenantSettingsFormData) {
     return { success: false, error: error.message || "Failed to update settings" };
   }
 }
+
+export async function updateLanguage(language: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id || !session?.user?.tenantId) {
+      throw new Error("Unauthorized");
+    }
+    await prisma.tenant.update({
+      where: { id: session.user.tenantId },
+      data: { language },
+    });
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating language:", error);
+    return { success: false };
+  }
+}

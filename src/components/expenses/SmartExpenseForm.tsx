@@ -30,7 +30,12 @@ export default function SmartExpenseForm({
 }) {
   const [activeTab, setActiveTab] = useState<"manual" | "voice" | "ocr">("manual");
   const [isProcessing, setIsProcessing] = useState(false);
-  const { currency } = useTenantPreferences();
+  const [isMounted, setIsMounted] = useState(false);
+  const { currency, t } = useTenantPreferences();
+  
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Form State
   const [projectId, setProjectId] = useState(expenseToEdit?.project?.id || initialProjectId || projects[0]?.id || "");
@@ -38,7 +43,8 @@ export default function SmartExpenseForm({
   const [category, setCategory] = useState(expenseToEdit?.category || "");
   const [notes, setNotes] = useState(expenseToEdit?.notes || "");
   const [date, setDate] = useState<Date | null>(expenseToEdit ? new Date(expenseToEdit.date) : new Date());
-  const [errors, setErrors] = useState<{ projectId?: string; amount?: string; date?: string; category?: string }>({});
+  const [editReason, setEditReason] = useState("");
+  const [errors, setErrors] = useState<{ projectId?: string; amount?: string; date?: string; category?: string; editReason?: string }>({});
 
   // Voice State
   const [isRecording, setIsRecording] = useState(false);
@@ -49,12 +55,13 @@ export default function SmartExpenseForm({
     if (e) e.preventDefault();
     
     // Custom Validation
-    const newErrors: { projectId?: string; amount?: string; date?: string; category?: string } = {};
+    const newErrors: { projectId?: string; amount?: string; date?: string; category?: string; editReason?: string } = {};
     if (!projectId) newErrors.projectId = "Please select a project";
     if (!amount) newErrors.amount = "Amount is required";
     else if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) newErrors.amount = "Amount must be greater than zero";
     if (!category) newErrors.category = "Category is required";
     if (!date) newErrors.date = "Date is required";
+    if (expenseToEdit && !editReason.trim()) newErrors.editReason = "Reason for edit is required";
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -72,7 +79,7 @@ export default function SmartExpenseForm({
     };
     try {
       if (expenseToEdit && expenseToEdit.id) {
-        const res = await updateExpense(expenseToEdit.id, payload);
+        const res = await updateExpense(expenseToEdit.id, payload, editReason.trim());
         if (res.success) {
           toast.success("Expense updated successfully!");
           onSuccess();
@@ -137,7 +144,8 @@ export default function SmartExpenseForm({
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         processAudioBlob(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -184,11 +192,11 @@ export default function SmartExpenseForm({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-3xl w-full max-w-lg shadow-modal overflow-hidden animate-fade-in flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in" onClick={onClose}>
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border sm:border-gray-100 overflow-hidden flex flex-col sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h2 className="text-xl font-bold text-primary-900">{expenseToEdit ? "Edit Expense" : "Log New Expense"}</h2>
+          <h2 className="text-xl font-bold text-primary-900">{expenseToEdit ? (t('edit_expense') || "Edit Expense") : (t('log_new_expense') || "Log New Expense")}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-2">
             <FaTimes />
           </button>
@@ -237,14 +245,17 @@ export default function SmartExpenseForm({
               {activeTab === "manual" && (
                 <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                   <div>
-                    <label className="block text-sm font-semibold text-primary-800 mb-1.5">Project</label>
+                    <label className="block text-sm font-semibold text-primary-800 mb-1.5">{t('project') || "Project"}</label>
                     <div className="relative">
                       <Select 
                         options={projects.map(p => ({ value: p.id, label: p.name }))}
                         value={projects.find(p => p.id === projectId) ? { value: projectId, label: projects.find(p => p.id === projectId)?.name } : null}
                         onChange={(val: any) => { setProjectId(val?.value || ""); setErrors(prev => ({ ...prev, projectId: undefined })); }}
                         placeholder="Search project..."
+                        menuPosition="fixed"
+                        menuPortalTarget={isMounted ? document.body : null}
                         styles={{
+                          menuPortal: base => ({ ...base, zIndex: 9999 }),
                           control: (base, state) => ({
                             ...base,
                             backgroundColor: errors.projectId ? 'rgba(254, 242, 242, 0.3)' : '#f9fafb',
@@ -308,7 +319,10 @@ export default function SmartExpenseForm({
                         onChange={(val: any) => { setCategory(val?.value?.toUpperCase() || ""); setErrors(prev => ({ ...prev, category: undefined })); }}
                         placeholder="Select..."
                         formatCreateLabel={(inputValue) => `+ Create new category "${inputValue}"`}
+                        menuPosition="fixed"
+                        menuPortalTarget={isMounted ? document.body : null}
                         styles={{
+                          menuPortal: base => ({ ...base, zIndex: 9999 }),
                           control: (base, state) => ({
                             ...base,
                             backgroundColor: errors.category ? 'rgba(254, 242, 242, 0.3)' : '#f9fafb',
@@ -346,7 +360,7 @@ export default function SmartExpenseForm({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-primary-800 mb-1.5">Date</label>
+                <label className="block text-sm font-semibold text-primary-800 mb-1.5">{t('date') || "Date"}</label>
                 <DatePicker 
                   selected={date} 
                   onChange={(d: Date | null) => setDate(d)}
@@ -365,20 +379,39 @@ export default function SmartExpenseForm({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-primary-800 mb-1.5">Notes (Optional)</label>
+                <label className="block text-sm font-semibold text-primary-800 mb-1.5">{t('notes_optional') || "Notes (Optional)"}</label>
                 <textarea 
                   value={notes} onChange={(e) => setNotes(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
-                  rows={3} placeholder="Vendor name or short description"
+                  rows={2} placeholder="Vendor name or short description"
                 />
               </div>
+
+              {expenseToEdit && (
+                <div>
+                  <label className="block text-sm font-semibold text-primary-800 mb-1.5">{t('reason_for_edit') || "Reason for Edit"} *</label>
+                  <textarea 
+                    value={editReason} onChange={(e) => { setEditReason(e.target.value); setErrors(prev => ({ ...prev, editReason: undefined })); }}
+                    className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all resize-none ${
+                      errors.editReason ? 'border-red-500 bg-red-50/30 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-primary-500'
+                    }`}
+                    rows={2} placeholder={t('reason_for_edit_placeholder') || "e.g. Corrected amount, fixing typo..."}
+                  />
+                  {errors.editReason && (
+                    <p className="text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      {errors.editReason}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <button 
                 type="submit" 
                 disabled={isProcessing}
                 className="w-full bg-primary-900 text-white py-3.5 rounded-xl font-bold hover:bg-primary-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
               >
-                {isProcessing ? <><FaSpinner className="animate-spin" /> Saving...</> : (expenseToEdit ? "Save Changes" : "Save Expense")}
+                {isProcessing ? <><FaSpinner className="animate-spin" /> {t('saving') || "Saving..."}</> : (expenseToEdit ? (t('save_changes') || "Save Changes") : (t('save_expense') || "Save Expense"))}
               </button>
             </form>
           )}

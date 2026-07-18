@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { updateProfile, ProfileFormData, updateTenantSettings, TenantSettingsFormData } from "@/app/actions/settings";
 import toast from "react-hot-toast";
+import { useTenantPreferences } from "@/components/providers/TenantProvider";
 
 type UserData = {
   id: string;
@@ -22,6 +23,7 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const { t } = useTenantPreferences();
   
   const [currency, setCurrency] = useState(initialUser.tenant?.currency || "INR");
   const [language, setLanguage] = useState(initialUser.tenant?.language || "en");
@@ -92,8 +94,8 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto items-start">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">Personal Profile</h2>
-          <p className="text-sm text-gray-500 mt-1">Update your personal information and contact details.</p>
+          <h2 className="text-lg font-bold text-gray-900">{t('personal_profile') || "Personal Profile"}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('personal_profile_desc') || "Update your personal information and contact details."}</p>
         </div>
 
       <div className="p-6">
@@ -101,8 +103,8 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
           
           <div className="max-w-lg space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">Full Name <span className="text-red-500">*</span></label>
-              <input type="text" id="name" name="name" defaultValue={initialUser.name || ""} placeholder="Your Name"
+              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">{t('full_name') || "Full Name"} <span className="text-red-500">*</span></label>
+              <input type="text" id="name" name="name" defaultValue={initialUser.name || ""} placeholder={t('full_name') || "Your Name"}
                 className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 ${
                   validationErrors.name 
                     ? "border-red-500 bg-red-50/30 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
@@ -118,15 +120,15 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
+              <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-1">{t('email_address') || "Email Address"}</label>
               <input type="email" id="email" defaultValue={initialUser.email || ""} disabled
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 outline-none cursor-not-allowed" 
               />
-              <p className="text-xs text-gray-500 mt-1.5">Email cannot be changed directly. Contact support.</p>
+              <p className="text-xs text-gray-500 mt-1.5">{t('email_desc') || "Email cannot be changed directly. Contact support."}</p>
             </div>
 
             <div>
-              <label htmlFor="mobileNumber" className="block text-sm font-bold text-gray-700 mb-1">Mobile Number</label>
+              <label htmlFor="mobileNumber" className="block text-sm font-bold text-gray-700 mb-1">{t('mobile_number') || "Mobile Number"}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <span className="text-gray-500 font-medium">+91</span>
@@ -151,7 +153,7 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
           <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end">
             <button type="submit" disabled={loading}
               className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 hover:bg-primary-800 transition-all flex items-center gap-2 ${loading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20'}`}>
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? (t('saving') || "Saving...") : (t('save_changes') || "Save Changes")}
             </button>
           </div>
         </form>
@@ -161,17 +163,17 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
       {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
-            <h2 className="text-lg font-bold text-gray-900">Application Preferences</h2>
-            <p className="text-sm text-gray-500 mt-1">Set the default currency and language for your entire company.</p>
-          </div>
+          <h2 className="text-lg font-bold text-gray-900">{t('app_preferences') || "Application Preferences"}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('app_preferences_desc') || "Set the default currency and language for your entire company."}</p>
+        </div>
 
           <div className="p-6">
             <form onSubmit={handleSettingsSubmit} className="space-y-6">
               
               <div className="w-full space-y-6">
                 <div>
-                  <label htmlFor="currency" className="block text-sm font-bold text-gray-700 mb-1">Currency Symbol</label>
-                  <div className="relative">
+              <label className="block text-sm font-bold text-gray-700 mb-1">{t('currency_symbol') || "Currency Symbol"}</label>
+              <div className="relative">
                     <select 
                       id="currency" 
                       value={currency}
@@ -192,8 +194,8 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
                 </div>
 
                 <div>
-                  <label htmlFor="language" className="block text-sm font-bold text-gray-700 mb-1">Application Language</label>
-                  <div className="relative">
+              <label className="block text-sm font-bold text-gray-700 mb-1">{t('application_language') || "Application Language"}</label>
+              <div className="relative">
                     <select 
                       id="language" 
                       value={language}
@@ -214,7 +216,7 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
               <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end">
                 <button type="submit" disabled={settingsLoading}
                   className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 hover:bg-primary-800 transition-all flex items-center gap-2 ${settingsLoading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20'}`}>
-                  {settingsLoading ? "Saving..." : "Save Preferences"}
+                  {settingsLoading ? (t('saving') || "Saving...") : (t('save_changes') || "Save Changes")}
                 </button>
               </div>
             </form>

@@ -26,7 +26,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const { currency } = useTenantPreferences();
+  const { currency, t } = useTenantPreferences();
 
   useEffect(() => {
     if (editData && isOpen) {
@@ -98,11 +98,11 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in" onClick={onClose}>
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border sm:border-gray-100 overflow-hidden flex flex-col sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900">{editData ? 'Edit Project' : 'Create New Project'}</h2>
+        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+          <h2 className="text-xl font-bold text-gray-900">{editData ? t('edit') : t('create_new_project')}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -117,7 +117,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             )}
             
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">Project Name <span className="text-red-500">*</span></label>
+              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">{t('project_name')} <span className="text-red-500">*</span></label>
               <input type="text" id="name" name="name" placeholder="E.g. Apollo Hospital Wing B"
                 defaultValue={editData?.name || ""}
                 className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 ${
@@ -135,7 +135,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             </div>
 
             <div>
-              <label htmlFor="clientName" className="block text-sm font-bold text-gray-700 mb-1">Client Name</label>
+              <label htmlFor="clientName" className="block text-sm font-bold text-gray-700 mb-1">{t('client_name')}</label>
               <input type="text" id="clientName" name="clientName" placeholder="E.g. Apollo Group"
                 defaultValue={editData?.clientName || ""}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900" />
@@ -143,7 +143,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="budget" className="block text-sm font-bold text-gray-700 mb-1">Est. Budget ({getCurrencySymbol(currency)})</label>
+                <label htmlFor="budget" className="block text-sm font-bold text-gray-700 mb-1">{t('est_budget')} ({getCurrencySymbol(currency)})</label>
                 <input type="number" id="budget" name="budget" placeholder="e.g. 5000" step="0.01" min="0"
                   defaultValue={editData?.budget || ""}
                   className={`w-full bg-gray-50 border rounded-xl px-4 py-2.5 text-gray-800 font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all no-spinners ${
@@ -160,27 +160,29 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
                 )}
               </div>
               <div>
-                <label htmlFor="startDate" className="block text-sm font-bold text-gray-700 mb-1">Start Date</label>
+              <label htmlFor="startDate" className="block text-sm font-bold text-gray-700 mb-1">{t('start_date')}</label>
+              <div className="relative">
                 <DatePicker 
                   selected={startDate}
                   onChange={(date: Date | null) => setStartDate(date)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900"
                   wrapperClassName="w-full"
-                  placeholderText="Select start date"
+                  placeholderText={t('select_start_date') || "Select start date"}
                   dateFormat="MMMM d, yyyy"
                   isClearable
                 />
               </div>
             </div>
+            </div>
 
             <div>
-              <label htmlFor="endDate" className="block text-sm font-bold text-gray-700 mb-1">Completed / End Date</label>
+              <label htmlFor="endDate" className="block text-sm font-bold text-gray-700 mb-1">{t('completed_end_date') || "Completed / End Date"}</label>
               <DatePicker 
                 selected={endDate}
                 onChange={(date: Date | null) => setEndDate(date)}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900"
                 wrapperClassName="w-full"
-                placeholderText="Select completed date (optional)"
+                placeholderText={t('select_completed_date') || "Select completed date (optional)"}
                 dateFormat="MMMM d, yyyy"
                 isClearable
                 minDate={startDate || undefined}
@@ -188,22 +190,22 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-1">Description / Notes</label>
-              <textarea id="description" name="description" rows={3} placeholder="Add any details about the site..."
+              <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-1">{t('description_notes') || "Description / Notes"}</label>
+              <textarea id="description" name="description" rows={3} placeholder={t('add_details_site') || "Add any details about the site..."}
                 defaultValue={editData?.description || ""}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900 resize-none"></textarea>
             </div>
           </form>
         </div>
 
-        <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+        <div className="p-6 pb-8 sm:pb-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0 mt-auto">
           <button type="button" onClick={onClose} disabled={loading}
-            className="px-6 py-2.5 rounded-xl font-semibold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">
-            Cancel
+            className="flex-1 sm:flex-none px-6 py-3 sm:py-2.5 rounded-xl font-bold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">
+            {t('cancel')}
           </button>
           <button type="submit" form="project-form" disabled={loading}
-            className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 hover:bg-primary-800 transition-all ${loading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20'}`}>
-            {loading ? (editData ? "Updating..." : "Creating...") : (editData ? "Update Project" : "Create Project")}
+            className={`flex-1 sm:flex-none px-6 py-3 sm:py-2.5 rounded-xl font-bold text-white bg-primary-900 hover:bg-primary-800 transition-all ${loading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20'}`}>
+            {loading ? "..." : (editData ? t('edit') : t('create_project'))}
           </button>
         </div>
 

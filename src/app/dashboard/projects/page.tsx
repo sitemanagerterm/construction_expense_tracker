@@ -1,21 +1,7 @@
-import React from "react";
-import ProjectList from "@/components/projects/ProjectList";
-import { getProjects } from "@/app/actions/projects";
+import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "Projects | MySiteBook",
-  description: "Manage your construction sites and projects.",
-};
-
-export default async function ProjectsPage() {
-  const res = await getProjects();
-  const initialProjects = res.success ? res.data : [];
-
-  return (
-    <div className="p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <ProjectList initialProjects={initialProjects || []} />
-      </div>
-    </div>
-  );
+export default function ProjectsRedirectPage() {
+  // We no longer have a generic projects list screen.
+  // The home screen is now the Project Details screen for the most recent project.
+  redirect("/dashboard");
 }

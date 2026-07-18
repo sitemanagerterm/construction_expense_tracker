@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { FaHistory, FaSearch, FaTrash } from "react-icons/fa";
+import { FaHistory, FaSearch, FaTrash, FaEdit, FaArchive } from "react-icons/fa";
 import { formatCurrency } from "@/lib/utils";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 
@@ -10,6 +10,8 @@ type AuditLog = {
   id: string;
   action: string;
   reason: string;
+  oldAmount?: number | null;
+  newAmount?: number | null;
   createdAt: Date;
   modifierName: string;
   expense: {
@@ -20,12 +22,14 @@ type AuditLog = {
   };
 };
 
-export default function AuditLogsClient({ initialLogs }: { initialLogs: any[] }) {
-  const { currency } = useTenantPreferences();
+export default function AuditLogsClient({ initialLogs, allProjects }: { initialLogs: any[], allProjects?: any[] }) {
+  const { currency, t } = useTenantPreferences();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterProject, setFilterProject] = useState("ALL");
 
-  const uniqueProjects = Array.from(new Set(initialLogs.map(log => log.expense.project.name)));
+  const uniqueProjects = allProjects
+    ? Array.from(new Set(allProjects.map(p => p.name)))
+    : Array.from(new Set(initialLogs.map(log => log.expense.project.name)));
 
   const filteredLogs = initialLogs.filter(log => {
     const matchesSearch = log.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,20 +46,20 @@ export default function AuditLogsClient({ initialLogs }: { initialLogs: any[] })
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <FaHistory className="text-primary-600" /> Audit Logs
+            <FaHistory className="text-primary-600" /> {t('audit_logs')}
           </h1>
-          <p className="text-gray-500 mt-1 text-sm">Review deleted expenses and modification history</p>
+          <p className="text-gray-500 mt-1 text-sm">{t('audit_logs_desc') || "Review deleted expenses and modification history"}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
-          <label className="text-xs font-semibold text-gray-500 mb-1">Search Logs</label>
+          <label className="text-xs font-semibold text-gray-500 mb-1">{t('search_logs')}</label>
           <div className="flex items-center gap-3">
             <FaSearch className="text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search reason or user..." 
+              placeholder={t('search_reason_or_user') || "Search reason or user..."} 
               className="w-full text-sm font-semibold text-gray-900 border-none outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -64,13 +68,13 @@ export default function AuditLogsClient({ initialLogs }: { initialLogs: any[] })
         </div>
 
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
-          <label className="text-xs font-semibold text-gray-500 mb-1">Filter by Project</label>
+          <label className="text-xs font-semibold text-gray-500 mb-1">{t('filter_by_project') || "Filter by Project"}</label>
           <select 
             value={filterProject} 
             onChange={(e) => setFilterProject(e.target.value)}
             className="w-full text-sm font-semibold text-gray-900 border-none outline-none bg-transparent cursor-pointer"
           >
-            <option value="ALL">All Projects</option>
+            <option value="ALL">{t('all_projects') || "All Projects"}</option>
             {uniqueProjects.map((projectName: any) => (
               <option key={projectName} value={projectName}>{projectName}</option>
             ))}
@@ -83,9 +87,9 @@ export default function AuditLogsClient({ initialLogs }: { initialLogs: any[] })
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
-                <th className="p-4 font-semibold whitespace-nowrap">Date / Time</th>
-                <th className="p-4 font-semibold whitespace-nowrap">Action</th>
-                <th className="p-4 font-semibold whitespace-nowrap">Original Expense</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('date_time') || "Date / Time"}</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('action_header') || "Action"}</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('original_expense') || "Original Expense"}</th>
                 <th className="p-4 font-semibold whitespace-nowrap">Modified By</th>
                 <th className="p-4 font-semibold min-w-[200px]">Reason</th>
               </tr>
@@ -104,21 +108,37 @@ export default function AuditLogsClient({ initialLogs }: { initialLogs: any[] })
                       {format(new Date(log.createdAt), "dd MMM yyyy")}
                       <div className="text-xs text-gray-400">{format(new Date(log.createdAt), "hh:mm a")}</div>
                     </td>
-                    <td className="p-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-red-50 text-red-600">
-                        <FaTrash className="text-[10px]" /> {log.action}
-                      </span>
+                    <td className="p-4 text-sm whitespace-nowrap">
+                      {log.action === "EDITED" ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                          <FaEdit className="text-amber-500" /> {t('edited') || "EDITED"}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-red-50 text-red-600 border border-red-100">
+                          <FaTrash className="text-red-500" /> {t('deleted') || "DELETED"}
+                        </span>
+                      )}
                     </td>
                     <td className="p-4 text-sm">
                       <div className="font-bold text-gray-900">{formatCurrency(log.expense.amount, currency)} - {log.expense.category}</div>
-                      <div className="text-xs text-gray-500">Project: {log.expense.project.name}</div>
+                      {log.action === "EDITED" && log.oldAmount != null && log.newAmount != null && (
+                        <div className="mt-1 flex items-center gap-2 text-xs font-semibold bg-amber-50 text-amber-700 w-fit px-2 py-1 rounded-md">
+                          <span className="line-through opacity-70">{formatCurrency(log.oldAmount, currency)}</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                          <span>{formatCurrency(log.newAmount, currency)}</span>
+                        </div>
+                      )}
+                      <div className="text-xs text-gray-500 mt-1">Project: {log.expense.project.name}</div>
                       <div className="text-xs text-gray-400">Exp Date: {format(new Date(log.expense.date), "dd MMM yyyy")}</div>
                     </td>
                     <td className="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
                       {log.modifierName}
                     </td>
-                    <td className="p-4 text-sm text-gray-600">
-                      {log.reason}
+                    <td className="p-4 text-sm">
+                      <div className="bg-blue-50/50 border border-blue-100 text-blue-900 p-2.5 rounded-lg text-xs font-semibold leading-relaxed relative overflow-hidden">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-400"></div>
+                        {log.reason}
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { FaPlus, FaTrash, FaEdit, FaCheckCircle, FaExclamationCircle, FaSync } from "react-icons/fa";
+import { FaPlus, FaTrash, FaEdit, FaCheckCircle, FaExclamationCircle, FaSync, FaArchive } from "react-icons/fa";
 import { formatCurrency } from "@/lib/utils";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 import Link from "next/link";
@@ -323,17 +323,17 @@ export default function ExpenseList({
       
       {/* Delete Confirmation Modal */}
       {deleteModal.isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setDeleteModal({ isOpen: false, expenseId: null, reason: "" })}>
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end sm:justify-center items-center p-4 pb-[72px] sm:pb-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setDeleteModal({ isOpen: false, expenseId: null, reason: "" })}>
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Expense</h3>
               <p className="text-sm text-gray-500 mb-4">Are you sure you want to delete this expense? This action will be logged in the audit trail.</p>
               
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Reason for Deletion *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Reason for Deleting *</label>
               <textarea
                 value={deleteModal.reason}
                 onChange={(e) => setDeleteModal({ ...deleteModal, reason: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 resize-none h-24"
+                className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 resize-none h-24"
                 placeholder="e.g. Entered wrong amount, duplicate entry..."
               ></textarea>
               
@@ -347,7 +347,7 @@ export default function ExpenseList({
                 <button 
                   onClick={confirmDelete}
                   disabled={!deleteModal.reason.trim()}
-                  className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Delete Expense
                 </button>

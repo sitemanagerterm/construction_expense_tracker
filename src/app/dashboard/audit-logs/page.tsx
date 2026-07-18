@@ -47,9 +47,17 @@ export default async function AuditLogsPage() {
     modifierName: users.find(u => u.id === log.modifiedBy)?.name || 'Unknown User'
   }));
 
+  const allProjects = await prisma.project.findMany({
+    where: {
+      tenantId: session.user.tenantId as string,
+      isDeleted: false
+    },
+    select: { id: true, name: true, status: true }
+  });
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
-      <AuditLogsClient initialLogs={logsWithUsers} />
+      <AuditLogsClient initialLogs={logsWithUsers} allProjects={allProjects} />
     </div>
   );
 }

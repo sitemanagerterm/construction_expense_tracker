@@ -169,20 +169,21 @@ model Project {
   status      String    @default("ACTIVE") // ACTIVE, COMPLETED, ARCHIVED
   isDeleted   Boolean   @default(false)
 
-  // Advances received for this project
-  advances    Advance[]
+  // Credits received for this project
+  credits     Credit[]
   expenses    Expense[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
 
-model Advance {
+model Credit {
   id          String   @id @default(cuid())
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   amount      Float
   date        DateTime @default(now())
+  paymentMethod String @default("CASH") // CASH, GPAY, BANK_TRANSFER
   notes       String?
 
   createdAt   DateTime @default(now())

@@ -106,13 +106,14 @@ export async function deleteExpense(id: string, reason: string) {
       return { success: false, error: "Deletion reason is required" };
     }
 
+    const existing = await prisma.expense.findUnique({ where: { id } });
+    if (!existing) return { success: false, error: "Not found" };
+
     // Only OWNER or SUPER_ADMIN can delete expenses (or staff if on the same day AND they created it)
     if (session.user.role !== "OWNER" && session.user.role !== "SUPER_ADMIN") {
-      const existing = await prisma.expense.findUnique({ where: { id } });
-      if (!existing) return { success: false, error: "Not found" };
       
       if (existing.userId !== session.user.id) {
-        return { success: false, error: "Staff can only delete their own entries." };
+        return { success: false, error: "Staff can only archive their own entries." };
       }
 
       const today = new Date();
@@ -122,7 +123,7 @@ export async function deleteExpense(id: string, reason: string) {
         today.getMonth() !== expenseDate.getMonth() ||
         today.getDate() !== expenseDate.getDate()
       ) {
-        return { success: false, error: "Staff cannot delete expenses from previous days." };
+        return { success: false, error: "Staff cannot archive expenses from previous days." };
       }
     }
     
@@ -142,6 +143,10 @@ export async function deleteExpense(id: string, reason: string) {
     ]);
 
     revalidatePath("/dashboard/expenses");
+    if (existing?.projectId) {
+      revalidatePath(`/dashboard/projects/${existing.projectId}`);
+    }
+    revalidatePath("/dashboard/projects");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete expense:", error);
@@ -149,7 +154,7 @@ export async function deleteExpense(id: string, reason: string) {
   }
 }
 
-export async function updateExpense(id: string, data: Partial<CreateExpenseInput>) {
+export async function updateExpense(id: string, data: Partial<CreateExpenseInput>, reason?: string) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -177,6 +182,12 @@ export async function updateExpense(id: string, data: Partial<CreateExpenseInput
     }
 
     const { projectId, amount, category, date, notes, receiptUrl } = data;
+    
+    if (!reason || reason.trim() === "") {
+      return { success: false, error: "Reason for edit is required" };
+    }
+
+    const isAmountChanged = amount !== undefined && amount !== existing.amount;
 
     const expense = await prisma.expense.update({
       where: { id },
@@ -198,8 +209,12 @@ export async function updateExpense(id: string, data: Partial<CreateExpenseInput
       data: {
         expenseId: id,
         action: "EDITED",
-        reason: "Updated expense details",
-        modifiedBy: session.user.id
+        reason: reason,
+        modifiedBy: session.user.id,
+        ...(isAmountChanged && {
+          oldAmount: existing.amount,
+          newAmount: amount
+        })
       }
     });
 

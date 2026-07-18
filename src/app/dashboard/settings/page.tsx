@@ -38,11 +38,15 @@ export default async function SettingsPage() {
     });
   }
 
+  const lang = user?.tenant?.language || "en";
+  const { dictionaries } = await import("@/lib/i18n/dictionaries");
+  const t = (key: string) => dictionaries[lang]?.[key] || dictionaries["en"][key] || key;
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('settings')}</h1>
           <p className="text-gray-500 text-sm mt-1">Manage your account and preferences.</p>
         </div>
       </div>
