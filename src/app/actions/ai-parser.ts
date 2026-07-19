@@ -34,7 +34,7 @@ export async function parseExpenseFromImage(base64Image: string, mimeType: strin
           role: "user",
           parts: [
             { inlineData: { data: base64Image, mimeType } },
-            { text: "Analyze this receipt/invoice. Extract the total amount, categorize it for a construction site, and provide a short note (like the vendor name)." }
+            { text: "You are a strict construction site expense analyzer. Analyze this receipt/invoice. Extract the total amount, categorize it for a construction site, and provide a short note (like the vendor name). EVERYTHING must be interpreted strictly in the context of construction." }
           ]
         }
       ],
@@ -64,7 +64,7 @@ export async function parseExpenseFromAudio(base64Audio: string, mimeType: strin
           role: "user",
           parts: [
             { inlineData: { data: base64Audio, mimeType: mimeType.split(';')[0] } },
-            { text: "Listen to this construction site worker recording an expense. Extract the amount, categorize it, and summarize what they bought. CRITICAL: Write the summary (notes) in the EXACT SAME LANGUAGE that the worker is speaking (e.g., if they speak in Tamil, write the notes in Tamil script). CONTEXT: Expect regional construction terminology (e.g. in Tamil: Sengal/செங்கல் = Bricks, Siment/சிமெண்ட் = Cement, Kambi/கம்பி = Steel/Rebar, Manal/மணல் = Sand, Jalli/ஜல்லி = Gravel). Do NOT confuse 'Sengal' with the English word 'Single'." }
+            { text: "You are a strict construction expense parser. Listen to this construction site worker recording an expense. Extract the amount, categorize it, and summarize what they bought. CRITICAL INSTRUCTION: EVERYTHING they say MUST be interpreted strictly in the context of CONSTRUCTION (e.g. tools, materials, labor, machinery, transport, site expenses). Do not interpret any word as a non-construction item. Write the summary (notes) in the EXACT SAME LANGUAGE that the worker is speaking (e.g., if they speak in Tamil, write the notes in Tamil script). CONTEXT: Expect regional construction terminology (e.g. in Tamil: Sengal/செங்கல் = Bricks, Siment/சிமெண்ட் = Cement, Kambi/கம்பி = Steel/Rebar, Manal/மணல் = Sand, 'man' or 'm-sand' = M-Sand/Sand, Jalli/ஜல்லி = Gravel, Kooli/கூலி = Labor). Do NOT confuse 'Sengal' with the English word 'Single', or 'man'/'manal' with the English word 'man'." }
           ]
         }
       ],
@@ -114,7 +114,7 @@ export async function parseMultipleExpensesFromAudio(base64Audio: string, mimeTy
           role: "user",
           parts: [
             { inlineData: { data: base64Audio, mimeType: mimeType.split(';')[0] } },
-            { text: "Listen to this construction site worker recording multiple expenses at once. Extract all the expenses mentioned. For each expense, extract the amount and categorize it. CRITICAL: Understand regional construction terminology (e.g. in Tamil: Sengal/செங்கல் = Bricks, Siment/சிமெண்ட் = Cement, Kambi/கம்பி = Steel/Rebar, Manal/மணல் = Sand, Jalli/ஜல்லி = Gravel, Kooli/கூலி = Labor). Return an array of expenses." }
+            { text: "You are a strict construction expense parser. Listen to this construction site worker recording multiple expenses at once. Extract all the expenses mentioned. For each expense, extract the amount and categorize it. CRITICAL INSTRUCTION: EVERYTHING they say MUST be interpreted strictly in the context of CONSTRUCTION (e.g. tools, materials, labor, machinery, transport). Do not interpret any word as a non-construction item. Understand regional construction terminology (e.g. in Tamil: Sengal/செங்கல் = Bricks, Siment/சிமெண்ட் = Cement, Kambi/கம்பி = Steel/Rebar, Manal/மணல் = Sand, 'man' or 'm-sand' = M-Sand/Sand, Jalli/ஜல்லி = Gravel, Kooli/கூலி = Labor). Do NOT confuse 'Sengal' with 'Single', or 'man'/'manal' with the English word 'man'. Return an array of expenses." }
           ]
         }
       ],

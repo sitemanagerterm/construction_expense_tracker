@@ -9,11 +9,13 @@ interface ExpenseHistoryModalProps {
   onClose: () => void;
   project: any;
   currency: string;
+  userRole?: string;
+  currentUserId?: string;
   onEdit?: (expense: any) => void;
   onDelete?: (expenseId: string) => void;
 }
 
-export default function ExpenseHistoryModal({ isOpen, onClose, project, currency, onEdit, onDelete }: ExpenseHistoryModalProps) {
+export default function ExpenseHistoryModal({ isOpen, onClose, project, currency, userRole, currentUserId, onEdit, onDelete }: ExpenseHistoryModalProps) {
   const { t } = useTenantPreferences();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedFilterCategory, setSelectedFilterCategory] = useState("ALL");
@@ -55,6 +57,21 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
   const sortedDateKeys = Object.keys(groupedExpenses).sort((a, b) => 
     groupedExpenses[b].date.getTime() - groupedExpenses[a].date.getTime()
   );
+
+  const canEditDelete = (exp: any) => {
+    if (userRole === "SUPER_ADMIN" || userRole === "OWNER") return true;
+    if (userRole === "STAFF") {
+      if (exp.userId !== currentUserId) return false;
+      const today = new Date();
+      const expenseDate = new Date(exp.createdAt || exp.date);
+      return (
+        today.getFullYear() === expenseDate.getFullYear() &&
+        today.getMonth() === expenseDate.getMonth() &&
+        today.getDate() === expenseDate.getDate()
+      );
+    }
+    return false;
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
@@ -114,20 +131,24 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
                           {formatCurrency(exp.amount, currency)}
                         </p>
                         <div className="flex gap-1.5 sm:gap-2 pl-3">
-                          <button 
-                            onClick={() => onEdit && onEdit(exp)}
-                            className="p-1.5 sm:p-2 bg-white rounded-xl text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors shadow-sm border border-gray-100"
-                            title="Edit"
-                          >
-                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                          </button>
-                          <button 
-                            onClick={() => onDelete && onDelete(exp.id)}
-                            className="p-1.5 sm:p-2 bg-white rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm border border-gray-100"
-                            title="Delete"
-                          >
-                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                          </button>
+                          {canEditDelete(exp) && (
+                            <>
+                              <button 
+                                onClick={() => onEdit && onEdit(exp)}
+                                className="p-1.5 sm:p-2 bg-white rounded-xl text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors shadow-sm border border-gray-100"
+                                title="Edit"
+                              >
+                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                              </button>
+                              <button 
+                                onClick={() => onDelete && onDelete(exp.id)}
+                                className="p-1.5 sm:p-2 bg-white rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm border border-gray-100"
+                                title="Delete"
+                              >
+                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

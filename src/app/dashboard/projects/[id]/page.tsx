@@ -62,6 +62,8 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
       project={project} 
       allProjects={allProjects} 
       currency={currency} 
+      userRole={session.user.role as string}
+      currentUserId={session.user.id as string}
     />
   );
 }

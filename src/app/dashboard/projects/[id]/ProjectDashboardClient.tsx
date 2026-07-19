@@ -18,7 +18,7 @@ import { toast } from "react-hot-toast";
 // This is a placeholder structure based on the video. 
 // We will refine the layout, add the modals, and implement the real actions later.
 
-export default function ProjectDashboardClient({ project, allProjects, currency }: any) {
+export default function ProjectDashboardClient({ project, allProjects, currency, userRole, currentUserId }: any) {
   const { t } = useTenantPreferences();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -208,50 +208,56 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
         </div>
         
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors border border-gray-200 shadow-sm relative z-30"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-            </button>
-            
-            {/* 3-dot Menu Dropdown */}
-            {isMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)}></div>
-                <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-                  <button 
-                    onClick={() => { setIsReportModalOpen(true); setIsMenuOpen(false); }}
-                    className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
-                  >
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    {t('view_report')}
-                  </button>
-                  <button 
-                    onClick={async () => {
-                      setIsMenuOpen(false);
-                      const { toggleProjectStatus } = await import("../actions");
-                      await toggleProjectStatus(project.id, project.status);
-                    }}
-                    className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3 border-t border-gray-50"
-                  >
-                    {project.status === "ACTIVE" ? (
-                      <>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-                        {t('mark_as_completed')}
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        {t('mark_as_active')}
-                      </>
+          {userRole !== "STAFF" && (
+            <div className="relative">
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors border border-gray-200 shadow-sm relative z-30"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+              </button>
+              
+              {/* 3-dot Menu Dropdown */}
+              {isMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)}></div>
+                  <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+                    {userRole !== "STAFF" && (
+                      <button 
+                        onClick={() => { setIsReportModalOpen(true); setIsMenuOpen(false); }}
+                        className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
+                      >
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        {t('view_report')}
+                      </button>
                     )}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+                    {userRole !== "STAFF" && (
+                      <button 
+                        onClick={async () => {
+                          setIsMenuOpen(false);
+                          const { toggleProjectStatus } = await import("../actions");
+                          await toggleProjectStatus(project.id, project.status);
+                        }}
+                        className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3 border-t border-gray-50"
+                      >
+                        {project.status === "ACTIVE" ? (
+                          <>
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            {t('mark_as_completed')}
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            {t('mark_as_active')}
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -260,76 +266,80 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Project Value Inline Edit Card */}
-          <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center h-full">
-          <div className="w-full mr-4">
-            <p className="text-gray-700 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('project_value')}</p>
-            {isEditingBudget ? (
-              <div className="flex items-center mt-1 border border-gray-200 rounded-xl bg-gray-50 overflow-hidden focus-within:ring-2 focus-within:ring-accent-500/20 focus-within:border-accent-500 focus-within:bg-white transition-all w-full">
-                <span className="pl-3 pr-1 text-gray-400 font-bold">{getCurrencySymbol(currency)}</span>
-                <input 
-                  type="number"
-                  value={budgetInputValue}
-                  onChange={(e) => setBudgetInputValue(e.target.value)}
-                  disabled={isUpdatingBudget}
-                  autoFocus
-                  className="w-full py-2 pr-3 bg-transparent border-none focus:outline-none focus:ring-0 font-bold text-gray-900 text-xl"
-                  placeholder="0.00"
-                />
-              </div>
-            ) : (
-              <p className="text-3xl font-bold text-gray-900 mt-1">{formatCurrency(project.budget || 0, currency)}</p>
-            )}
-          </div>
-          
-          <div className="shrink-0 flex gap-2 self-end mb-1">
-            {isEditingBudget ? (
-              <>
+          {userRole !== "STAFF" && (
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center h-full">
+            <div className="w-full mr-4">
+              <p className="text-gray-700 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('project_value')}</p>
+              {isEditingBudget ? (
+                <div className="flex items-center mt-1 border border-gray-200 rounded-xl bg-gray-50 overflow-hidden focus-within:ring-2 focus-within:ring-accent-500/20 focus-within:border-accent-500 focus-within:bg-white transition-all w-full">
+                  <span className="pl-3 pr-1 text-gray-400 font-bold">{getCurrencySymbol(currency)}</span>
+                  <input 
+                    type="number"
+                    value={budgetInputValue}
+                    onChange={(e) => setBudgetInputValue(e.target.value)}
+                    disabled={isUpdatingBudget}
+                    autoFocus
+                    className="w-full py-2 pr-3 bg-transparent border-none focus:outline-none focus:ring-0 font-bold text-gray-900 text-xl"
+                    placeholder="0.00"
+                  />
+                </div>
+              ) : (
+                <p className="text-3xl font-bold text-gray-900 mt-1">{formatCurrency(project.budget || 0, currency)}</p>
+              )}
+            </div>
+            
+            <div className="shrink-0 flex gap-2 self-end mb-1">
+              {isEditingBudget ? (
+                <>
+                  <button 
+                    onClick={handleSaveBudget}
+                    disabled={isUpdatingBudget}
+                    className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 transition-colors border border-emerald-100 shadow-sm"
+                  >
+                    {isUpdatingBudget ? (
+                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    ) : (
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => setIsEditingBudget(false)}
+                    disabled={isUpdatingBudget}
+                    className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200 shadow-sm"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </>
+              ) : (
                 <button 
-                  onClick={handleSaveBudget}
-                  disabled={isUpdatingBudget}
-                  className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 transition-colors border border-emerald-100 shadow-sm"
+                  onClick={() => {
+                    setBudgetInputValue(project.budget ? project.budget.toString() : "");
+                    setIsEditingBudget(true);
+                  }}
+                  className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors border border-gray-200"
                 >
-                  {isUpdatingBudget ? (
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  ) : (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                  )}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </button>
-                <button 
-                  onClick={() => setIsEditingBudget(false)}
-                  disabled={isUpdatingBudget}
-                  className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200 shadow-sm"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-              </>
-            ) : (
-              <button 
-                onClick={() => {
-                  setBudgetInputValue(project.budget ? project.budget.toString() : "");
-                  setIsEditingBudget(true);
-                }}
-                className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors border border-gray-200"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+          )}
 
         {/* Amount Received / Credit */}
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center h-full">
-          <p className="text-gray-700 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('credit_received')}</p>
-          <div className="flex justify-between items-end">
-            <p className="text-3xl font-bold text-emerald-600">{formatCurrency(totalCredits, currency)}</p>
-            <button 
-              onClick={() => setIsCreditModalOpen(true)}
-              className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full hover:bg-emerald-100 transition-colors"
-            >
-              + {t('add_credit')}
-            </button>
+        {userRole !== "STAFF" && (
+          <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center h-full">
+            <p className="text-gray-700 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('credit_received')}</p>
+            <div className="flex justify-between items-end">
+              <p className="text-3xl font-bold text-emerald-600">{formatCurrency(totalCredits, currency)}</p>
+              <button 
+                onClick={() => setIsCreditModalOpen(true)}
+                className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full hover:bg-emerald-100 transition-colors"
+              >
+                + {t('add_credit')}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Expenses Overview */}
           <div 
@@ -344,37 +354,40 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path></svg>
             </div>
           </div>
-          <div className={`p-5 rounded-2xl border flex flex-col justify-center h-full ${remainingBalance < 0 ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}>
-            <p className={`text-[11px] font-bold mb-1 uppercase tracking-wider ${remainingBalance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
-              {remainingBalance < 0 ? 'Project Loss' : 'Project Profit'}
-            </p>
-            <div className="flex items-end justify-between">
-              <p className={`text-2xl sm:text-3xl font-bold ${remainingBalance < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
-                {remainingBalance < 0 ? '-' : '+'}{formatCurrency(Math.abs(remainingBalance), currency)}
+          {userRole !== "STAFF" && (
+            <div className={`p-5 rounded-2xl border flex flex-col justify-center h-full ${remainingBalance < 0 ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}>
+              <p className={`text-[11px] font-bold mb-1 uppercase tracking-wider ${remainingBalance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                {remainingBalance < 0 ? 'Project Loss' : 'Project Profit'}
               </p>
-              {project.budget > 0 && (
-                <div className={`flex items-center gap-0.5 pb-0.5 text-sm font-bold ${remainingBalance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
-                  {remainingBalance < 0 ? (
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
-                  ) : (
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
-                  )}
-                  <span>{Math.abs((remainingBalance / project.budget) * 100).toFixed(1)}%</span>
-                </div>
-              )}
+              <div className="flex items-end justify-between">
+                <p className={`text-2xl sm:text-3xl font-bold ${remainingBalance < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
+                  {remainingBalance < 0 ? '-' : '+'}{formatCurrency(Math.abs(remainingBalance), currency)}
+                </p>
+                {project.budget > 0 && (
+                  <div className={`flex items-center gap-0.5 pb-0.5 text-sm font-bold ${remainingBalance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                    {remainingBalance < 0 ? (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
+                    ) : (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                    )}
+                    <span>{Math.abs((remainingBalance / project.budget) * 100).toFixed(1)}%</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Recent Expenses List */}
         <div className="mt-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-3 px-1">{t('recent_expenses') || "Recent Expenses"}</h3>
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
             {project.expenses.length === 0 ? (
               <p className="p-5 text-center text-gray-500 text-sm font-medium">{t('no_expenses_yet')}</p>
             ) : (
               project.expenses.slice(0, 5).map((exp: any, idx: number) => (
                 <div key={idx} className="p-5 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                  <p className="font-bold text-gray-900 uppercase tracking-wide text-sm">{exp.category}</p>
+                  <p className="font-bold text-gray-900 uppercase tracking-wide text-sm">{t(exp.category.toLowerCase()) || exp.category}</p>
                   <p className="font-bold text-accent-500 text-lg">{formatCurrency(exp.amount, currency)}</p>
                 </div>
               ))
@@ -416,7 +429,9 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
         onClose={() => setIsExpenseHistoryModalOpen(false)}
         project={project}
         currency={currency}
-        onEdit={handleEditExpense}
+        userRole={userRole}
+        currentUserId={currentUserId}
+        onEdit={(exp) => handleEditExpense(exp)}
         onDelete={handleDeleteExpense}
       />
 
