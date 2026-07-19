@@ -199,8 +199,8 @@ export default function StaffClientPage({
 
       {/* Custom Confirmation Modal */}
       {confirmModal && confirmModal.isOpen && (
-        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center p-4 pb-[72px] sm:pb-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in" onClick={() => setConfirmModal(null)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm shadow-xl overflow-hidden flex flex-col scale-100" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-slate-900/50 backdrop-blur-sm p-0 sm:p-4 animate-fade-in" onClick={() => setConfirmModal(null)}>
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-sm rounded-none sm:rounded-2xl shadow-none sm:shadow-xl overflow-hidden flex flex-col scale-100 sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-2">{confirmModal.title}</h3>
               <p className="text-gray-500 text-sm mb-6 leading-relaxed">

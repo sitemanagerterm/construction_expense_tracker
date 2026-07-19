@@ -208,8 +208,8 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, currency, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center items-center bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 pb-[72px] sm:pb-4 animate-in fade-in">
-      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-full sm:max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border border-gray-100 overflow-hidden flex flex-col sm:max-h-[90vh]">
         
         {/* Header */}
         <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">

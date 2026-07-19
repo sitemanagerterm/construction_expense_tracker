@@ -47,7 +47,7 @@ export default async function SettingsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('settings')}</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage your account and preferences.</p>
+          <p className="text-gray-500 text-sm mt-1">{t('manage_account_desc') || "Manage your account and preferences."}</p>
         </div>
       </div>
       

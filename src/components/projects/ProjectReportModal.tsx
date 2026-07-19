@@ -21,7 +21,7 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
   const profitLoss = totalCredits - totalExpenses;
   const projectValue = project?.budget || 0;
   
-  const plPercentage = projectValue > 0 ? ((profitLoss / projectValue) * 100).toFixed(1) : "0.0";
+  const plPercentage = projectValue > 0 ? Math.abs((profitLoss / projectValue) * 100).toFixed(1) : "0.0";
   const isProfit = profitLoss >= 0;
 
   // Combine expenses and credits into a single ledger array and calculate running balance
@@ -58,36 +58,38 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
       doc.setFontSize(22);
       doc.setTextColor(17, 24, 39);
       doc.setFont("helvetica", "bold");
-      doc.text("Project Financial Report", 14, 20);
+      doc.text(t('project_financial_report') || "Project Financial Report", 14, 20);
       
       // Project Info & Date
       doc.setFontSize(11);
       doc.setTextColor(107, 114, 128);
       doc.setFont("helvetica", "normal");
-      doc.text(`Project Name:`, 14, 30);
+      const projNameLabel = (t('project_name') || "Project Name") + ":";
+      doc.text(projNameLabel, 14, 30);
       doc.setTextColor(17, 24, 39);
       doc.setFont("helvetica", "bold");
-      doc.text(project.name, 43, 30);
+      doc.text(project.name, 14 + doc.getTextWidth(projNameLabel) + 2, 30);
 
       doc.setFontSize(11);
       doc.setTextColor(107, 114, 128);
       doc.setFont("helvetica", "normal");
-      doc.text(`Generated on:`, 140, 30);
+      const generatedLabel = (t('generated_on') || "Generated on") + ":";
+      doc.text(generatedLabel, 140, 30);
       doc.setTextColor(17, 24, 39);
-      doc.text(new Date().toLocaleDateString('en-GB'), 168, 30);
+      doc.text(new Date().toLocaleDateString('en-GB'), 140 + doc.getTextWidth(generatedLabel) + 2, 30);
 
       // Summary Cards
       doc.setFontSize(12);
       doc.setTextColor(17, 24, 39);
       doc.setFont("helvetica", "bold");
-      doc.text("Financial Summary", 14, 50);
+      doc.text(t('financial_summary') || "Financial Summary", 14, 50);
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(107, 114, 128);
-      doc.text("Total Credits", 14, 58);
-      doc.text("Total Expenses", 80, 58);
-      doc.text("Profit / Loss", 146, 58);
+      doc.text(t('total_credits') || "Total Credits", 14, 58);
+      doc.text(t('total_expenses') || "Total Expenses", 80, 58);
+      doc.text(t('profit_loss') || "Profit / Loss", 146, 58);
 
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
@@ -121,11 +123,26 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
       });
 
       // Ledger Table
-      const tableColumn = ["Date", "Description", "Credit", "Expense", "Balance"];
+      const tableColumn = [
+        t('date') || "Date", 
+        t('description') || "Description", 
+        t('credit') || "Credit", 
+        t('expense') || "Expense", 
+        t('balance') || "Balance"
+      ];
       const tableRows: any[] = [];
 
       pdfLedger.forEach(entry => {
-        const desc = entry.type === 'CREDIT' ? (entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod) : entry.category;
+        let desc = entry.type === 'CREDIT' ? (entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod) : entry.category;
+        
+        // Basic translation for descriptions
+        if (desc === 'Bank Transfer') desc = t('bank_transfer') || desc;
+        if (desc === 'CASH') desc = t('cash') || desc;
+        if (desc === 'UPI' || desc === 'GPAY') desc = desc; // keep acronyms usually
+        if (entry.type !== 'CREDIT' && entry.category) {
+          desc = t(entry.category.toLowerCase()) || entry.category;
+        }
+
         const entryData = [
           entry.date.toLocaleDateString('en-GB'),
           (desc || 'N/A').toUpperCase(),

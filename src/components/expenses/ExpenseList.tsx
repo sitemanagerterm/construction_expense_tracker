@@ -323,8 +323,8 @@ export default function ExpenseList({
       
       {/* Delete Confirmation Modal */}
       {deleteModal.isOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col justify-end sm:justify-center items-center p-4 pb-[72px] sm:pb-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setDeleteModal({ isOpen: false, expenseId: null, reason: "" })}>
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/40 backdrop-blur-sm p-0 sm:p-4 animate-fade-in" onClick={() => setDeleteModal({ isOpen: false, expenseId: null, reason: "" })}>
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-md rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl overflow-hidden flex flex-col sm:max-h-[90vh] animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Expense</h3>
               <p className="text-sm text-gray-500 mb-4">Are you sure you want to delete this expense? This action will be logged in the audit trail.</p>

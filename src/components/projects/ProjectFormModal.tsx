@@ -117,7 +117,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             )}
             
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">{t('project_name')} <span className="text-red-500">*</span></label>
+              <label htmlFor="name" className="block text-left text-sm font-bold text-gray-700 mb-1">{t('project_name')} <span className="text-red-500">*</span></label>
               <input type="text" id="name" name="name" placeholder="E.g. Apollo Hospital Wing B"
                 defaultValue={editData?.name || ""}
                 className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 ${
@@ -135,7 +135,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             </div>
 
             <div>
-              <label htmlFor="clientName" className="block text-sm font-bold text-gray-700 mb-1">{t('client_name')}</label>
+              <label htmlFor="clientName" className="block text-left text-sm font-bold text-gray-700 mb-1">{t('client_name')}</label>
               <input type="text" id="clientName" name="clientName" placeholder="E.g. Apollo Group"
                 defaultValue={editData?.clientName || ""}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900" />
@@ -143,7 +143,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="budget" className="block text-sm font-bold text-gray-700 mb-1">{t('est_budget')} ({getCurrencySymbol(currency)})</label>
+                <label htmlFor="budget" className="block text-left text-sm font-bold text-gray-700 mb-1">{t('est_budget')} ({getCurrencySymbol(currency)})</label>
                 <input type="number" id="budget" name="budget" placeholder="e.g. 5000" step="0.01" min="0"
                   defaultValue={editData?.budget || ""}
                   className={`w-full bg-gray-50 border rounded-xl px-4 py-2.5 text-gray-800 font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all no-spinners ${
@@ -160,7 +160,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
                 )}
               </div>
               <div>
-              <label htmlFor="startDate" className="block text-sm font-bold text-gray-700 mb-1">{t('start_date')}</label>
+              <label htmlFor="startDate" className="block text-left text-sm font-bold text-gray-700 mb-1">{t('start_date')}</label>
               <div className="relative">
                 <DatePicker 
                   selected={startDate}
@@ -176,7 +176,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             </div>
 
             <div>
-              <label htmlFor="endDate" className="block text-sm font-bold text-gray-700 mb-1">{t('completed_end_date') || "Completed / End Date"}</label>
+              <label htmlFor="endDate" className="block text-left text-sm font-bold text-gray-700 mb-1">{t('completed_end_date') || "Completed / End Date"}</label>
               <DatePicker 
                 selected={endDate}
                 onChange={(date: Date | null) => setEndDate(date)}
@@ -190,7 +190,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-1">{t('description_notes') || "Description / Notes"}</label>
+              <label htmlFor="description" className="block text-left text-sm font-bold text-gray-700 mb-1">{t('description_notes') || "Description / Notes"}</label>
               <textarea id="description" name="description" rows={3} placeholder={t('add_details_site') || "Add any details about the site..."}
                 defaultValue={editData?.description || ""}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900 resize-none"></textarea>

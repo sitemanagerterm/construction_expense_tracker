@@ -326,7 +326,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
               onClick={() => setIsCreditModalOpen(true)}
               className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full hover:bg-emerald-100 transition-colors"
             >
-              {t('add_credit')}
+              + {t('add_credit')}
             </button>
           </div>
         </div>
@@ -438,8 +438,8 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
 
       {/* Error Message Modal */}
       {errorMessage && (
-        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center p-4 pb-[72px] sm:pb-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl max-w-sm w-full p-6 text-center animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/40 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-sm rounded-none sm:rounded-2xl shadow-none sm:shadow-xl p-6 text-center flex flex-col sm:max-h-[90vh] animate-in zoom-in-95 duration-200">
             <div className="w-12 h-12 rounded-full bg-red-100 text-red-500 mx-auto flex items-center justify-center mb-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             </div>
@@ -452,8 +452,8 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
 
       {/* Delete Confirmation Modal */}
       {expenseToDelete && (
-        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center p-4 pb-[72px] sm:pb-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setExpenseToDelete(null)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4 animate-fade-in" onClick={() => setExpenseToDelete(null)}>
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-sm rounded-none sm:rounded-2xl shadow-none sm:shadow-xl overflow-hidden flex flex-col sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 text-center">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -473,8 +473,8 @@ export default function ProjectDashboardClient({ project, allProjects, currency 
 
       {/* Edit Expense Modal */}
       {expenseToEdit && (
-        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center p-4 pb-[72px] sm:pb-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/40 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-sm rounded-none sm:rounded-2xl shadow-none sm:shadow-xl p-6 flex flex-col sm:max-h-[90vh] animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-gray-900 mb-2">{t('edit_expense') || "Edit Expense"}</h3>
             <p className="text-sm text-gray-500 mb-4">{t('edit_expense_desc') || "Enter a new amount and reason for this expense."}</p>
             <div className="mb-4">
