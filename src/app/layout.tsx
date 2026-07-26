@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -11,7 +11,6 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-import type { Metadata, Viewport } from "next";
 
 export const viewport: Viewport = {
   themeColor: "#0f172a",
