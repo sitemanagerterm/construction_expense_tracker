@@ -58,7 +58,15 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
         <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0 print:hidden">
           <div>
             <h2 className="text-xl font-bold text-gray-900">{t('project_report')}</h2>
-            <p className="text-gray-500 text-sm mt-1 font-medium">{project.name}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-gray-500 text-sm font-medium">{project.name}</p>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
+                project.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 
+                project.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+              }`}>
+                {project.status === 'ACTIVE' ? (t('active') || 'ACTIVE') : project.status === 'COMPLETED' ? (t('completed') || 'COMPLETED') : project.status}
+              </span>
+            </div>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors shadow-sm">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -71,8 +79,14 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
           <div className="hidden print:block pb-4 border-b border-gray-200 mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('project_financial_report') || 'Project Financial Report'}</h1>
             <div className="flex justify-between text-sm text-gray-600 mt-3">
-              <div>
+              <div className="flex items-center gap-2">
                 <span className="font-bold text-gray-800">{t('project_name') || 'Project Name'}:</span> {project.name}
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
+                  project.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 
+                  project.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {project.status === 'ACTIVE' ? (t('active') || 'ACTIVE') : project.status === 'COMPLETED' ? (t('completed') || 'COMPLETED') : project.status}
+                </span>
               </div>
               <div>
                 <span className="font-bold text-gray-800">{t('generated_on') || 'Generated on'}:</span> {new Date().toLocaleDateString('en-GB')}

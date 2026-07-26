@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import "./globals.css";
 
 const inter = Inter({
@@ -48,6 +49,7 @@ export default function RootLayout({
             <Providers>
               {children}
               <Toaster position="bottom-right" />
+              <PWAInstallPrompt />
             </Providers>
           </LanguageProvider>
         </ThemeProvider>
