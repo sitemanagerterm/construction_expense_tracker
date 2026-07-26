@@ -53,13 +53,13 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
             className="w-[150px] lg:w-[170px] h-auto object-contain drop-shadow-sm hidden dark:block" 
           />
         </Link>
-        <div className="mt-4 px-1 pb-2 border-b border-gray-100 dark:border-slate-800 mb-2">
-          <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">Company</p>
-          <p className="text-[15px] font-black text-gray-800 dark:text-white truncate capitalize">{tenantName}</p>
+        <div className="mt-1 px-1 pb-2 border-b border-gray-100 dark:border-slate-800 mb-1">
+          <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Company</p>
+          <p className="text-sm font-black text-gray-800 dark:text-white truncate capitalize">{tenantName}</p>
         </div>
       </div>
 
-      <nav className="flex-1 px-4 space-y-1 mt-2">
+      <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 space-y-1 mt-1 scrollbar-thin pb-2">
         {navLinks.map((link) => {
           if (link.roles && !link.roles.includes(user?.role)) {
             return null;
