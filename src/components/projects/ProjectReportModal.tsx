@@ -43,11 +43,104 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
     return { ...entry, balance: currentBalance };
   }).reverse();
 
-  const handleDownloadPdf = () => {
-    // We use window.print() to leverage native browser PDF generation.
-    // This perfectly supports all languages (Tamil, Hindi, etc.) and text shaping without heavy fonts.
-    window.print();
-    toast.success(t('pdf_generated') || "Please save as PDF from the print dialog.");
+  const pdfLedger = [...ledger].reverse();
+
+  const handleDownloadPdf = async () => {
+    setIsGenerating(true);
+    const toastId = toast.loading(t('generating_pdf') || "Generating PDF...");
+    
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const element = document.getElementById('report-content');
+      if (!element) throw new Error("Report content not found");
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          // Hide UI elements
+          const printHidden = clonedDoc.querySelectorAll('.print\\:hidden');
+          printHidden.forEach(el => {
+            (el as HTMLElement).style.setProperty('display', 'none', 'important');
+          });
+          
+          // Show Print elements
+          const printBlock = clonedDoc.querySelectorAll('.print\\:block, .print\\:flex');
+          printBlock.forEach(el => {
+            if (el.classList.contains('print:flex')) {
+              (el as HTMLElement).style.setProperty('display', 'flex', 'important');
+            } else {
+              (el as HTMLElement).style.setProperty('display', 'block', 'important');
+            }
+          });
+
+          // Expand the scrollable areas to capture full content and prevent horizontal cutoff
+          const container = clonedDoc.getElementById('report-content');
+          if (container) {
+            container.style.setProperty('width', '1024px', 'important'); // Force desktop width for full capture
+            container.style.setProperty('max-width', 'none', 'important');
+            container.style.setProperty('height', 'auto', 'important');
+            container.style.setProperty('max-height', 'none', 'important');
+            container.style.setProperty('overflow', 'visible', 'important');
+            container.style.setProperty('border', 'none', 'important');
+            container.style.setProperty('box-shadow', 'none', 'important');
+          }
+
+          const scrollArea = clonedDoc.getElementById('report-scroll-area');
+          if (scrollArea) {
+            scrollArea.style.setProperty('overflow', 'visible', 'important');
+            scrollArea.style.setProperty('height', 'auto', 'important');
+            scrollArea.style.setProperty('max-height', 'none', 'important');
+            scrollArea.style.setProperty('padding', '2rem', 'important');
+          }
+
+          // Ensure any overflow-x-auto divs are visible
+          const xScrolls = clonedDoc.querySelectorAll('.overflow-x-auto');
+          xScrolls.forEach(el => {
+             (el as HTMLElement).style.setProperty('overflow', 'visible', 'important');
+          });
+        }
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      // If content is taller than A4, we might need multiple pages, but for this report,
+      // it's usually 1-2 pages. For simplicity and perfect rendering, we will just fit width 
+      // and let the height scale. If it exceeds 1 page, jsPDF handles adding pages if we do it manually,
+      // but the easiest is just printing the image on one long page or scaling it. 
+      // Since it's a financial report, scaling to fit width on A4 and splitting if needed:
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${project.name.replace(/\s+/g, '_')}_Financial_Report.pdf`);
+      toast.success(t('pdf_generated') || "PDF downloaded successfully.", { id: toastId });
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      toast.error("Failed to generate PDF.", { id: toastId });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -73,12 +166,16 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-grow p-5 space-y-6 print:overflow-visible print:max-h-none print:h-auto print:p-8 print:pt-4">
+        <div id="report-scroll-area" className="overflow-y-auto flex-grow p-5 space-y-6 print:overflow-visible print:max-h-none print:h-auto print:p-8 print:pt-4">
           
           {/* Print Only Header */}
-          <div className="hidden print:block pb-4 border-b border-gray-200 mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('project_financial_report') || 'Project Financial Report'}</h1>
-            <div className="flex justify-between text-sm text-gray-600 mt-3">
+          <div className="hidden print:flex flex-col pb-4 border-b border-gray-200 mb-6">
+            <div className="flex justify-between items-start mb-4">
+              <h1 className="text-2xl font-bold text-gray-900">{t('project_financial_report') || 'Project Financial Report'}</h1>
+              {/* Add Logo */}
+              <img src="/mysitebook-logo-dark.png" alt="MySiteBook" className="h-14 object-contain" />
+            </div>
+            <div className="flex justify-between text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-gray-800">{t('project_name') || 'Project Name'}:</span> {project.name}
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
@@ -149,7 +246,60 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
           {/* Ledger */}
           <div>
             <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-3">{t('ledger_entries') || "Ledger Entries"}</h3>
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            
+            {/* UI Table - Descending Order */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm print:hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
+                      <th className="px-2 py-3 sm:p-4 font-bold">{t('sl_no') || "SL No"}</th>
+                      <th className="px-2 py-3 sm:p-4 font-bold">{t('date') || "Date"}</th>
+                      <th className="px-2 py-3 sm:p-4 font-bold">{t('description') || "Description"}</th>
+                      <th className="px-2 py-3 sm:p-4 font-bold text-right">{t('credit') || "Credit"}</th>
+                      <th className="px-2 py-3 sm:p-4 font-bold text-right">{t('expense') || "Expense"}</th>
+                      <th className="px-2 py-3 sm:p-4 font-bold text-right">{t('balance') || "Balance"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-sm">
+                    {ledger.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-gray-500 font-medium">{t('no_entries_recorded') || "No entries recorded."}</td>
+                      </tr>
+                    ) : (
+                      ledger.map((entry, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-2 py-3 sm:p-4 text-gray-600 font-medium">{idx + 1}</td>
+                          <td className="px-2 py-3 sm:p-4 text-gray-600 whitespace-nowrap">{entry.date.toLocaleDateString('en-GB')}</td>
+                          <td className="px-2 py-3 sm:p-4 font-bold text-gray-900 min-w-[100px] max-w-[150px] sm:max-w-none truncate sm:whitespace-normal">
+                            {entry.type === 'CREDIT' ? (
+                              <span className="capitalize">{entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod}</span>
+                            ) : (
+                              <div>
+                                <span className="capitalize">{entry.category}</span>
+                                {entry.notes && <span className="block text-xs text-gray-500 font-normal mt-0.5 truncate">{entry.notes}</span>}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-2 py-3 sm:p-4 font-bold text-emerald-600 text-right whitespace-nowrap">
+                            {entry.type === 'CREDIT' ? formatCurrency(entry.amount, currency) : '-'}
+                          </td>
+                          <td className="px-2 py-3 sm:p-4 font-bold text-amber-500 text-right whitespace-nowrap">
+                            {entry.type === 'EXPENSE' ? formatCurrency(entry.amount, currency) : '-'}
+                          </td>
+                          <td className={`px-2 py-3 sm:p-4 font-bold text-right whitespace-nowrap ${entry.balance < 0 ? 'text-red-500' : 'text-gray-900'}`}>
+                            {formatCurrency(entry.balance, currency)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* PDF Table - Ascending Order */}
+            <div className="hidden print:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
               <div className="overflow-x-auto print:overflow-visible">
                 <table className="w-full text-left border-collapse print:table">
                   <thead>
@@ -163,16 +313,16 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-sm">
-                    {ledger.length === 0 ? (
+                    {pdfLedger.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="p-8 text-center text-gray-500 font-medium">{t('no_entries_recorded') || "No entries recorded."}</td>
                       </tr>
                     ) : (
-                      ledger.map((entry, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                      pdfLedger.map((entry, idx) => (
+                        <tr key={idx} className="bg-white">
                           <td className="p-4 text-gray-600 font-medium">{idx + 1}</td>
                           <td className="p-4 text-gray-600 whitespace-nowrap">{entry.date.toLocaleDateString('en-GB')}</td>
-                          <td className="p-4 font-bold text-gray-900 min-w-[120px]">
+                          <td className="p-4 font-bold text-gray-900">
                             {entry.type === 'CREDIT' ? (
                               <span className="capitalize">{entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod}</span>
                             ) : (
@@ -182,13 +332,13 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
                               </div>
                             )}
                           </td>
-                          <td className="p-4 font-bold text-emerald-600 text-right">
+                          <td className="p-4 font-bold text-emerald-600 text-right whitespace-nowrap">
                             {entry.type === 'CREDIT' ? formatCurrency(entry.amount, currency) : '-'}
                           </td>
-                          <td className="p-4 font-bold text-amber-500 text-right">
+                          <td className="p-4 font-bold text-amber-500 text-right whitespace-nowrap">
                             {entry.type === 'EXPENSE' ? formatCurrency(entry.amount, currency) : '-'}
                           </td>
-                          <td className={`p-4 font-bold text-right ${entry.balance < 0 ? 'text-red-500' : 'text-gray-900'}`}>
+                          <td className={`p-4 font-bold text-right whitespace-nowrap ${entry.balance < 0 ? 'text-red-500' : 'text-gray-900'}`}>
                             {formatCurrency(entry.balance, currency)}
                           </td>
                         </tr>

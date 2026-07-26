@@ -96,23 +96,23 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
+      <div className="p-3 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
         
         {/* Desktop Language Toggle */}
-        <div className="flex bg-gray-100 dark:bg-slate-800 rounded-xl p-1 border border-gray-200 dark:border-slate-700 w-full justify-between">
-          <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
-          <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>தமிழ்</button>
-          <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हिंदी</button>
+        <div className="flex bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700 w-full justify-between">
+          <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
+          <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>தமிழ்</button>
+          <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हिंदी</button>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl p-3 flex items-center justify-between">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-9 h-9 rounded-full bg-accent text-primary-900 flex items-center justify-center font-bold text-sm shrink-0 shadow-sm uppercase border border-accent/30">
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-lg p-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-accent text-primary-900 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm uppercase border border-accent/30">
               {user?.name?.charAt(0) || "U"}
             </div>
             <div className="flex flex-col overflow-hidden">
               <span className="text-sm font-bold text-gray-900 dark:text-white truncate capitalize">{user?.name || "User"}</span>
-              <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{user?.role || "OWNER"}</span>
+              <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{user?.role || "OWNER"}</span>
             </div>
           </div>
         </div>
@@ -122,10 +122,10 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
           <ThemeToggle />
           <button 
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex-1 flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all font-medium text-sm text-gray-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 border border-transparent outline-none group"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all font-semibold text-sm text-gray-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 border border-transparent outline-none group"
           >
             <span className="text-gray-400 dark:text-slate-500 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
               </svg>
             </span>
