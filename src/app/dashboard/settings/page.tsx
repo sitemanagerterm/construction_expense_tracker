@@ -31,7 +31,12 @@ export default async function SettingsPage() {
           select: {
             name: true,
             currency: true,
-            language: true
+            language: true,
+            contactPerson: true,
+            mobileNo: true,
+            address: true,
+            pincode: true,
+            businessType: true
           }
         }
       }

@@ -65,7 +65,7 @@ export default function Onboarding() {
 
         <div className="relative z-10">
           <Link href="/" className="inline-flex items-center group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1 -ml-4">
-            <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[180px] md:w-[240px] h-auto object-contain transition-transform group-hover:scale-105" />
+            <Image src="/mysitebook-logo-dark.png" alt="MySiteBook" width={300} height={100} className="w-[180px] md:w-[240px] h-auto object-contain transition-transform group-hover:scale-105" />
           </Link>
         </div>
 
@@ -99,7 +99,7 @@ export default function Onboarding() {
             <div className="absolute inset-0 opacity-20 bg-[url('/grid-pattern.svg')]"></div>
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-[40px] translate-x-1/2 -translate-y-1/2"></div>
             <Link href="/" className="inline-block group relative z-10 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1">
-              <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[150px] sm:w-[180px] h-auto object-contain" />
+              <Image src="/mysitebook-logo-dark.png" alt="MySiteBook" width={300} height={100} className="w-[150px] sm:w-[180px] h-auto object-contain" />
             </Link>
           </div>
 

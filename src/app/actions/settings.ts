@@ -67,6 +67,48 @@ export async function updateTenantSettings(data: TenantSettingsFormData) {
   }
 }
 
+export type TenantInfoFormData = {
+  name: string;
+  contactPerson?: string;
+  mobileNo?: string;
+  address?: string;
+  pincode?: string;
+  businessType?: string;
+};
+
+export async function updateTenantInformation(data: TenantInfoFormData) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id || !session?.user?.tenantId) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (user?.role !== "OWNER" && user?.role !== "ADMIN") {
+       throw new Error("Only owners or admins can update company information.");
+    }
+
+    const updated = await prisma.tenant.update({
+      where: { id: session.user.tenantId },
+      data: {
+        name: data.name,
+        contactPerson: data.contactPerson || null,
+        mobileNo: data.mobileNo || null,
+        address: data.address || null,
+        pincode: data.pincode || null,
+        businessType: data.businessType || null,
+      },
+    });
+
+    revalidatePath("/dashboard/settings");
+    revalidatePath("/", "layout");
+    return { success: true, data: updated };
+  } catch (error: any) {
+    console.error("Error updating company information:", error);
+    return { success: false, error: error.message || "Failed to update company information" };
+  }
+}
+
 export async function updateLanguage(language: string) {
   try {
     const session = await getServerSession(authOptions);

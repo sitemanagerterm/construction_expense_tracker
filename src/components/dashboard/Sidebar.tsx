@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { BadgeIndianRupee, Home, Users, History, FileText, ShieldAlert } from "lucide-react";
+import { BadgeIndianRupee, Home, Users, History, FileText, ShieldAlert, Settings } from "lucide-react";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 import { updateLanguage } from "@/app/actions/settings";
 import { useState } from "react";
@@ -16,7 +16,8 @@ export const navLinks = [
   { name: "Staff & Team", href: "/dashboard/staff", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], translationKey: "staff" },
   { name: "Audit Logs", href: "/dashboard/audit-logs", icon: <History className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], translationKey: "audit_logs" },
   { name: "Documents", href: "/dashboard/documents", icon: <FileText className="w-5 h-5" />, translationKey: "documents" },
-  { name: "Super Admin", href: "/dashboard/super-admin", icon: <ShieldAlert className="w-5 h-5" />, roles: ["SUPER_ADMIN"], translationKey: "super_admin" }
+  { name: "Super Admin", href: "/dashboard/super-admin", icon: <ShieldAlert className="w-5 h-5" />, roles: ["SUPER_ADMIN"], translationKey: "super_admin" },
+  { name: "Settings", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], translationKey: "settings" }
 ];
 
 export default function Sidebar({ user, tenantName }: { user: any, tenantName?: string }) {

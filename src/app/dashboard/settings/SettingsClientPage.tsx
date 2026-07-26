@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { updateProfile, ProfileFormData, updateTenantSettings, TenantSettingsFormData } from "@/app/actions/settings";
+import { updateProfile, ProfileFormData, updateTenantSettings, TenantSettingsFormData, updateTenantInformation, TenantInfoFormData } from "@/app/actions/settings";
 import toast from "react-hot-toast";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 
@@ -11,7 +11,16 @@ type UserData = {
   email: string | null;
   mobileNumber: string | null;
   role: string;
-  tenant: { name: string; currency: string; language: string; } | null;
+  tenant: { 
+    name: string; 
+    currency: string; 
+    language: string;
+    contactPerson?: string | null;
+    mobileNo?: string | null;
+    address?: string | null;
+    pincode?: string | null;
+    businessType?: string | null;
+  } | null;
 };
 
 type ValidationErrors = {
@@ -22,6 +31,7 @@ type ValidationErrors = {
 export default function SettingsClientPage({ initialUser }: { initialUser: UserData }) {
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
+  const [tenantLoading, setTenantLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const { t } = useTenantPreferences();
   
@@ -88,6 +98,36 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
       toast.error(res.error || "Failed to update preferences");
     }
     setSettingsLoading(false);
+  };
+
+  const handleTenantSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setTenantLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const data: TenantInfoFormData = {
+      name: (formData.get("name") as string).trim(),
+      contactPerson: (formData.get("contactPerson") as string)?.trim() || undefined,
+      mobileNo: (formData.get("mobileNo") as string)?.trim() || undefined,
+      address: (formData.get("address") as string)?.trim() || undefined,
+      pincode: (formData.get("pincode") as string)?.trim() || undefined,
+      businessType: (formData.get("businessType") as string) || undefined,
+    };
+
+    if (!data.name) {
+      toast.error("Company Name is required");
+      setTenantLoading(false);
+      return;
+    }
+
+    const res = await updateTenantInformation(data);
+    
+    if (res.success) {
+      toast.success("Site Owner Information updated successfully!");
+    } else {
+      toast.error(res.error || "Failed to update information");
+    }
+    setTenantLoading(false);
   };
 
   return (
@@ -158,6 +198,87 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
           </div>
         </form>
       </div>
+      
+      {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden lg:col-span-2">
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('site_owner_info') || "Site Owner Information"}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('site_owner_info_desc') || "Update the company details provided during registration."}</p>
+          </div>
+
+          <div className="p-6">
+            <form onSubmit={handleTenantSubmit} className="space-y-6">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="company_name" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Company Name <span className="text-red-500">*</span></label>
+                  <input type="text" id="company_name" name="name" defaultValue={initialUser.tenant?.name || ""} placeholder="Company Name" required
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contactPerson" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Owner Name</label>
+                  <input type="text" id="contactPerson" name="contactPerson" defaultValue={initialUser.tenant?.contactPerson || ""} placeholder="Ramesh Kumar"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="tenantMobileNo" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Company Phone</label>
+                  <input type="tel" id="tenantMobileNo" name="mobileNo" defaultValue={initialUser.tenant?.mobileNo || ""} placeholder="Phone Number"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="businessType" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Business Type</label>
+                  <div className="relative">
+                    <select 
+                      id="businessType" 
+                      name="businessType"
+                      defaultValue={initialUser.tenant?.businessType || ""}
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800 appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled>Select type</option>
+                      <option value="general_contractor">General Contractor</option>
+                      <option value="builder">Builder / Developer</option>
+                      <option value="subcontractor">Subcontractor</option>
+                      <option value="architect">Architect / Designer</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 dark:text-slate-400">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="address" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Company Address</label>
+                  <input type="text" id="address" name="address" defaultValue={initialUser.tenant?.address || ""} placeholder="123 Main Street"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="pincode" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Pincode</label>
+                  <input type="text" id="pincode" name="pincode" defaultValue={initialUser.tenant?.pincode || ""} placeholder="600001"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+              </div>
+              
+              <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 flex justify-end">
+                <button type="submit" disabled={tenantLoading}
+                  className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 dark:bg-accent hover:bg-primary-800 dark:hover:bg-accent-600 transition-all flex items-center gap-2 ${tenantLoading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20 dark:shadow-accent-500/20'}`}>
+                  {tenantLoading ? (t('saving') || "Saving...") : (t('save_changes') || "Save Changes")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       </div>
 
       {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (

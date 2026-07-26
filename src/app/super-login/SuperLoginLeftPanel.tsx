@@ -17,7 +17,7 @@ export default function SuperLoginLeftPanel() {
 
       <div className="relative z-10">
         <Link href="/" className="inline-flex items-center group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1 -ml-4">
-          <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[150px] md:w-[190px] h-auto object-contain transition-transform group-hover:scale-105" />
+          <Image src="/mysitebook-logo-dark.png" alt="MySiteBook" width={300} height={100} className="w-[150px] md:w-[190px] h-auto object-contain transition-transform group-hover:scale-105" />
           <span className="ml-3 text-accent font-bold tracking-widest uppercase text-sm border border-accent/30 px-2 py-0.5 rounded shadow-[0_0_10px_rgba(249,115,22,0.2)]">Admin</span>
         </Link>
       </div>
