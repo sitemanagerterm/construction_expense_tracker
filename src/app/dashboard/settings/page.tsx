@@ -12,9 +12,7 @@ export const metadata = {
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
   
-  if (session?.user?.role === "STAFF") {
-    redirect("/dashboard");
-  }
+
 
   let user = null;
 
@@ -27,6 +25,7 @@ export default async function SettingsPage() {
         email: true,
         mobileNumber: true,
         role: true,
+        tenantRole: { select: { permissions: true } },
         tenant: {
           select: {
             name: true,
@@ -41,11 +40,33 @@ export default async function SettingsPage() {
         }
       }
     });
+
+    const hasAccess = 
+      user?.role === "OWNER" || 
+      user?.role === "SUPER_ADMIN" || 
+      (user?.role === "STAFF" && user?.tenantRole?.permissions?.includes("settings.view"));
+
+    if (!hasAccess) {
+      redirect("/dashboard");
+    }
   }
 
   const lang = user?.tenant?.language || "en";
   const { dictionaries } = await import("@/lib/i18n/dictionaries");
   const t = (key: string) => dictionaries[lang]?.[key] || dictionaries["en"][key] || key;
+
+  let roles: any[] = [];
+  if (user?.tenant?.name) {
+    roles = await prisma.tenantRole.findMany({
+      where: { tenantId: session?.user?.tenantId as string },
+      include: {
+        _count: {
+          select: { users: true }
+        }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+  }
 
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -57,7 +78,7 @@ export default async function SettingsPage() {
       </div>
       
       {user ? (
-        <SettingsClientPage initialUser={user} />
+        <SettingsClientPage initialUser={user} initialRoles={roles} />
       ) : (
         <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-4 rounded-xl">Error loading user profile.</div>
       )}

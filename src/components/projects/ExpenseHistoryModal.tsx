@@ -14,9 +14,11 @@ interface ExpenseHistoryModalProps {
   isCompleted?: boolean;
   onEdit?: (expense: any) => void;
   onDelete?: (expenseId: string) => void;
+  canEditExpense?: boolean;
+  canDeleteExpense?: boolean;
 }
 
-export default function ExpenseHistoryModal({ isOpen, onClose, project, currency, userRole, currentUserId, isCompleted, onEdit, onDelete }: ExpenseHistoryModalProps) {
+export default function ExpenseHistoryModal({ isOpen, onClose, project, currency, userRole, currentUserId, isCompleted, onEdit, onDelete, canEditExpense = false, canDeleteExpense = false }: ExpenseHistoryModalProps) {
   const { t } = useTenantPreferences();
   
   const today = new Date();
@@ -101,14 +103,35 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
     groupedExpenses[b].date.getTime() - groupedExpenses[a].date.getTime()
   );
 
-  const canEditDelete = (exp: any) => {
+  const canEdit = (exp: any) => {
     if (isCompleted) return false;
     
     if (userRole === "SUPER_ADMIN" || userRole === "OWNER") return true;
+    if (canEditExpense) return true;
+    
+    // Fallback original logic for staff without explicit 'edit any' permission
     if (userRole === "STAFF") {
       if (exp.userId !== currentUserId) return false;
       const today = new Date();
-      // Ensure we explicitly use createdAt for edit restrictions
+      const createdDate = exp.createdAt ? new Date(exp.createdAt) : new Date();
+      return (
+        today.getFullYear() === createdDate.getFullYear() &&
+        today.getMonth() === createdDate.getMonth() &&
+        today.getDate() === createdDate.getDate()
+      );
+    }
+    return false;
+  };
+
+  const canDelete = (exp: any) => {
+    if (isCompleted) return false;
+    if (userRole === "SUPER_ADMIN" || userRole === "OWNER") return true;
+    if (canDeleteExpense) return true;
+    
+    // Fallback logic for delete
+    if (userRole === "STAFF") {
+      if (exp.userId !== currentUserId) return false;
+      const today = new Date();
       const createdDate = exp.createdAt ? new Date(exp.createdAt) : new Date();
       return (
         today.getFullYear() === createdDate.getFullYear() &&
@@ -126,6 +149,9 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
         {/* Header */}
         <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-gray-50 dark:bg-slate-900/50">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 bg-gray-200/80 dark:bg-slate-700/80 dark:text-slate-300 px-2 py-0.5 rounded-full line-clamp-1 max-w-[200px]">{project?.name || "Project"}</span>
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('all_expenses') || "All Expenses"}</h2>
             <p className="text-accent-500 dark:text-accent-400 text-lg mt-1 font-bold">
               <span className="text-gray-500 dark:text-slate-400 font-medium mr-2 text-base">{filteredForGrouping.length} {t('entries') || "entries"} &bull;</span>
@@ -192,27 +218,30 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
                         </p>
                       </div>
                       <div className="flex items-center shrink-0">
-                        <p className={`font-bold text-gray-800 dark:text-slate-200 text-[14px] sm:text-[15px] text-right min-w-[70px] sm:min-w-[90px] whitespace-nowrap ${canEditDelete(exp) ? 'pr-3 border-r border-gray-100 dark:border-slate-700' : ''}`}>
+                        <p className={`font-bold text-gray-800 dark:text-slate-200 text-[14px] sm:text-[15px] text-right min-w-[70px] sm:min-w-[90px] whitespace-nowrap ${(canEdit(exp) || canDelete(exp)) ? 'pr-3 border-r border-gray-100 dark:border-slate-700' : ''}`}>
                           {formatCurrency(exp.amount, currency)}
                         </p>
                         <div className="flex gap-1.5 sm:gap-2 pl-3">
-                          {canEditDelete(exp) && (
-                            <>
-                              <button 
-                                onClick={() => onEdit && onEdit(exp)}
-                                className="p-1.5 sm:p-2 bg-white dark:bg-slate-800 rounded-xl text-gray-400 dark:text-slate-400 hover:text-accent-600 dark:hover:text-accent-400 hover:bg-accent-50 dark:hover:bg-accent-500/10 transition-colors shadow-sm border border-gray-100 dark:border-slate-700"
-                                title="Edit"
-                              >
-                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                              </button>
-                              <button 
-                                onClick={() => onDelete && onDelete(exp.id)}
-                                className="p-1.5 sm:p-2 bg-white dark:bg-slate-800 rounded-xl text-gray-400 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-colors shadow-sm border border-gray-100 dark:border-slate-700"
-                                title="Delete"
-                              >
-                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                              </button>
-                            </>
+                          {canEdit(exp) && onEdit && (
+                            <button 
+                              onClick={() => {
+                                onEdit(exp);
+                              }}
+                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors border border-blue-100 dark:border-blue-500/20"
+                              title="Edit expense"
+                            >
+                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                          )}
+                          
+                          {canDelete(exp) && onDelete && (
+                            <button 
+                              onClick={() => onDelete(exp.id)}
+                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center transition-colors border border-red-100 dark:border-red-500/20"
+                              title="Delete expense"
+                            >
+                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
                           )}
                         </div>
                       </div>

@@ -24,7 +24,7 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
   const balanceAmount = projectValue - totalCredits;
   const isBalancePositive = balanceAmount >= 0;
   
-  const plPercentage = projectValue > 0 ? Math.abs((profitLoss / projectValue) * 100).toFixed(1) : "0.0";
+  const plPercentage = totalCredits > 0 ? Math.abs((profitLoss / totalCredits) * 100).toFixed(1) : "0.0";
   const isProfit = profitLoss >= 0;
 
   // Combine expenses and credits into a single ledger array and calculate running balance

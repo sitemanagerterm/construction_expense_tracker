@@ -12,13 +12,22 @@ export default async function DashboardPage() {
 
   const tenantId = session.user.tenantId;
 
+  // Determine base query conditions
+  const projectWhereClause: any = {
+    tenantId,
+    isDeleted: false,
+    status: "ACTIVE"
+  };
+
+  if (session.user.role === "STAFF") {
+    projectWhereClause.allocatedUsers = {
+      some: { id: session.user.id }
+    };
+  }
+
   // Find the most recently updated active project
   const latestProject = await prisma.project.findFirst({
-    where: { 
-      tenantId, 
-      isDeleted: false,
-      status: "ACTIVE" 
-    },
+    where: projectWhereClause,
     orderBy: {
       updatedAt: 'desc'
     }
@@ -28,8 +37,13 @@ export default async function DashboardPage() {
     redirect(`/dashboard/projects/${latestProject.id}`);
   } else {
     // If no active project, maybe check if there is any completed project
+    const anyProjectWhere = { tenantId, isDeleted: false };
+    if (session.user.role === "STAFF") {
+      (anyProjectWhere as any).allocatedUsers = { some: { id: session.user.id } };
+    }
+
     const anyProject = await prisma.project.findFirst({
-      where: { tenantId, isDeleted: false },
+      where: anyProjectWhere,
       orderBy: { updatedAt: 'desc' }
     });
     

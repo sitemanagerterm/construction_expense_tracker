@@ -24,7 +24,8 @@ export default async function ExpensesPage() {
     where: {
       tenantId: session.user.tenantId as string,
       status: "ACTIVE",
-      isDeleted: false
+      isDeleted: false,
+      ...(session.user.role === "STAFF" ? { allocatedUsers: { some: { id: session.user.id } } } : {})
     },
     select: {
       id: true,

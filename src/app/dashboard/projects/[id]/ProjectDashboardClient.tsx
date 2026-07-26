@@ -9,7 +9,7 @@ import AddExpenseModal from "@/components/projects/AddExpenseModal";
 import ProjectReportModal from "@/components/projects/ProjectReportModal";
 import ExpenseHistoryModal from "@/components/projects/ExpenseHistoryModal";
 import ProjectFormModal from "@/components/projects/ProjectFormModal";
-import { addCredit, addExpenses, updateProjectBudget } from "../actions";
+import { addExpenses, deleteProject, updateProjectBudget, addCredit, updateCredit } from "../actions";
 import { deleteExpense, updateExpense } from "@/app/actions/expenses";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
@@ -52,16 +52,19 @@ function DesktopThemeToggle() {
   );
 }
 
-export default function ProjectDashboardClient({ project, allProjects, currency, userRole, currentUserId }: any) {
+export default function ProjectDashboardClient({ project, allProjects, currency, userRole, currentUserId, userPermissions = [] }: any) {
   const { t } = useTenantPreferences();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [projectSearchQuery, setProjectSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreditModalOpen, setIsCreditModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isExpenseHistoryModalOpen, setIsExpenseHistoryModalOpen] = useState(false);
   const [isProjectFormModalOpen, setIsProjectFormModalOpen] = useState(false);
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
+  const [isProjectDeleteModalOpen, setIsProjectDeleteModalOpen] = useState(false);
   
   // Inline Budget Edit State
   const [isEditingBudget, setIsEditingBudget] = useState(false);
@@ -70,6 +73,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
   
   // Custom Dialog States
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [deleteExpenseReason, setDeleteExpenseReason] = useState("");
   const [expenseToEdit, setExpenseToEdit] = useState<any | null>(null);
   const [editAmountValue, setEditAmountValue] = useState("");
   const [editReasonValue, setEditReasonValue] = useState("");
@@ -77,6 +81,22 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+
+  // Granular Permissions
+  const isOwnerOrAdmin = userRole === "OWNER" || userRole === "ADMIN" || userRole === "SUPER_ADMIN";
+  const canViewProjectValue = isOwnerOrAdmin || userPermissions.includes("projects.view_value");
+  const canViewCredits = isOwnerOrAdmin || userPermissions.includes("credits.view");
+  const canAddExpense = isOwnerOrAdmin || userPermissions.includes("expenses.add");
+  const canAddCredit = isOwnerOrAdmin || userPermissions.includes("credits.add");
+  const canEditProject = isOwnerOrAdmin || userPermissions.includes("projects.edit");
+  const canDeleteProject = isOwnerOrAdmin || userPermissions.includes("projects.delete");
+  const canAddProject = isOwnerOrAdmin || userPermissions.includes("projects.add");
+  const canViewProjectSettings = canEditProject || canDeleteProject || isOwnerOrAdmin;
+  const canViewExpenses = isOwnerOrAdmin || userPermissions.includes("expenses.view");
+  const canEditExpense = (isOwnerOrAdmin || userPermissions.includes("expenses.edit")) && canViewExpenses;
+  const canDeleteExpense = (isOwnerOrAdmin || userPermissions.includes("expenses.delete")) && canViewExpenses;
+  const canEditCredit = isOwnerOrAdmin || userPermissions.includes("credits.edit");
+  const canDeleteCredit = isOwnerOrAdmin || userPermissions.includes("credits.delete");
   
   const handleAddCredit = async (data: any) => {
     try {
@@ -85,6 +105,16 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
       console.error(error);
       setErrorMessage(error.message || "Failed to add credit");
       throw error; // re-throw to allow the modal to know it failed
+    }
+  };
+
+  const handleEditCredit = async (data: any) => {
+    try {
+      await updateCredit(data);
+    } catch (error: any) {
+      console.error(error);
+      setErrorMessage(error.message || "Failed to update credit");
+      throw error;
     }
   };
 
@@ -113,13 +143,14 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
   };
 
   const confirmDeleteExpense = async () => {
-    if (expenseToDelete) {
+    if (expenseToDelete && deleteExpenseReason.trim()) {
       setIsDeleting(true);
       try {
-        const res = await deleteExpense(expenseToDelete, "Deleted from dashboard");
+        const res = await deleteExpense(expenseToDelete, deleteExpenseReason.trim());
         if (res.success) {
           toast.success(t('expense_deleted') || "Expense deleted successfully");
           setExpenseToDelete(null);
+          setDeleteExpenseReason("");
           router.refresh();
         } else {
           toast.error(t('expense_deleted_err') || res.error || "Failed to delete expense");
@@ -191,7 +222,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
           <div className="relative">
             <div 
               className="cursor-pointer group flex flex-col justify-center px-3 py-1.5 -ml-2 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => { setIsDropdownOpen(!isDropdownOpen); setProjectSearchQuery(""); }}
             >
               <div className="flex items-center gap-2 mb-0.5">
                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">{t('project_label')}</p>
@@ -212,9 +243,23 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
             {isDropdownOpen && (
               <>
                 <div className="fixed inset-0 z-40 cursor-default" onClick={(e) => { e.stopPropagation(); setIsDropdownOpen(false); }}></div>
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                  <div className="max-h-64 overflow-y-auto py-2">
-                    {allProjects.map((p: any) => (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                  <div className="p-2 border-b border-gray-50 dark:border-slate-700">
+                    <input 
+                      type="text" 
+                      placeholder={t('search_projects') || "Search projects..."}
+                      value={projectSearchQuery}
+                      onChange={(e) => setProjectSearchQuery(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 text-gray-900 dark:text-white"
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                  <div className="max-h-64 overflow-y-auto py-1">
+                    {allProjects.filter((p: any) => p.name.toLowerCase().includes(projectSearchQuery.toLowerCase())).length === 0 && (
+                      <div className="px-5 py-4 text-sm text-gray-500 dark:text-slate-400 text-center">No projects found</div>
+                    )}
+                    {allProjects.filter((p: any) => p.name.toLowerCase().includes(projectSearchQuery.toLowerCase())).map((p: any) => (
                       <a 
                         key={p.id} 
                         href={`/dashboard/projects/${p.id}`} 
@@ -225,16 +270,18 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                       </a>
                     ))}
                   </div>
-                  <button 
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      setIsProjectFormModalOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2 px-5 py-3.5 border-t border-gray-50 dark:border-slate-700 text-[15px] font-bold text-accent-500 dark:text-accent hover:bg-accent-50 dark:hover:bg-accent/10 transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
-                    {t('new_project')}
-                  </button>
+                  {canAddProject && (
+                    <button 
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setIsProjectFormModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-5 py-3.5 border-t border-gray-50 dark:border-slate-700 text-[15px] font-bold text-accent-500 dark:text-accent hover:bg-accent-50 dark:hover:bg-accent/10 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
+                      {t('new_project')}
+                    </button>
+                  )}
                 </div>
               </>
             )}
@@ -244,7 +291,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         <div className="flex items-center gap-2">
           {/* Desktop theme toggle */}
           <DesktopThemeToggle />
-          {userRole !== "STAFF" && (
+          {canViewProjectSettings && (
             <div className="relative">
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -258,7 +305,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)}></div>
                   <div className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-                    {userRole !== "STAFF" && (
+                    {isOwnerOrAdmin && (
                       <button 
                         onClick={() => { setIsReportModalOpen(true); setIsMenuOpen(false); }}
                         className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-3"
@@ -267,7 +314,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                         {t('view_report')}
                       </button>
                     )}
-                    {userRole !== "STAFF" && (
+                    {canEditProject && (
                       <button 
                         onClick={async () => {
                           setIsMenuOpen(false);
@@ -279,14 +326,44 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                         {project.status === "ACTIVE" ? (
                           <>
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-                            {t('mark_as_completed')}
+                            {t('mark_as_completed') || 'Mark as Completed'}
                           </>
                         ) : (
                           <>
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            {t('mark_as_active')}
+                            {t('mark_as_active') || 'Mark as Active'}
                           </>
                         )}
+                      </button>
+                    )}
+                    {canEditProject && (
+                      <button 
+                        onClick={() => { setIsEditProjectModalOpen(true); setIsMenuOpen(false); }}
+                        className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-3 border-t border-gray-50 dark:border-slate-700"
+                      >
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        {(t('edit_project') === 'edit_project' ? 'Edit Project' : t('edit_project')) || 'Edit Project'}
+                      </button>
+                    )}
+                    {canDeleteProject && (
+                      <button 
+                        onClick={() => {
+                          if (project.status === 'COMPLETED') {
+                            setIsProjectDeleteModalOpen(true); 
+                            setIsMenuOpen(false);
+                          } else {
+                            toast.error(t('project_must_be_completed') === 'project_must_be_completed' ? "Only completed projects can be deleted. Please mark the project as completed first." : t('project_must_be_completed'));
+                          }
+                        }}
+                        className={`w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold flex items-center gap-3 border-t border-gray-50 dark:border-slate-700 transition-colors ${
+                          project.status === 'COMPLETED' 
+                            ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10' 
+                            : 'text-gray-400 dark:text-slate-500 cursor-not-allowed opacity-70'
+                        }`}
+                        title={project.status !== 'COMPLETED' ? "Only completed projects can be deleted" : ""}
+                      >
+                        <svg className={`w-4 h-4 ${project.status === 'COMPLETED' ? 'text-red-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        {(t('delete_project') === 'delete_project' ? 'Delete Project' : t('delete_project')) || 'Delete Project'}
                       </button>
                     )}
                   </div>
@@ -300,13 +377,13 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
       <div className="p-4 w-full max-w-5xl mx-auto space-y-6">
         
         {project.status === 'COMPLETED' && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
             <div>
-              <h3 className="font-bold text-amber-900 dark:text-amber-300">Project Completed</h3>
-              <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">This site is marked as completed. Adding, editing, or deleting expenses and credits is frozen.</p>
+              <h3 className="font-bold text-blue-900 dark:text-blue-300">Project Completed</h3>
+              <p className="text-sm text-blue-700 dark:text-blue-400 font-medium">Your project is completed. If you want to add any expenses against this site, you need to change the status to active.</p>
             </div>
           </div>
         )}
@@ -314,7 +391,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Project Value Inline Edit Card */}
-          {userRole !== "STAFF" && (
+          {canViewProjectValue && (
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center h-full transition-colors">
             <div className="w-full mr-4">
               <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('project_value')}</p>
@@ -376,26 +453,25 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
           )}
 
         {/* Amount Received / Credit */}
-        {userRole !== "STAFF" && (
+        {canViewCredits && (
           <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col justify-center h-full transition-colors">
             <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('credit_received')}</p>
-            <div className="flex justify-between items-end">
-              <div className="flex items-end justify-between mt-1">
-                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{formatCurrency(totalCredits, currency)}</p>
-                {userRole !== "STAFF" && project.status !== "COMPLETED" && (
-                  <button 
-                    onClick={() => setIsCreditModalOpen(true)}
-                    className="text-xs font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors"
-                  >
-                    + {t('add_credit')}
-                  </button>
-                )}
-              </div>
+            <div className="flex items-center justify-between mt-1 w-full gap-4">
+              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{formatCurrency(totalCredits, currency)}</p>
+              {canAddCredit && project.status !== "COMPLETED" && (
+                <button 
+                  onClick={() => setIsCreditModalOpen(true)}
+                  className="text-xs font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors shrink-0"
+                >
+                  + {t('add_credit')}
+                </button>
+              )}
             </div>
           </div>
         )}
 
         {/* Expenses Overview */}
+        {canViewExpenses && (
           <div 
             onClick={() => setIsExpenseHistoryModalOpen(true)}
             className="bg-accent-50 dark:bg-accent/10 p-5 rounded-2xl border border-accent-100 dark:border-accent/20 cursor-pointer hover:bg-accent-100 dark:hover:bg-accent/20 transition-colors flex justify-between items-center group h-full"
@@ -408,7 +484,8 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path></svg>
             </div>
           </div>
-          {userRole !== "STAFF" && (
+        )}
+          {canViewCredits && canViewExpenses && (
             <div className={`p-5 rounded-2xl border flex flex-col justify-center h-full ${remainingBalance < 0 ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20'}`}>
               <p className={`text-[11px] font-bold mb-1 uppercase tracking-wider ${remainingBalance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {project.status === 'ACTIVE' ? (t('cash_flow_trend') || 'Available Balance') : remainingBalance < 0 ? (t('project_loss') || 'Project Loss') : (t('project_profit') || 'Project Profit')}
@@ -417,14 +494,14 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                 <p className={`text-2xl sm:text-3xl font-bold ${remainingBalance < 0 ? 'text-red-700 dark:text-red-500' : 'text-emerald-700 dark:text-emerald-500'}`}>
                   {remainingBalance < 0 ? '-' : '+'}{formatCurrency(Math.abs(remainingBalance), currency)}
                 </p>
-                {project.budget > 0 && (
+                {totalCredits > 0 && (
                   <div className={`flex items-center gap-0.5 pb-0.5 text-sm font-bold ${remainingBalance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                     {remainingBalance < 0 ? (
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
                     ) : (
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
                     )}
-                    <span>{Math.abs((remainingBalance / project.budget) * 100).toFixed(1)}%</span>
+                    <span>{Math.abs((remainingBalance / totalCredits) * 100).toFixed(1)}%</span>
                   </div>
                 )}
               </div>
@@ -433,34 +510,36 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         </div>
 
         {/* Recent Expenses List */}
-        <div className="mt-6">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 px-1">{t('recent_expenses') || "Recent Expenses"}</h3>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
-            {project.expenses.length === 0 ? (
-              <p className="p-5 text-center text-gray-500 dark:text-slate-400 text-sm font-medium">{t('no_expenses_yet')}</p>
-            ) : (
-              [...project.expenses]
-                .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                .slice(0, 5)
-                .map((exp: any, idx: number) => (
-                <div key={idx} className="p-5 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <div>
-                    <p className="font-bold text-gray-900 dark:text-white text-sm capitalize">
-                      {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() ? exp.notes : (t(exp.category.toLowerCase()) || exp.category)}
-                    </p>
-                    {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() && (
-                      <p className="text-[11px] text-gray-400 dark:text-slate-500 uppercase tracking-wide mt-0.5">
-                        {t(exp.category.toLowerCase()) || exp.category}
+        {canViewExpenses && (
+          <div className="mt-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 px-1">{t('recent_expenses') || "Recent Expenses"}</h3>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
+              {project.expenses.length === 0 ? (
+                <p className="p-5 text-center text-gray-500 dark:text-slate-400 text-sm font-medium">{t('no_expenses_yet')}</p>
+              ) : (
+                [...project.expenses]
+                  .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .slice(0, 5)
+                  .map((exp: any, idx: number) => (
+                  <div key={idx} className="p-5 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <div>
+                      <p className="font-bold text-gray-900 dark:text-white text-sm capitalize">
+                        {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() ? exp.notes : (t(exp.category.toLowerCase()) || exp.category)}
                       </p>
-                    )}
+                      {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() && (
+                        <p className="text-[11px] text-gray-400 dark:text-slate-500 uppercase tracking-wide mt-0.5">
+                          {t(exp.category.toLowerCase()) || exp.category}
+                        </p>
+                      )}
+                    </div>
+                    <p className="font-bold text-accent-500 dark:text-accent-400 text-lg">{formatCurrency(exp.amount, currency)}</p>
                   </div>
-                  <p className="font-bold text-accent-500 dark:text-accent-400 text-lg">{formatCurrency(exp.amount, currency)}</p>
-                </div>
-              ))
-            )}
-            
+                ))
+              )}
+              
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
 
@@ -469,8 +548,12 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         onClose={() => setIsCreditModalOpen(false)}
         project={project}
         currency={currency}
-        onAddCredit={handleAddCredit}
         isCompleted={project.status === 'COMPLETED'}
+        onAddCredit={handleAddCredit}
+        onEditCredit={handleEditCredit}
+        canAddCredit={canAddCredit}
+        canEditCredit={canEditCredit}
+        canDeleteCredit={canDeleteCredit}
       />
 
       <AddExpenseModal
@@ -492,6 +575,8 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         currentUserId={currentUserId}
         onEdit={(exp) => handleEditExpense(exp)}
         onDelete={handleDeleteExpense}
+        canEditExpense={canEditExpense}
+        canDeleteExpense={canDeleteExpense}
       />
 
       <ProjectFormModal
@@ -500,6 +585,16 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         onSuccess={(newProject: any) => {
           setIsProjectFormModalOpen(false);
           router.push(`/dashboard/projects/${newProject.id}`);
+        }}
+      />
+
+      <ProjectFormModal
+        isOpen={isEditProjectModalOpen}
+        editData={project}
+        onClose={() => setIsEditProjectModalOpen(false)}
+        onSuccess={(updatedProject: any) => {
+          setIsEditProjectModalOpen(false);
+          router.refresh();
         }}
       />
 
@@ -533,10 +628,22 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('delete_expense') || "Delete Expense"}</h3>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('delete_expense_confirm') || "Are you sure you want to delete this expense? It will be removed or moved to the audit logs."}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('delete_expense_confirm') || "Are you sure you want to delete this expense? It will be removed or moved to the audit logs."}</p>
+              
+              <div className="mb-6 text-left">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1.5">{(t('reason_for_deletion') === 'reason_for_deletion' ? 'Reason for Deletion' : t('reason_for_deletion')) || "Reason for Deletion"}</label>
+                <textarea 
+                  value={deleteExpenseReason}
+                  onChange={(e) => setDeleteExpenseReason(e.target.value)}
+                  className="w-full py-2.5 px-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:bg-white dark:focus:bg-slate-900 font-medium text-gray-900 dark:text-white resize-none h-24"
+                  placeholder="Why are you deleting this expense?"
+                  required
+                />
+              </div>
+
               <div className="flex gap-3">
-                <button onClick={() => setExpenseToDelete(null)} className="flex-1 py-2.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">{t('cancel') || "Cancel"}</button>
-                <button onClick={confirmDeleteExpense} disabled={isDeleting} className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors disabled:opacity-50">
+                <button onClick={() => { setExpenseToDelete(null); setDeleteExpenseReason(""); }} className="flex-1 py-2.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">{t('cancel') || "Cancel"}</button>
+                <button onClick={confirmDeleteExpense} disabled={isDeleting || !deleteExpenseReason.trim()} className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors disabled:opacity-50">
                   {isDeleting ? (t('processing') || "Processing...") : (t('delete') || "Delete")}
                 </button>
               </div>
@@ -587,8 +694,50 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
           </div>
         </div>
       )}
+
+      {/* Delete Project Confirmation Modal */}
+      {isProjectDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-slate-900/40 dark:bg-slate-900 sm:dark:bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-fade-in" onClick={() => setIsProjectDeleteModalOpen(false)}>
+          <div className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 sm:border w-full h-full sm:h-auto sm:max-w-sm rounded-none sm:rounded-2xl shadow-none sm:shadow-xl overflow-hidden flex flex-col sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{(t('delete_project') === 'delete_project' ? 'Delete Project' : t('delete_project')) || "Delete Project"}</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-2">{(t('delete_project_confirm') === 'delete_project_confirm' ? 'Are you absolutely sure you want to delete this project?' : t('delete_project_confirm')) || "Are you absolutely sure you want to delete this project?"}</p>
+              <p className="text-xs text-red-500 dark:text-red-400 font-medium mb-6">This action cannot be undone. All related expenses and credits will be permanently removed.</p>
+              
+              <div className="flex gap-3">
+                <button onClick={() => setIsProjectDeleteModalOpen(false)} className="flex-1 py-2.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">{t('cancel') || "Cancel"}</button>
+                <button 
+                  onClick={async () => {
+                    setIsDeleting(true);
+                    try {
+                      await deleteProject(project.id);
+                      toast.success(t('project_deleted') || "Project deleted successfully");
+                      router.push("/dashboard");
+                    } catch (error: any) {
+                      toast.error(error.message || "Failed to delete project");
+                      setIsDeleting(false);
+                      setIsProjectDeleteModalOpen(false);
+                    }
+                  }} 
+                  disabled={isDeleting} 
+                  className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {t('deleting') || "Deleting..."}</>
+                  ) : (
+                    (t('delete') || "Delete")
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Floating Action Button for Add Expense */}
-      {project.status !== 'COMPLETED' && (
+      {project.status !== 'COMPLETED' && canAddExpense && (
         <button 
           onClick={() => setIsExpenseModalOpen(true)}
           className="fixed bottom-24 right-4 sm:bottom-12 sm:right-8 z-40 bg-accent-500 hover:bg-accent-600 text-white px-5 h-14 sm:px-6 sm:h-16 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-accent-500/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"

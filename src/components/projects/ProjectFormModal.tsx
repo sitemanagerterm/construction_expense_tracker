@@ -102,7 +102,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
       <div className="bg-white dark:bg-slate-900 w-full h-full sm:h-auto sm:max-w-lg rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border sm:border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 shrink-0">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editData ? t('edit') : t('create_new_project')}</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{editData ? (t('edit_project') === 'edit_project' ? 'Edit Project' : t('edit_project')) || 'Edit Project' : t('create_new_project')}</h2>
           <button onClick={onClose} className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -205,7 +205,7 @@ export default function ProjectFormModal({ isOpen, onClose, onSuccess, editData 
           </button>
           <button type="submit" form="project-form" disabled={loading}
             className={`flex-1 sm:flex-none px-6 py-3 sm:py-2.5 rounded-xl font-bold text-white bg-primary-900 dark:bg-accent hover:bg-primary-800 dark:hover:bg-accent-600 transition-all ${loading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20 dark:shadow-accent-500/20'}`}>
-            {loading ? "..." : (editData ? t('edit') : t('create_project'))}
+            {loading ? "..." : (editData ? (t('save_changes') === 'save_changes' ? 'Save Changes' : t('save_changes')) || 'Save Changes' : t('create_project'))}
           </button>
         </div>
 

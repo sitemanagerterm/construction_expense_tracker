@@ -9,6 +9,8 @@ export type StaffFormData = {
   name: string;
   mobileNumber: string;
   pin: string;
+  tenantRoleId?: string;
+  allocatedProjectIds?: string[];
 };
 
 async function getAuthTenant() {
@@ -26,6 +28,10 @@ export async function getStaff() {
       where: {
         tenantId,
         role: "STAFF",
+      },
+      include: {
+        tenantRole: { select: { name: true } },
+        allocatedProjects: { select: { id: true } }
       },
       orderBy: {
         createdAt: "desc",
@@ -94,6 +100,10 @@ export async function addStaff(data: StaffFormData) {
         mobileNumber: data.mobileNumber,
         pin: data.pin,
         role: "STAFF",
+        tenantRoleId: data.tenantRoleId || null,
+        allocatedProjects: data.allocatedProjectIds && data.allocatedProjectIds.length > 0
+          ? { connect: data.allocatedProjectIds.map(id => ({ id })) }
+          : undefined,
       },
     });
 
@@ -124,6 +134,10 @@ export async function updateStaff(staffId: string, data: StaffFormData) {
         name: data.name,
         mobileNumber: data.mobileNumber,
         pin: data.pin,
+        tenantRoleId: data.tenantRoleId || null,
+        allocatedProjects: data.allocatedProjectIds
+          ? { set: data.allocatedProjectIds.map(id => ({ id })) }
+          : undefined,
       },
     });
 

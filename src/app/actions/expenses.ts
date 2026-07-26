@@ -75,7 +75,8 @@ export async function getExpenses() {
     const expenses = await prisma.expense.findMany({
       where: {
         project: {
-          tenantId: session.user.tenantId
+          tenantId: session.user.tenantId,
+          ...(session.user.role === "STAFF" ? { allocatedUsers: { some: { id: session.user.id } } } : {})
         },
         isDeleted: false
       },

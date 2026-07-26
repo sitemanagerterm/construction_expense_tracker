@@ -10,6 +10,10 @@ neonConfig.webSocketConstructor = ws;
 declare global {
   // eslint-disable-next-line no-var
   var __prisma_neon: PrismaClient | undefined;
+  // eslint-disable-next-line no-var
+  var __prisma_neon_v2: PrismaClient | undefined;
+  // eslint-disable-next-line no-var
+  var __prisma_neon_v3: PrismaClient | undefined;
 }
 
 function readDatabaseUrl(): string {
@@ -78,11 +82,11 @@ function createPrismaClient(): PrismaClient {
  * Singleton PrismaClient — lazy-initialised on first access.
  */
 export const prisma: PrismaClient =
-  global.__prisma_neon ??
+  global.__prisma_neon_v3 ??
   (() => {
     const client = createPrismaClient();
     if (process.env.NODE_ENV !== "production") {
-      global.__prisma_neon = client;
+      global.__prisma_neon_v3 = client;
     }
     return client;
   })();

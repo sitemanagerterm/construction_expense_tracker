@@ -7,12 +7,27 @@ import AuditLogsClient from "./AuditLogsClient";
 export default async function AuditLogsPage() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id || (session.user.role !== "OWNER" && session.user.role !== "SUPER_ADMIN")) {
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  // Fetch full user to get tenantRole permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { tenantRole: true }
+  });
+
+  const hasAccess = 
+    session.user.role === "OWNER" || 
+    session.user.role === "SUPER_ADMIN" || 
+    (session.user.role === "STAFF" && user?.tenantRole?.permissions?.includes("audit_log.view"));
+
+  if (!hasAccess) {
     redirect("/dashboard");
   }
 
-  // Fetch all audit logs for expenses belonging to projects in this tenant
-  const logs = await prisma.expenseAuditLog.findMany({
+  // Fetch all audit logs for expenses
+  const expenseLogs = await prisma.expenseAuditLog.findMany({
     where: {
       expense: {
         project: {
@@ -30,19 +45,43 @@ export default async function AuditLogsPage() {
         }
       }
     },
-    orderBy: {
-      createdAt: 'desc'
-    }
   });
 
+  // Fetch all audit logs for credits
+  const creditLogs = await prisma.creditAuditLog.findMany({
+    where: {
+      credit: {
+        project: {
+          tenantId: session.user.tenantId as string,
+        }
+      }
+    },
+    include: {
+      credit: {
+        select: {
+          amount: true,
+          paymentMethod: true,
+          date: true,
+          project: { select: { name: true } }
+        }
+      }
+    },
+  });
+
+  // Combine and sort logs by createdAt desc
+  const combinedLogs = [
+    ...expenseLogs.map(log => ({ ...log, type: 'EXPENSE' as const })),
+    ...creditLogs.map(log => ({ ...log, type: 'CREDIT' as const }))
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
   // Fetch users to map modifiedBy to names
-  const userIds = [...new Set(logs.map(log => log.modifiedBy))];
+  const userIds = [...new Set(combinedLogs.map(log => log.modifiedBy))];
   const users = await prisma.user.findMany({
     where: { id: { in: userIds } },
     select: { id: true, name: true, role: true }
   });
 
-  const logsWithUsers = logs.map(log => ({
+  const logsWithUsers = combinedLogs.map(log => ({
     ...log,
     modifierName: users.find(u => u.id === log.modifiedBy)?.name || 'Unknown User'
   }));
@@ -50,7 +89,6 @@ export default async function AuditLogsPage() {
   const allProjects = await prisma.project.findMany({
     where: {
       tenantId: session.user.tenantId as string,
-      isDeleted: false
     },
     select: { id: true, name: true, status: true }
   });

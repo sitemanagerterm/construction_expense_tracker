@@ -20,7 +20,8 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
     where: {
       id: projectId,
       tenantId: session.user.tenantId as string,
-      isDeleted: false
+      isDeleted: false,
+      ...(session.user.role === "STAFF" ? { allocatedUsers: { some: { id: session.user.id } } } : {})
     },
     include: {
       expenses: {
@@ -29,6 +30,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
         include: { user: true }
       },
       credits: {
+        where: { isDeleted: false },
         orderBy: { date: 'desc' }
       }
     }
@@ -49,13 +51,29 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
   const allProjects = await prisma.project.findMany({
     where: {
       tenantId: session.user.tenantId as string,
-      isDeleted: false
+      isDeleted: false,
+      ...(session.user.role === "STAFF" ? { allocatedUsers: { some: { id: session.user.id } } } : {})
     },
     select: { id: true, name: true }
   });
 
   const tenant = await prisma.tenant.findUnique({ where: { id: session.user.tenantId as string }, select: { currency: true } });
   const currency = tenant?.currency || "INR";
+
+  // Fetch user permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { tenantRole: true }
+  });
+  
+  let userPermissions: string[] = [];
+  if (user?.tenantRole?.permissions) {
+    try {
+      userPermissions = JSON.parse(user.tenantRole.permissions);
+    } catch (e) {
+      userPermissions = [];
+    }
+  }
 
   return (
     <ProjectDashboardClient 
@@ -64,6 +82,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
       currency={currency} 
       userRole={session.user.role as string}
       currentUserId={session.user.id as string}
+      userPermissions={userPermissions}
     />
   );
 }

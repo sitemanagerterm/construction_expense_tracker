@@ -13,7 +13,22 @@ export const metadata = {
 export default async function StaffPage() {
   const session = await getServerSession(authOptions);
   
-  if (session?.user?.role === "STAFF") {
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  // Fetch full user to get tenantRole permissions
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { tenantRole: true }
+  });
+
+  const hasAccess = 
+    session.user.role === "OWNER" || 
+    session.user.role === "SUPER_ADMIN" || 
+    (session.user.role === "STAFF" && user?.tenantRole?.permissions?.includes("staff.view"));
+
+  if (!hasAccess) {
     redirect("/dashboard");
   }
 
@@ -23,6 +38,20 @@ export default async function StaffPage() {
   const t = (key: string) => dictionaries[lang]?.[key] || dictionaries["en"][key] || key;
 
   const { data: staff, staffLimit, activeStaffCount, error } = await getStaff();
+  
+  const roles = await prisma.tenantRole.findMany({
+    where: { tenantId: session?.user?.tenantId as string },
+    orderBy: { createdAt: 'asc' }
+  });
+
+  const activeProjects = await prisma.project.findMany({
+    where: {
+      tenantId: session?.user?.tenantId as string,
+      status: "ACTIVE",
+      isDeleted: false
+    },
+    select: { id: true, name: true }
+  });
 
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6">
@@ -40,6 +69,10 @@ export default async function StaffPage() {
           initialStaff={staff || []} 
           staffLimit={staffLimit || 1}
           activeStaffCount={activeStaffCount || 0}
+          initialRoles={roles}
+          activeProjects={activeProjects}
+          userRole={session.user.role}
+          userPermissions={user?.tenantRole?.permissions || []}
         />
       )}
     </div>

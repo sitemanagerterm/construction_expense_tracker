@@ -13,11 +13,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const navLinks = [
   { name: "Dashboard", href: "/dashboard", icon: <Home className="w-5 h-5" />, translationKey: "dashboard" },
-  { name: "Staff & Team", href: "/dashboard/staff", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], translationKey: "staff" },
-  { name: "Audit Logs", href: "/dashboard/audit-logs", icon: <History className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], translationKey: "audit_logs" },
+  { name: "Staff & Team", href: "/dashboard/staff", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "staff.view", translationKey: "staff" },
+  { name: "Audit Logs", href: "/dashboard/audit-logs", icon: <History className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "audit_log.view", translationKey: "audit_logs" },
   { name: "Documents", href: "/dashboard/documents", icon: <FileText className="w-5 h-5" />, translationKey: "documents" },
   { name: "Super Admin", href: "/dashboard/super-admin", icon: <ShieldAlert className="w-5 h-5" />, roles: ["SUPER_ADMIN"], translationKey: "super_admin" },
-  { name: "Settings", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], translationKey: "settings" }
+  { name: "Settings", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "settings.view", translationKey: "settings" }
 ];
 
 export default function Sidebar({ user, tenantName }: { user: any, tenantName?: string }) {
@@ -59,10 +59,14 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
         </div>
       </div>
 
-      <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 space-y-1 mt-1 scrollbar-thin pb-2">
+      <nav className="flex-1 px-4 space-y-1 mt-1 pb-2 relative z-50">
         {navLinks.map((link) => {
           if (link.roles && !link.roles.includes(user?.role)) {
-            return null;
+            // Check if user is STAFF and has the required permission via their tenantRole
+            const hasPermission = user?.role === "STAFF" && link.permission && user?.tenantRole?.permissions?.includes(link.permission);
+            if (!hasPermission) {
+              return null;
+            }
           }
 
           const isActive = link.href === "/dashboard"  

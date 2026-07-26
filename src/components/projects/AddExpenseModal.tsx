@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
+
 import { formatCurrency } from "@/lib/utils";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 import { parseMultipleExpensesFromAudio, parseExpenseFromImage } from "@/app/actions/ai-parser";
@@ -10,7 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function AddExpenseModal({ isOpen, onClose, projectId, projectName, currency, onAddExpenses }: any) {
-  const { data: session } = useSession();
+
   const { t } = useTenantPreferences();
 
   const [tab, setTab] = useState<"MANUAL" | "VOICE" | "IMAGE">("MANUAL");

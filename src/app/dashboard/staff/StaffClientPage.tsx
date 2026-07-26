@@ -14,16 +14,27 @@ type Staff = {
   pin: string | null;
   isBlocked: boolean;
   createdAt: Date;
+  tenantRoleId?: string | null;
+  tenantRole?: { name: string } | null;
+  allocatedProjects?: { id: string }[];
 };
 
 export default function StaffClientPage({ 
   initialStaff,
   staffLimit,
-  activeStaffCount
+  activeStaffCount,
+  initialRoles = [],
+  activeProjects = [],
+  userRole = "OWNER",
+  userPermissions = []
 }: { 
   initialStaff: Staff[],
   staffLimit: number,
-  activeStaffCount: number
+  activeStaffCount: number,
+  initialRoles?: any[],
+  activeProjects?: any[],
+  userRole?: string,
+  userPermissions?: string[]
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState<Staff | null>(null);
@@ -31,6 +42,11 @@ export default function StaffClientPage({
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; actionText: string; actionStyle: string; hideCancel?: boolean; onConfirm: () => void } | null>(null);
   const router = useRouter();
   const { t } = useTenantPreferences();
+
+  const canAddStaff = userRole === 'OWNER' || userRole === 'SUPER_ADMIN' || userPermissions.includes('staff.add');
+  const canEditStaff = userRole === 'OWNER' || userRole === 'SUPER_ADMIN' || userPermissions.includes('staff.edit');
+  const canDeleteStaff = userRole === 'OWNER' || userRole === 'SUPER_ADMIN' || userPermissions.includes('staff.delete');
+  const hasActionColumn = canEditStaff || canDeleteStaff;
 
   const handleConfirmAction = (title: string, message: string, actionText: string, actionStyle: string, action: () => void, hideCancel?: boolean) => {
     setConfirmModal({
@@ -75,30 +91,32 @@ export default function StaffClientPage({
   return (
     <div>
       <div className="flex justify-end mb-6">
-        <div className="flex flex-col items-end gap-1">
-          <button 
-            onClick={() => {
-              if (activeStaffCount >= staffLimit) {
-                handleConfirmAction(
-                  t('staff_limit_reached') || "Staff Limit Reached",
-                  t('staff_limit_message')?.replace('{limit}', staffLimit.toString()) || `You have reached your limit of ${staffLimit} active staff members. Please upgrade your plan or block an existing staff member to add more.`,
-                  t('understood') || "Understood",
-                  "bg-primary-600 hover:bg-primary-700",
-                  () => {},
-                  true // hide cancel button
-                );
-                return;
-              }
-              setEditData(null);
-              setIsModalOpen(true);
-            }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-primary-900 text-white shadow-primary-900/20 hover:bg-primary-800 hover:-translate-y-0.5"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            {t('add_staff')}
-          </button>
+          <div className="flex gap-3">
+            {canAddStaff && (
+              <button 
+                onClick={() => {
+                  if (activeStaffCount >= staffLimit) {
+                    handleConfirmAction(
+                      t('staff_limit_reached') || "Staff Limit Reached",
+                      t('staff_limit_message')?.replace('{limit}', staffLimit.toString()) || `You have reached your limit of ${staffLimit} active staff members. Please upgrade your plan or block an existing staff member to add more.`,
+                      t('understood') || "Understood",
+                      "bg-primary-600 hover:bg-primary-700",
+                      () => {},
+                      true // hide cancel button
+                    );
+                    return;
+                  }
+                  setEditData(null);
+                  setIsModalOpen(true);
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-primary-900 text-white shadow-primary-900/20 hover:bg-primary-800 hover:-translate-y-0.5"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                {t('add_staff')}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
         {initialStaff.length === 0 ? (
@@ -116,10 +134,11 @@ export default function StaffClientPage({
                 <tr>
                   <th className="px-6 py-4">{t('name')}</th>
                   <th className="px-6 py-4">{t('mobile_number')}</th>
+                  <th className="px-6 py-4">Role</th>
                   <th className="px-6 py-4">{t('login_pin')}</th>
                   <th className="px-6 py-4">{t('status')}</th>
                   <th className="px-6 py-4">{t('added_on')}</th>
-                  <th className="px-6 py-4 text-right">{t('actions')}</th>
+                  {hasActionColumn && <th className="px-6 py-4 text-right">{t('actions')}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
@@ -127,6 +146,15 @@ export default function StaffClientPage({
                   <tr key={staff.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{staff.name}</td>
                     <td className="px-6 py-4">{staff.mobileNumber}</td>
+                    <td className="px-6 py-4">
+                      {staff.tenantRole ? (
+                        <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 whitespace-nowrap">
+                          {staff.tenantRole.name}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 dark:text-slate-500 text-sm">Staff (Default)</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4">
                       <span className="font-mono bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded text-gray-700 dark:text-slate-300 tracking-wider font-semibold">
                         {staff.pin || t('not_set')}
@@ -146,49 +174,57 @@ export default function StaffClientPage({
                       )}
                     </td>
                     <td className="px-6 py-4">{new Date(staff.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap justify-end items-center gap-3">
-                        <button 
-                          onClick={() => {
-                            setEditData(staff);
-                            setIsModalOpen(true);
-                          }}
-                          className="px-3 py-1.5 rounded-lg text-sm bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/40 hover:text-primary-800 dark:hover:text-primary-300 font-medium transition-colors"
-                        >
-                          {t('edit')}
-                        </button>
-                      {staff.isBlocked ? (
-                        <button 
-                          onClick={() => handleToggleBlock(staff.id, false)}
-                          disabled={isDeleting === staff.id}
-                          className="px-3 py-1.5 rounded-lg text-sm bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium disabled:opacity-50 transition-colors"
-                        >
-                          {isDeleting === staff.id ? "..." : t('unblock')}
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={() => handleToggleBlock(staff.id, true)}
-                          disabled={isDeleting === staff.id}
-                          className="px-3 py-1.5 rounded-lg text-sm bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20 hover:text-amber-800 dark:hover:text-amber-300 font-medium disabled:opacity-50 transition-colors"
-                        >
-                          {isDeleting === staff.id ? "..." : t('block')}
-                        </button>
-                      )}
-                      <button 
-                        onClick={() => handleConfirmAction(
-                          t('remove_staff_member') || "Remove Staff Member",
-                          t('remove_staff_confirm') || "Are you sure you want to remove this staff member? If they have logged expenses, they will be blocked instead to preserve financial records.",
-                          t('remove') || "Remove",
-                          "bg-red-500 hover:bg-red-600",
-                          () => handleDelete(staff.id)
+                    {hasActionColumn && (
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2 shrink-0">
+                          {canEditStaff && (
+                            <button 
+                              onClick={() => {
+                                setEditData(staff);
+                                setIsModalOpen(true);
+                              }}
+                              className="px-3 py-1.5 rounded-lg text-sm bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/40 hover:text-primary-800 dark:hover:text-primary-300 font-medium transition-colors"
+                            >
+                              {t('edit')}
+                            </button>
+                          )}
+                        {canDeleteStaff && (
+                          <>
+                            {staff.isBlocked ? (
+                              <button 
+                                onClick={() => handleToggleBlock(staff.id, false)}
+                                disabled={isDeleting === staff.id}
+                                className="px-3 py-1.5 rounded-lg text-sm bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 hover:text-emerald-800 dark:hover:text-emerald-300 font-medium disabled:opacity-50 transition-colors"
+                              >
+                                {isDeleting === staff.id ? "..." : t('unblock')}
+                              </button>
+                            ) : (
+                              <button 
+                                onClick={() => handleToggleBlock(staff.id, true)}
+                                disabled={isDeleting === staff.id}
+                                className="px-3 py-1.5 rounded-lg text-sm bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20 hover:text-amber-800 dark:hover:text-amber-300 font-medium disabled:opacity-50 transition-colors"
+                              >
+                                {isDeleting === staff.id ? "..." : t('block')}
+                              </button>
+                            )}
+                            <button 
+                              onClick={() => handleConfirmAction(
+                                t('remove_staff_member') || "Remove Staff Member",
+                                t('remove_staff_confirm') || "Are you sure you want to remove this staff member? If they have logged expenses, they will be blocked instead to preserve financial records.",
+                                t('remove') || "Remove",
+                                "bg-red-500 hover:bg-red-600",
+                                () => handleDelete(staff.id)
+                              )}
+                              disabled={isDeleting === staff.id}
+                              className="px-3 py-1.5 rounded-lg text-sm bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-800 dark:hover:text-red-300 font-medium disabled:opacity-50 transition-colors"
+                            >
+                              {isDeleting === staff.id ? "..." : t('remove')}
+                            </button>
+                          </>
                         )}
-                        disabled={isDeleting === staff.id}
-                        className="px-3 py-1.5 rounded-lg text-sm bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-800 dark:hover:text-red-300 font-medium disabled:opacity-50 transition-colors"
-                      >
-                        {isDeleting === staff.id ? "..." : t('remove')}
-                      </button>
-                      </div>
-                    </td>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -227,12 +263,17 @@ export default function StaffClientPage({
         </div>
       )}
 
-      <AddStaffModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSuccess={() => router.refresh()} 
-        editData={editData}
-      />
+        <AddStaffModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={() => {
+            setIsModalOpen(false);
+            window.location.reload();
+          }}
+          editData={editData}
+          roles={initialRoles}
+          activeProjects={activeProjects}
+        />
     </div>
   );
 }

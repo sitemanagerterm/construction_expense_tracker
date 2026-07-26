@@ -14,9 +14,16 @@ type AuditLog = {
   newAmount?: number | null;
   createdAt: Date;
   modifierName: string;
-  expense: {
+  type: 'EXPENSE' | 'CREDIT';
+  expense?: {
     amount: number;
     category: string;
+    date: Date;
+    project: { name: string };
+  };
+  credit?: {
+    amount: number;
+    paymentMethod: string;
     date: Date;
     project: { name: string };
   };
@@ -29,14 +36,15 @@ export default function AuditLogsClient({ initialLogs, allProjects }: { initialL
 
   const uniqueProjects = allProjects
     ? Array.from(new Set(allProjects.map(p => p.name)))
-    : Array.from(new Set(initialLogs.map(log => log.expense.project.name)));
+    : Array.from(new Set(initialLogs.map(log => log.expense?.project.name || log.credit?.project.name)));
 
   const filteredLogs = initialLogs.filter(log => {
+    const projectName = log.expense?.project.name || log.credit?.project.name || "";
     const matchesSearch = log.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           log.modifierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          log.expense.project.name.toLowerCase().includes(searchTerm.toLowerCase());
+                          projectName.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesProject = filterProject === "ALL" || log.expense.project.name === filterProject;
+    const matchesProject = filterProject === "ALL" || projectName === filterProject;
 
     return matchesSearch && matchesProject;
   });
@@ -74,9 +82,9 @@ export default function AuditLogsClient({ initialLogs, allProjects }: { initialL
             onChange={(e) => setFilterProject(e.target.value)}
             className="w-full text-sm font-semibold text-gray-900 dark:text-white border-none outline-none bg-transparent cursor-pointer"
           >
-            <option value="ALL">{t('all_projects') || "All Projects"}</option>
+            <option value="ALL" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{t('all_projects') || "All Projects"}</option>
             {uniqueProjects.map((projectName: any) => (
-              <option key={projectName} value={projectName}>{projectName}</option>
+              <option key={projectName} value={projectName} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{projectName}</option>
             ))}
           </select>
         </div>
@@ -89,7 +97,7 @@ export default function AuditLogsClient({ initialLogs, allProjects }: { initialL
               <tr className="bg-gray-50/80 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
                 <th className="p-4 font-semibold whitespace-nowrap">{t('date_time') || "Date / Time"}</th>
                 <th className="p-4 font-semibold whitespace-nowrap">{t('action_header') || "Action"}</th>
-                <th className="p-4 font-semibold whitespace-nowrap">{t('original_expense') || "Original Expense"}</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('original_record') || "Original Record"}</th>
                 <th className="p-4 font-semibold whitespace-nowrap">Modified By</th>
                 <th className="p-4 font-semibold min-w-[200px]">Reason</th>
               </tr>
@@ -120,16 +128,32 @@ export default function AuditLogsClient({ initialLogs, allProjects }: { initialL
                       )}
                     </td>
                     <td className="p-4 text-sm">
-                      <div className="font-bold text-gray-900 dark:text-white">{formatCurrency(log.expense.amount, currency)} - {log.expense.category}</div>
-                      {log.action === "EDITED" && log.oldAmount != null && log.newAmount != null && (
-                        <div className="mt-1 flex items-center gap-2 text-xs font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 w-fit px-2 py-1 rounded-md">
-                          <span className="line-through opacity-70">{formatCurrency(log.oldAmount, currency)}</span>
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                          <span>{formatCurrency(log.newAmount, currency)}</span>
-                        </div>
-                      )}
-                      <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Project: {log.expense.project.name}</div>
-                      <div className="text-xs text-gray-400 dark:text-slate-500">Exp Date: {format(new Date(log.expense.date), "dd MMM yyyy")}</div>
+                      {log.type === 'EXPENSE' && log.expense ? (
+                        <>
+                          <div className="font-bold text-gray-900 dark:text-white">
+                            <span className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-slate-500 mr-2 border border-gray-200 dark:border-slate-700 px-1.5 py-0.5 rounded">EXPENSE</span>
+                            {formatCurrency(log.expense.amount, currency)} - {log.expense.category}
+                          </div>
+                          {log.action === "EDITED" && log.oldAmount != null && log.newAmount != null && (
+                            <div className="mt-1 flex items-center gap-2 text-xs font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 w-fit px-2 py-1 rounded-md">
+                              <span className="line-through opacity-70">{formatCurrency(log.oldAmount, currency)}</span>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                              <span>{formatCurrency(log.newAmount, currency)}</span>
+                            </div>
+                          )}
+                          <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Project: {log.expense.project.name}</div>
+                          <div className="text-xs text-gray-400 dark:text-slate-500">Date: {format(new Date(log.expense.date), "dd MMM yyyy")}</div>
+                        </>
+                      ) : log.type === 'CREDIT' && log.credit ? (
+                        <>
+                          <div className="font-bold text-gray-900 dark:text-white">
+                            <span className="text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-500 mr-2 border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded">CREDIT</span>
+                            {formatCurrency(log.credit.amount, currency)} - {log.credit.paymentMethod}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Project: {log.credit.project.name}</div>
+                          <div className="text-xs text-gray-400 dark:text-slate-500">Date: {format(new Date(log.credit.date), "dd MMM yyyy")}</div>
+                        </>
+                      ) : null}
                     </td>
                     <td className="p-4 text-sm font-semibold text-gray-900 dark:text-slate-300 whitespace-nowrap">
                       {log.modifierName}

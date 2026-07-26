@@ -44,6 +44,7 @@ model Tenant {
   projects              Project[]
   subscriptions         Subscription[]
   paymentHistory        PaymentHistory[]
+  roles                 TenantRole[]
 }
 
 model User {
@@ -65,12 +66,32 @@ model User {
   tenantId      String?
   tenant        Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
+  tenantRoleId  String?
+  tenantRole    TenantRole? @relation(fields: [tenantRoleId], references: [id], onDelete: SetNull)
+
   accounts      Account[]
   sessions      Session[]
   expenses      Expense[] // Expenses logged by this user
+  
+  allocatedProjects Project[] @relation("UserAllocatedProjects")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model TenantRole {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  permissions String   @db.Text
+  isDefault   Boolean  @default(false)
+  
+  users       User[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Account {
@@ -172,6 +193,8 @@ model Project {
   // Credits received for this project
   credits     Credit[]
   expenses    Expense[]
+  
+  allocatedUsers User[] @relation("UserAllocatedProjects")
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -186,8 +209,24 @@ model Credit {
   paymentMethod String @default("CASH") // CASH, GPAY, BANK_TRANSFER
   notes       String?
 
+  auditLogs   CreditAuditLog[]
+  isDeleted   Boolean  @default(false)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model CreditAuditLog {
+  id          String   @id @default(cuid())
+  creditId    String
+  credit      Credit   @relation(fields: [creditId], references: [id], onDelete: Cascade)
+  action      String   // "EDITED", "DELETED"
+  reason      String   // Reason provided by the Owner
+  modifiedBy  String   // User ID of the Owner who modified it
+  oldAmount   Float?
+  newAmount   Float?
+  
+  createdAt   DateTime @default(now())
 }
 
 model Expense {

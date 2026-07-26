@@ -34,16 +34,27 @@ export default async function DashboardLayout({
     redirect("/expired");
   }
 
+  let userWithRole = { ...session.user } as any;
+  if (session.user.role === "STAFF") {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { tenantRole: true }
+    });
+    if (dbUser?.tenantRole) {
+      userWithRole.tenantRole = dbUser.tenantRole;
+    }
+  }
+
   return (
     <TenantPreferencesProvider language={tenant?.language || "en"} currency={tenant?.currency || "INR"}>
       <div className="flex h-screen bg-slate-50 dark:bg-brandbg overflow-hidden text-gray-900 dark:text-slate-200 font-sans transition-colors duration-200">
         {/* Desktop Sidebar */}
-        <Sidebar user={session.user} tenantName={tenant?.name || "Company"} />
+        <Sidebar user={userWithRole} tenantName={tenant?.name || "Company"} />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           {/* Mobile Top Header */}
-          <TopHeader user={session.user} tenantName={tenant?.name || "Company"} />
+          <TopHeader user={userWithRole} tenantName={tenant?.name || "Company"} />
 
           {/* Scrollable Main Content */}
           <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
@@ -51,7 +62,7 @@ export default async function DashboardLayout({
           </main>
 
           {/* Mobile Bottom Navigation */}
-          <MobileNav user={session.user} />
+          <MobileNav user={userWithRole} />
         </div>
       </div>
     </TenantPreferencesProvider>

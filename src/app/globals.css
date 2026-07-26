@@ -19,6 +19,26 @@ body {
   color: var(--foreground);
 }
 
+/* Override browser autofill default styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 50px white inset !important;
+    -webkit-text-fill-color: #111827 !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+@media (prefers-color-scheme: dark) {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 50px #0f172a inset !important; /* dark slate background */
+      -webkit-text-fill-color: #f8fafc !important; /* light text */
+  }
+}
+
 @keyframes shine-sweep {
   0% { transform: translateX(-150%) skewX(-20deg); }
   20% { transform: translateX(300%) skewX(-20deg); }
