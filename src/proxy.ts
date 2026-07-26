@@ -3,10 +3,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // This function can be marked `async` if using `await` inside
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register');
+  const isHomePage = request.nextUrl.pathname === '/';
   const isDashboardPage = request.nextUrl.pathname.startsWith('/dashboard');
   const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding');
   const isExpiredPage = request.nextUrl.pathname.startsWith('/expired');
@@ -27,7 +28,7 @@ export async function middleware(request: NextRequest) {
   // The user is logged in
   const hasTenant = !!token.tenantId;
 
-  if (isAuthPage) {
+  if (isAuthPage || isHomePage) {
     if (hasTenant) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     } else {
@@ -51,6 +52,7 @@ export async function middleware(request: NextRequest) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/onboarding/:path*',
     '/expired/:path*',

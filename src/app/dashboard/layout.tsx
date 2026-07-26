@@ -27,7 +27,7 @@ export default async function DashboardLayout({
   // Fetch tenant preferences and expiry
   const tenant = await prisma.tenant.findUnique({
     where: { id: session.user.tenantId },
-    select: { language: true, currency: true, subscriptionExpiry: true }
+    select: { language: true, currency: true, subscriptionExpiry: true, name: true }
   });
 
   if (tenant?.subscriptionExpiry && new Date(tenant.subscriptionExpiry) < new Date()) {
@@ -36,14 +36,14 @@ export default async function DashboardLayout({
 
   return (
     <TenantPreferencesProvider language={tenant?.language || "en"} currency={tenant?.currency || "INR"}>
-      <div className="flex h-screen bg-slate-50 overflow-hidden text-gray-900 font-sans">
+      <div className="flex h-screen bg-slate-50 dark:bg-brandbg overflow-hidden text-gray-900 dark:text-slate-200 font-sans transition-colors duration-200">
         {/* Desktop Sidebar */}
-        <Sidebar user={session.user} />
+        <Sidebar user={session.user} tenantName={tenant?.name || "Company"} />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           {/* Mobile Top Header */}
-          <TopHeader user={session.user} />
+          <TopHeader user={session.user} tenantName={tenant?.name || "Company"} />
 
           {/* Scrollable Main Content */}
           <main className="flex-1 overflow-y-auto pb-20 md:pb-0">

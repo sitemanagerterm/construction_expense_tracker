@@ -152,6 +152,7 @@ export const dictionaries: Record<string, Dictionary> = {
     save_changes: "Save Changes",
     application_preferences: "Application Preferences",
     project_value: "Project Value",
+    balance_amount: "Balance Amount",
     credit_received: "Credit Received",
     add_credit_2: "+ Add Credit",
     remaining: "Remaining",
@@ -211,16 +212,21 @@ export const dictionaries: Record<string, Dictionary> = {
     pdf_generated_err: "Failed to generate PDF",
     voice_parsed: "Voice parsed successfully!",
     voice_parsed_err: "AI couldn't understand the voice note.",
-    audio_error: "Error processing audio"
+    audio_error: "Error processing audio",
+    all_time: "All Time",
+    all_categories: "All Categories",
+    month: "Month",
+    cash_flow_trend: "Available Balance",
+    project_loss: "Project Loss"
   },
   ta: {
     dashboard: "முகப்பு",
     projects: "திட்டங்கள் மற்றும் தளங்கள்",
     expenses: "செலவு கண்காணிப்பு",
-    staff: "பணியாளர்கள் & குழு",
+    staff: "பணியாளர்கள்",
     settings: "அமைப்புகள்",
     manage_account_desc: "உங்கள் கணக்கு மற்றும் விருப்பங்களை நிர்வகிக்கவும்.",
-    audit_logs: "தணிக்கை பதிவுகள்",
+    audit_logs: "பதிவேடு",
     documents: "ஆவணங்கள்",
     documents_subtitle: "தளத் தொடர்பான வரைபடங்கள், அனுமதிகள் மற்றும் கோப்புகளைப் பதிவேற்றி நிர்வகிக்கவும்.",
     coming_soon: "விரைவில்",
@@ -346,6 +352,7 @@ export const dictionaries: Record<string, Dictionary> = {
     save_changes: "மாற்றங்களைச் சேமி",
     application_preferences: "பயன்பாட்டு விருப்பத்தேர்வுகள்",
     project_value: "திட்ட மதிப்பு",
+    balance_amount: "மீதமுள்ள தொகை",
     credit_received: "பெறப்பட்ட தொகை",
     add_credit_2: "+ தொகை சேர்",
     remaining: "மீதம்",
@@ -405,7 +412,12 @@ export const dictionaries: Record<string, Dictionary> = {
     pdf_generated_err: "PDF உருவாக்குவதில் தோல்வி",
     voice_parsed: "குரல் வெற்றிகரமாகப் பகுப்பாய்வு செய்யப்பட்டது!",
     voice_parsed_err: "AI ஆல் குரல் குறிப்பைப் புரிந்து கொள்ள முடியவில்லை.",
-    audio_error: "ஆடியோவைச் செயலாக்குவதில் பிழை"
+    audio_error: "ஆடியோவைச் செயலாக்குவதில் பிழை",
+    all_time: "அனைத்து நேரம்",
+    all_categories: "அனைத்து பிரிவுகள்",
+    month: "மாதம்",
+    cash_flow_trend: "கையிருப்பு",
+    project_loss: "திட்ட இழப்பு"
   },
   hi: {
     dashboard: "डैशबोर्ड",
@@ -540,6 +552,7 @@ export const dictionaries: Record<string, Dictionary> = {
     save_changes: "परिवर्तन सहेजें",
     application_preferences: "एप्लिकेशन प्राथमिकताएं",
     project_value: "प्रोजेक्ट मूल्य",
+    balance_amount: "शेष राशि",
     credit_received: "प्राप्त राशि",
     add_credit_2: "+ राशि जोड़ें",
     remaining: "शेष",
@@ -600,6 +613,11 @@ export const dictionaries: Record<string, Dictionary> = {
     pdf_generated_err: "PDF जनरेट करने में विफल",
     voice_parsed: "आवाज़ सफलतापूर्वक पार्स की गई!",
     voice_parsed_err: "AI वॉयस नोट को समझ नहीं सका।",
-    audio_error: "ऑडियो संसाधित करने में त्रुटि"
+    audio_error: "ऑडियो संसाधित करने में त्रुटि",
+    all_time: "सभी समय",
+    all_categories: "सभी श्रेणियां",
+    month: "महीना",
+    cash_flow_trend: "उपलब्ध शेष",
+    project_loss: "प्रोजेक्ट नुकसान"
   }
 };

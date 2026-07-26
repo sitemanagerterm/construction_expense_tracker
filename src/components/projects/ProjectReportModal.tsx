@@ -21,6 +21,9 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
   const profitLoss = totalCredits - totalExpenses;
   const projectValue = project?.budget || 0;
   
+  const balanceAmount = projectValue - totalCredits;
+  const isBalancePositive = balanceAmount >= 0;
+  
   const plPercentage = projectValue > 0 ? Math.abs((profitLoss / projectValue) * 100).toFixed(1) : "0.0";
   const isProfit = profitLoss >= 0;
 
@@ -41,167 +44,18 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
   }).reverse();
 
   const handleDownloadPdf = () => {
-    setIsGenerating(true);
-    try {
-      const doc = new jsPDF();
-      
-      // Helper to fix ₹ rendering issue in standard PDF fonts
-      const pdfFormatCurrency = (amount: number, curr: string) => {
-        return formatCurrency(amount, curr).replace('₹', 'Rs.');
-      };
-
-      // Header Background
-      doc.setFillColor(249, 250, 251);
-      doc.rect(0, 0, 210, 40, 'F');
-      
-      // Title
-      doc.setFontSize(22);
-      doc.setTextColor(17, 24, 39);
-      doc.setFont("helvetica", "bold");
-      doc.text(t('project_financial_report') || "Project Financial Report", 14, 20);
-      
-      // Project Info & Date
-      doc.setFontSize(11);
-      doc.setTextColor(107, 114, 128);
-      doc.setFont("helvetica", "normal");
-      const projNameLabel = (t('project_name') || "Project Name") + ":";
-      doc.text(projNameLabel, 14, 30);
-      doc.setTextColor(17, 24, 39);
-      doc.setFont("helvetica", "bold");
-      doc.text(project.name, 14 + doc.getTextWidth(projNameLabel) + 2, 30);
-
-      doc.setFontSize(11);
-      doc.setTextColor(107, 114, 128);
-      doc.setFont("helvetica", "normal");
-      const generatedLabel = (t('generated_on') || "Generated on") + ":";
-      doc.text(generatedLabel, 140, 30);
-      doc.setTextColor(17, 24, 39);
-      doc.text(new Date().toLocaleDateString('en-GB'), 140 + doc.getTextWidth(generatedLabel) + 2, 30);
-
-      // Summary Cards
-      doc.setFontSize(12);
-      doc.setTextColor(17, 24, 39);
-      doc.setFont("helvetica", "bold");
-      doc.text(t('financial_summary') || "Financial Summary", 14, 50);
-
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(107, 114, 128);
-      doc.text(t('total_credits') || "Total Credits", 14, 58);
-      doc.text(t('total_expenses') || "Total Expenses", 80, 58);
-      doc.text(t('profit_loss') || "Profit / Loss", 146, 58);
-
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(5, 150, 105); // emerald-600
-      doc.text(pdfFormatCurrency(totalCredits, currency), 14, 64);
-      
-      doc.setTextColor(220, 38, 38); // red-600
-      doc.text(pdfFormatCurrency(totalExpenses, currency), 80, 64);
-      
-      // Dynamic color for Profit/Loss
-      if (profitLoss >= 0) {
-        doc.setTextColor(5, 150, 105); // green
-      } else {
-        doc.setTextColor(220, 38, 38); // red
-      }
-      doc.text(pdfFormatCurrency(profitLoss, currency), 146, 64);
-
-      // Line separator
-      doc.setDrawColor(229, 231, 235);
-      doc.line(14, 70, 196, 70);
-
-      // Calculate forward balance for PDF
-      let pdfBalance = 0;
-      const pdfLedger = rawLedger.map((entry) => {
-        if (entry.type === 'CREDIT') {
-          pdfBalance += (entry.amount || 0);
-        } else {
-          pdfBalance -= (entry.amount || 0);
-        }
-        return { ...entry, balance: pdfBalance };
-      });
-
-      // Ledger Table
-      const tableColumn = [
-        t('date') || "Date", 
-        t('description') || "Description", 
-        t('credit') || "Credit", 
-        t('expense') || "Expense", 
-        t('balance') || "Balance"
-      ];
-      const tableRows: any[] = [];
-
-      pdfLedger.forEach(entry => {
-        let desc = entry.type === 'CREDIT' ? (entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod) : entry.category;
-        
-        // Basic translation for descriptions
-        if (desc === 'Bank Transfer') desc = t('bank_transfer') || desc;
-        if (desc === 'CASH') desc = t('cash') || desc;
-        if (desc === 'UPI' || desc === 'GPAY') desc = desc; // keep acronyms usually
-        if (entry.type !== 'CREDIT' && entry.category) {
-          desc = t(entry.category.toLowerCase()) || entry.category;
-        }
-
-        const entryData = [
-          entry.date.toLocaleDateString('en-GB'),
-          (desc || 'N/A').toUpperCase(),
-          entry.type === 'CREDIT' ? pdfFormatCurrency(entry.amount, currency) : '-',
-          entry.type === 'EXPENSE' ? pdfFormatCurrency(entry.amount, currency) : '-',
-          pdfFormatCurrency(entry.balance, currency)
-        ];
-        tableRows.push(entryData);
-      });
-
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 75,
-        theme: 'striped',
-        headStyles: {
-          fillColor: [31, 41, 55], // gray-800
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-        },
-        alternateRowStyles: {
-          fillColor: [249, 250, 251], // gray-50
-        },
-        styles: {
-          fontSize: 9,
-          cellPadding: 4,
-        },
-        columnStyles: {
-          2: { halign: 'right', textColor: [5, 150, 105], fontStyle: 'bold' }, // Credit
-          3: { halign: 'right', textColor: [220, 38, 38], fontStyle: 'bold' }, // Expense
-          4: { halign: 'right', fontStyle: 'bold' }, // Balance
-        },
-        didDrawPage: function (data) {
-          // Footer
-          doc.setFontSize(8);
-          doc.setTextColor(156, 163, 175);
-          doc.setFont("helvetica", "normal");
-          doc.text(`Page ${data.pageNumber}`, doc.internal.pageSize.width - 20, doc.internal.pageSize.height - 10);
-          doc.text('Generated by Construction Expense Tracker', 14, doc.internal.pageSize.height - 10);
-        }
-      });
-
-      doc.save(`Project_Report_${project.name}.pdf`);
-      
-      toast.success(t('pdf_generated') || "PDF Generated Successfully!");
-    } catch (error) {
-      console.error(error);
-      toast.error(t('pdf_generated_err') || "Failed to generate PDF");
-    } finally {
-      setIsGenerating(false);
-    }
+    // We use window.print() to leverage native browser PDF generation.
+    // This perfectly supports all languages (Tamil, Hindi, etc.) and text shaping without heavy fonts.
+    window.print();
+    toast.success(t('pdf_generated') || "Please save as PDF from the print dialog.");
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in" onClick={onClose}>
-      <div className="bg-white w-full h-full sm:h-auto sm:max-w-4xl rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border sm:border-gray-100 overflow-hidden flex flex-col sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in print:absolute print:inset-0 print:bg-white print:p-0 print:m-0" onClick={onClose}>
+      <div id="report-content" className="bg-white w-full h-full sm:h-auto sm:max-w-4xl rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl border-0 sm:border sm:border-gray-100 overflow-hidden flex flex-col sm:max-h-[90vh] print:max-w-none print:rounded-none print:border-none print:shadow-none print:h-auto print:max-h-none print:block" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0 print:hidden">
           <div>
             <h2 className="text-xl font-bold text-gray-900">{t('project_report')}</h2>
             <p className="text-gray-500 text-sm mt-1 font-medium">{project.name}</p>
@@ -211,10 +65,26 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-grow p-5 space-y-6">
+        <div className="overflow-y-auto flex-grow p-5 space-y-6 print:overflow-visible print:max-h-none print:h-auto print:p-8 print:pt-4">
           
+          {/* Print Only Header */}
+          <div className="hidden print:block pb-4 border-b border-gray-200 mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('project_financial_report') || 'Project Financial Report'}</h1>
+            <div className="flex justify-between text-sm text-gray-600 mt-3">
+              <div>
+                <span className="font-bold text-gray-800">{t('project_name') || 'Project Name'}:</span> {project.name}
+              </div>
+              <div>
+                <span className="font-bold text-gray-800">{t('generated_on') || 'Generated on'}:</span> {new Date().toLocaleDateString('en-GB')}
+              </div>
+            </div>
+          </div>
           {/* Summary Cards */}
-          <div className="grid grid-cols-2 gap-4 shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 shrink-0">
+            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{t('project_value') || "Project Value"}</p>
+              <p className="text-xl font-bold text-blue-600">{formatCurrency(projectValue, currency)}</p>
+            </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{t('total_credit')}</p>
               <p className="text-xl font-bold text-emerald-600">{formatCurrency(totalCredits, currency)}</p>
@@ -225,25 +95,40 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
             </div>
           </div>
 
-          {/* Profit / Loss */}
-          <div className={`p-6 rounded-2xl border shrink-0 ${isProfit ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-            <p className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: isProfit ? '#059669' : '#dc2626' }}>
-              {isProfit ? t('project_profit') : 'Project Loss'}
-            </p>
-            <div className="flex justify-between items-end">
-              <p className={`text-4xl font-bold ${isProfit ? 'text-emerald-600' : 'text-red-600'}`}>
-                {isProfit ? '+' : ''}{formatCurrency(profitLoss, currency)}
+          {/* Big Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0">
+            {/* Balance Amount */}
+            <div className={`p-6 rounded-2xl border ${isBalancePositive ? 'bg-blue-50 border-blue-100' : 'bg-red-50 border-red-100'}`}>
+              <p className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: isBalancePositive ? '#2563eb' : '#dc2626' }}>
+                {t('balance_amount') || "Balance Amount"}
               </p>
-              {projectValue > 0 && (
-                <div className={`flex items-center gap-0.5 pb-1 text-lg font-bold ${isProfit ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {isProfit ? (
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
-                  ) : (
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
-                  )}
-                  <span>{plPercentage}%</span>
-                </div>
-              )}
+              <div className="flex justify-between items-end">
+                <p className={`text-3xl sm:text-4xl font-bold ${isBalancePositive ? 'text-blue-600' : 'text-red-600'}`}>
+                  {formatCurrency(balanceAmount, currency)}
+                </p>
+              </div>
+            </div>
+
+            {/* Profit / Loss */}
+            <div className={`p-6 rounded-2xl border ${isProfit ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+              <p className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: isProfit ? '#059669' : '#dc2626' }}>
+                {project.status === 'ACTIVE' ? (t('cash_flow_trend') || 'Available Balance') : isProfit ? (t('project_profit') || 'Project Profit') : (t('project_loss') || 'Project Loss')}
+              </p>
+              <div className="flex justify-between items-end">
+                <p className={`text-3xl sm:text-4xl font-bold ${isProfit ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {isProfit ? '+' : ''}{formatCurrency(profitLoss, currency)}
+                </p>
+                {projectValue > 0 && (
+                  <div className={`flex items-center gap-0.5 pb-1 text-lg font-bold ${isProfit ? 'text-emerald-600' : 'text-red-600'}`}>
+                    {isProfit ? (
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                    ) : (
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
+                    )}
+                    <span>{plPercentage}%</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -251,8 +136,8 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
           <div>
             <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-3">{t('ledger_entries') || "Ledger Entries"}</h3>
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto print:overflow-visible">
+                <table className="w-full text-left border-collapse print:table">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
                       <th className="p-4 font-bold">{t('sl_no') || "SL No"}</th>
@@ -271,10 +156,17 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
                     ) : (
                       ledger.map((entry, idx) => (
                         <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                          <td className="p-4 text-gray-600 font-medium">{ledger.length - idx}</td>
+                          <td className="p-4 text-gray-600 font-medium">{idx + 1}</td>
                           <td className="p-4 text-gray-600 whitespace-nowrap">{entry.date.toLocaleDateString('en-GB')}</td>
-                          <td className="p-4 font-bold text-gray-900 capitalize min-w-[120px]">
-                            {entry.type === 'CREDIT' ? (entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod) : entry.category}
+                          <td className="p-4 font-bold text-gray-900 min-w-[120px]">
+                            {entry.type === 'CREDIT' ? (
+                              <span className="capitalize">{entry.paymentMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : entry.paymentMethod}</span>
+                            ) : (
+                              <div>
+                                <span className="capitalize">{entry.category}</span>
+                                {entry.notes && <span className="block text-xs text-gray-500 font-normal mt-0.5">{entry.notes}</span>}
+                              </div>
+                            )}
                           </td>
                           <td className="p-4 font-bold text-emerald-600 text-right">
                             {entry.type === 'CREDIT' ? formatCurrency(entry.amount, currency) : '-'}
@@ -297,7 +189,7 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
         </div>
 
         {/* Footer */}
-        <div className="p-5 pb-8 sm:pb-5 border-t border-gray-100 bg-gray-50 mt-auto shrink-0">
+        <div className="p-5 pb-8 sm:pb-5 border-t border-gray-100 bg-gray-50 mt-auto shrink-0 print:hidden">
           <button 
             onClick={handleDownloadPdf}
             disabled={isGenerating}

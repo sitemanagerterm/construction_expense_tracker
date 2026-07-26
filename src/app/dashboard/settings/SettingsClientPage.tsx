@@ -92,10 +92,10 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto items-start">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{t('personal_profile') || "Personal Profile"}</h2>
-          <p className="text-sm text-gray-500 mt-1">{t('personal_profile_desc') || "Update your personal information and contact details."}</p>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('personal_profile') || "Personal Profile"}</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('personal_profile_desc') || "Update your personal information and contact details."}</p>
         </div>
 
       <div className="p-6">
@@ -103,12 +103,12 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
           
           <div className="max-w-lg space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">{t('full_name') || "Full Name"} <span className="text-red-500">*</span></label>
+              <label htmlFor="name" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">{t('full_name') || "Full Name"} <span className="text-red-500">*</span></label>
               <input type="text" id="name" name="name" defaultValue={initialUser.name || ""} placeholder={t('full_name') || "Your Name"}
-                className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 ${
+                className={`w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800 ${
                   validationErrors.name 
-                    ? "border-red-500 bg-red-50/30 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                    : "border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                    ? "border-red-500 bg-red-50/30 dark:bg-red-500/10 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+                    : "border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20"
                 }`} 
               />
               {validationErrors.name && (
@@ -120,24 +120,24 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-1">{t('email_address') || "Email Address"}</label>
+              <label htmlFor="email" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">{t('email_address') || "Email Address"}</label>
               <input type="email" id="email" defaultValue={initialUser.email || ""} disabled
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 outline-none cursor-not-allowed" 
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 outline-none cursor-not-allowed" 
               />
-              <p className="text-xs text-gray-500 mt-1.5">{t('email_desc') || "Email cannot be changed directly. Contact support."}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1.5">{t('email_desc') || "Email cannot be changed directly. Contact support."}</p>
             </div>
 
             <div>
-              <label htmlFor="mobileNumber" className="block text-sm font-bold text-gray-700 mb-1">{t('mobile_number') || "Mobile Number"}</label>
+              <label htmlFor="mobileNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">{t('mobile_number') || "Mobile Number"}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <span className="text-gray-500 font-medium">+91</span>
+                  <span className="text-gray-500 dark:text-slate-400 font-medium">+91</span>
                 </div>
                 <input type="tel" id="mobileNumber" name="mobileNumber" defaultValue={initialUser.mobileNumber || ""} placeholder="9876543210" maxLength={10}
-                  className={`w-full pl-12 pr-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 ${
+                  className={`w-full pl-12 pr-4 py-2.5 rounded-xl border outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800 ${
                     validationErrors.mobileNumber 
-                      ? "border-red-500 bg-red-50/30 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                      : "border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                      ? "border-red-500 bg-red-50/30 dark:bg-red-500/10 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+                      : "border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20"
                   }`} 
                 />
               </div>
@@ -150,9 +150,9 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
             </div>
           </div>
           
-          <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end">
+          <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 flex justify-end">
             <button type="submit" disabled={loading}
-              className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 hover:bg-primary-800 transition-all flex items-center gap-2 ${loading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20'}`}>
+              className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 dark:bg-accent hover:bg-primary-800 dark:hover:bg-accent-600 transition-all flex items-center gap-2 ${loading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20 dark:shadow-accent-500/20'}`}>
               {loading ? (t('saving') || "Saving...") : (t('save_changes') || "Save Changes")}
             </button>
           </div>
@@ -161,10 +161,10 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
       </div>
 
       {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{t('app_preferences') || "Application Preferences"}</h2>
-          <p className="text-sm text-gray-500 mt-1">{t('app_preferences_desc') || "Set the default currency and language for your entire company."}</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('app_preferences') || "Application Preferences"}</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('app_preferences_desc') || "Set the default currency and language for your entire company."}</p>
         </div>
 
           <div className="p-6">
@@ -172,13 +172,13 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
               
               <div className="w-full space-y-6">
                 <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">{t('currency_symbol') || "Currency Symbol"}</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">{t('currency_symbol') || "Currency Symbol"}</label>
               <div className="relative">
                     <select 
                       id="currency" 
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900 bg-white appearance-none cursor-pointer"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800 appearance-none cursor-pointer"
                     >
                       <option value="INR">Rupee (₹ INR)</option>
                       <option value="USD">US Dollar ($ USD)</option>
@@ -187,35 +187,35 @@ export default function SettingsClientPage({ initialUser }: { initialUser: UserD
                       <option value="GBP">British Pound (£ GBP)</option>
                       <option value="EUR">Euro (€ EUR)</option>
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 dark:text-slate-400">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                   </div>
                 </div>
 
                 <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">{t('application_language') || "Application Language"}</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">{t('application_language') || "Application Language"}</label>
               <div className="relative">
                     <select 
                       id="language" 
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-gray-900 bg-white appearance-none cursor-pointer"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800 appearance-none cursor-pointer"
                     >
                       <option value="en">English</option>
                       <option value="ta">Tamil (தமிழ்)</option>
                       <option value="hi">Hindi (हिंदी)</option>
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 dark:text-slate-400">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end">
+              <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 flex justify-end">
                 <button type="submit" disabled={settingsLoading}
-                  className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 hover:bg-primary-800 transition-all flex items-center gap-2 ${settingsLoading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20'}`}>
+                  className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 dark:bg-accent hover:bg-primary-800 dark:hover:bg-accent-600 transition-all flex items-center gap-2 ${settingsLoading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20 dark:shadow-accent-500/20'}`}>
                   {settingsLoading ? (t('saving') || "Saving...") : (t('save_changes') || "Save Changes")}
                 </button>
               </div>

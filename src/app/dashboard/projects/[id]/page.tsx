@@ -37,9 +37,9 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
   if (!project) {
     return (
       <div className="p-8 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[50vh]">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Project Not Found</h2>
-        <p className="text-gray-500 mb-6">The project you are looking for does not exist or has been deleted.</p>
-        <Link href="/dashboard/projects" className="bg-primary-900 text-white px-6 py-2.5 rounded-xl font-semibold">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Project Not Found</h2>
+        <p className="text-gray-500 dark:text-slate-400 mb-6">The project you are looking for does not exist or has been deleted.</p>
+        <Link href="/dashboard/projects" className="bg-primary-900 dark:bg-accent text-white dark:text-primary-900 px-6 py-2.5 rounded-xl font-semibold">
           Back to Projects
         </Link>
       </div>

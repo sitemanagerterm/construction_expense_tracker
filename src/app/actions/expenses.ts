@@ -28,11 +28,15 @@ export async function createExpense(data: CreateExpenseInput) {
     // Verify the project belongs to the user's tenant
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      select: { tenantId: true }
+      select: { tenantId: true, status: true }
     });
 
     if (!project || project.tenantId !== session.user.tenantId) {
       return { success: false, error: "Project not found or unauthorized" };
+    }
+
+    if (project.status === 'COMPLETED') {
+      return { success: false, error: "Cannot create an expense for a completed project." };
     }
 
     const expense = await prisma.expense.create({
@@ -106,8 +110,15 @@ export async function deleteExpense(id: string, reason: string) {
       return { success: false, error: "Deletion reason is required" };
     }
 
-    const existing = await prisma.expense.findUnique({ where: { id } });
+    const existing = await prisma.expense.findUnique({ 
+      where: { id },
+      include: { project: true } 
+    });
     if (!existing) return { success: false, error: "Not found" };
+
+    if (existing.project?.status === 'COMPLETED') {
+      return { success: false, error: "Cannot delete an expense from a completed project." };
+    }
 
     // Only OWNER or SUPER_ADMIN can delete expenses (or staff if on the same day AND they created it)
     if (session.user.role !== "OWNER" && session.user.role !== "SUPER_ADMIN") {
@@ -164,6 +175,10 @@ export async function updateExpense(id: string, data: Partial<CreateExpenseInput
     const existing = await prisma.expense.findUnique({ where: { id }, include: { project: true } });
     if (!existing || existing.project.tenantId !== session.user.tenantId) {
       return { success: false, error: "Not found or unauthorized" };
+    }
+
+    if (existing.project.status === 'COMPLETED') {
+      return { success: false, error: "Cannot edit an expense in a completed project." };
     }
 
     if (session.user.role !== "OWNER" && session.user.role !== "SUPER_ADMIN") {

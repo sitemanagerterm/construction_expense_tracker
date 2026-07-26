@@ -1,80 +1,88 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import fs from "fs";
 import path from "path";
 
+neonConfig.webSocketConstructor = ws;
+
 declare global {
   // eslint-disable-next-line no-var
-  var __prisma: PrismaClient | undefined;
+  var __prisma_neon: PrismaClient | undefined;
 }
 
 function readDatabaseUrl(): string {
-  // Try process.env first
-  const fromEnv = process.env.DATABASE_URL;
-  if (fromEnv) return fromEnv;
+  // 1. Try process.env first
+  let url = process.env.DATABASE_URL;
+  if (url) {
+    url = url.trim().replace(/^["']|["']$/g, "");
+    if (url.startsWith("postgresql://") || url.startsWith("postgres://")) {
+      return url;
+    }
+  }
 
-  // Fallback: manually parse .env file line by line
+  // 2. Fallback: read .env file directly (handles Turbopack env-loading issues)
   try {
-    const envPath = fs.existsSync(path.resolve(process.cwd(), ".env"))
-      ? path.resolve(process.cwd(), ".env")
-      : "d:\\xampp\\htdocs\\construction_expense_tracker\\.env";
-
-    const lines = fs.readFileSync(envPath, "utf8").split("\n");
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("DATABASE_URL")) {
-        const eqIdx = trimmed.indexOf("=");
-        if (eqIdx !== -1) {
-          let val = trimmed.slice(eqIdx + 1).trim();
-          if (
-            (val.startsWith('"') && val.endsWith('"')) ||
-            (val.startsWith("'") && val.endsWith("'"))
-          ) {
-            val = val.slice(1, -1);
-          }
-          if (val) {
-            console.log("[prisma] DATABASE_URL loaded directly from .env");
+    const envPath = path.resolve(
+      process.cwd() || "d:\\xampp\\htdocs\\construction_expense_tracker",
+      ".env"
+    );
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, "utf8");
+      for (const line of content.split(/\r?\n/)) {
+        const match = line.match(/^DATABASE_URL\s*=\s*(.+)$/);
+        if (match) {
+          const val = match[1].trim().replace(/^["']|["']$/g, "");
+          if (val.startsWith("postgresql://") || val.startsWith("postgres://")) {
+            console.log("[prisma] DATABASE_URL read directly from .env file");
             return val;
           }
         }
       }
     }
   } catch (err) {
-    console.error("[prisma] Could not read .env:", err);
+    console.error("[prisma] Error reading .env:", err);
   }
 
-  throw new Error("[prisma] DATABASE_URL is not set. Check your .env file.");
+  throw new Error("[prisma] DATABASE_URL not found. Check your .env file.");
 }
 
 function createPrismaClient(): PrismaClient {
   const connectionString = readDatabaseUrl();
+
+  // Parse URL manually to bypass Turbopack's broken pg-connection-string bundling
+  const parsed = new URL(connectionString);
+
+  // PrismaNeon v7 takes a PoolConfig directly (NOT a Pool instance)
+  const poolConfig = {
+    host: parsed.hostname,
+    port: parsed.port ? Number(parsed.port) : 5432,
+    database: parsed.pathname.replace(/^\//, ""),
+    user: decodeURIComponent(parsed.username),
+    password: decodeURIComponent(parsed.password),
+    ssl: true,
+  };
+
   console.log(
-    "[prisma] Creating PrismaClient (pg adapter) with URL:",
-    connectionString.substring(0, 45) + "..."
+    `[prisma] Connecting → host=${parsed.hostname} db=${parsed.pathname.slice(1)}`
   );
 
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
+  // ✅ PrismaNeon accepts PoolConfig directly in v7 (not a Pool instance)
+  const adapter = new PrismaNeon(poolConfig);
 
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+  return new PrismaClient({ adapter });
 }
 
 /**
- * Lazy singleton — PrismaClient is only created on first property access,
- * NOT at module import time. This ensures DATABASE_URL is loaded by Next.js
- * before we read it.
+ * Singleton PrismaClient — lazy-initialised on first access.
  */
-export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
-  get(_target, prop) {
-    if (!global.__prisma) {
-      global.__prisma = createPrismaClient();
+export const prisma: PrismaClient =
+  global.__prisma_neon ??
+  (() => {
+    const client = createPrismaClient();
+    if (process.env.NODE_ENV !== "production") {
+      global.__prisma_neon = client;
     }
-    const client = global.__prisma;
-    const value = (client as any)[prop];
-    return typeof value === "function" ? value.bind(client) : value;
-  },
-});
+    return client;
+  })();

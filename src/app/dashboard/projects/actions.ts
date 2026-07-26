@@ -24,6 +24,10 @@ export async function addCredit(data: { projectId: string; amount: number; payme
     throw new Error("Project not found");
   }
 
+  if (project.status === 'COMPLETED') {
+    throw new Error("Cannot add credit to a completed project");
+  }
+
   await prisma.credit.create({
     data: {
       projectId: data.projectId,
@@ -56,6 +60,10 @@ export async function deleteCredit(creditId: string, projectId: string) {
     throw new Error("Project not found");
   }
 
+  if (project.status === 'COMPLETED') {
+    throw new Error("Cannot delete credit from a completed project");
+  }
+
   await prisma.credit.delete({
     where: {
       id: creditId
@@ -66,7 +74,7 @@ export async function deleteCredit(creditId: string, projectId: string) {
   return { success: true };
 }
 
-export async function addExpenses(projectId: string, expenses: Array<{ category: string; amount: number; notes?: string }>) {
+export async function addExpenses(projectId: string, expenses: Array<{ category: string; amount: number; notes?: string; date?: string | Date }>) {
   const session = await getServerSession(authOptions);
   
   if (!session) {
@@ -85,6 +93,10 @@ export async function addExpenses(projectId: string, expenses: Array<{ category:
     throw new Error("Project not found");
   }
 
+  if (project.status === 'COMPLETED') {
+    throw new Error("Cannot add expenses to a completed project");
+  }
+
   // Use createMany to insert multiple expenses
   await prisma.expense.createMany({
     data: expenses.map(exp => ({
@@ -93,6 +105,7 @@ export async function addExpenses(projectId: string, expenses: Array<{ category:
       category: exp.category.toUpperCase(), // basic normalization
       amount: exp.amount,
       notes: exp.notes || "",
+      date: exp.date ? new Date(exp.date) : new Date(),
     }))
   });
 
@@ -129,6 +142,21 @@ export async function updateProjectBudget(projectId: string, budget: number) {
   
   if (!session) {
     throw new Error("Unauthorized");
+  }
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      tenantId: session.user.tenantId as string,
+    }
+  });
+
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  if (project.status === 'COMPLETED') {
+    throw new Error("Cannot update budget of a completed project");
   }
 
   await prisma.project.update({
