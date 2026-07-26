@@ -4,6 +4,7 @@ import { Providers } from "@/components/Providers";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -51,24 +52,22 @@ export default function RootLayout({
           </LanguageProvider>
         </ThemeProvider>
         
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    function(registration) {
-                      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    },
-                    function(err) {
-                      console.log('ServiceWorker registration failed: ', err);
-                    }
-                  );
-                });
-              }
-            `,
-          }}
-        />
+        <Script id="sw-register" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(
+                  function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                  },
+                  function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                  }
+                );
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   );
