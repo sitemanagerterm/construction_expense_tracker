@@ -23,10 +23,19 @@ export default async function StaffPage() {
     include: { tenantRole: true }
   });
 
+  let userPermissions: string[] = [];
+  if (user?.tenantRole?.permissions) {
+    try {
+      userPermissions = JSON.parse(user.tenantRole.permissions);
+    } catch {
+      userPermissions = [];
+    }
+  }
+
   const hasAccess = 
     session.user.role === "OWNER" || 
     session.user.role === "SUPER_ADMIN" || 
-    (session.user.role === "STAFF" && user?.tenantRole?.permissions?.includes("staff.view"));
+    (session.user.role === "STAFF" && userPermissions.includes("staff.view"));
 
   if (!hasAccess) {
     redirect("/dashboard");
@@ -72,7 +81,7 @@ export default async function StaffPage() {
           initialRoles={roles}
           activeProjects={activeProjects}
           userRole={session.user.role}
-          userPermissions={user?.tenantRole?.permissions || []}
+          userPermissions={userPermissions}
         />
       )}
     </div>
