@@ -169,25 +169,31 @@ export default function ProjectReportModal({ isOpen, onClose, project, currency 
         <div id="report-scroll-area" className="overflow-y-auto flex-grow p-5 space-y-6 print:overflow-visible print:max-h-none print:h-auto print:p-8 print:pt-4">
           
           {/* Print Only Header */}
-          <div className="hidden print:flex flex-col pb-4 border-b border-gray-200 mb-6">
-            <div className="flex justify-between items-start mb-4">
-              <h1 className="text-2xl font-bold text-gray-900">{t('project_financial_report') || 'Project Financial Report'}</h1>
-              {/* Add Logo */}
-              <img src="/mysitebook-logo-dark.png" alt="MySiteBook" className="h-14 object-contain" />
-            </div>
-            <div className="flex justify-between text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-800">{t('project_name') || 'Project Name'}:</span> {project.name}
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
-                  project.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 
-                  project.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+          <div className="hidden print:flex justify-between items-start pb-6 border-b-2 border-gray-100 mb-6">
+            {/* Left Column: Title & Project Info */}
+            <div className="flex flex-col gap-3">
+              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                {t('project_financial_report') || 'Project Financial Report'}
+              </h1>
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-bold text-gray-800">
+                  {t('project_name') || 'Project Name'}: <span className="font-normal text-gray-600">{project.name}</span>
+                </span>
+                <span className={`text-base font-bold tracking-wide uppercase ${
+                  project.status === 'ACTIVE' ? 'text-emerald-600' : 
+                  project.status === 'COMPLETED' ? 'text-blue-600' : 'text-gray-500'
                 }`}>
-                  {project.status === 'ACTIVE' ? (t('active') || 'ACTIVE') : project.status === 'COMPLETED' ? (t('completed') || 'COMPLETED') : project.status}
+                  ({project.status === 'ACTIVE' ? (t('active') || 'ACTIVE') : project.status === 'COMPLETED' ? (t('completed') || 'COMPLETED') : project.status})
                 </span>
               </div>
-              <div>
-                <span className="font-bold text-gray-800">{t('generated_on') || 'Generated on'}:</span> {new Date().toLocaleDateString('en-GB')}
-              </div>
+            </div>
+            
+            {/* Right Column: Logo & Meta Info */}
+            <div className="flex flex-col items-end gap-3 pt-1">
+              <img src="/mysitebook-logo-dark.png" alt="MySiteBook" className="h-16 object-contain" />
+              <span className="text-sm font-semibold text-gray-500">
+                {t('generated_on') || 'Generated on'}: <span className="font-bold text-gray-800 ml-1">{new Date().toLocaleDateString('en-GB')}</span>
+              </span>
             </div>
           </div>
           {/* Summary Cards */}
