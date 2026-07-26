@@ -34,7 +34,7 @@ export default async function SuperLoginPage() {
           <div className="lg:hidden flex flex-col items-center justify-center mb-10 -mx-8 -mt-8 sm:-mx-12 sm:-mt-12 py-10 bg-slate-900 relative overflow-hidden rounded-b-[2rem] shadow-md">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-[40px] translate-x-1/2 -translate-y-1/2"></div>
             <div className="inline-flex items-center relative z-10 rounded-lg p-1">
-              <img src="/mysitebook-logo-dark.png" alt="MySiteBook" width={300} height={100} className="w-[130px] sm:w-[160px] h-auto object-contain" />
+              <img src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[130px] sm:w-[160px] h-auto object-contain" />
             </div>
             <span className="relative z-10 mt-2 text-accent font-bold tracking-widest uppercase text-xs border border-accent/30 px-2 py-0.5 rounded">Admin Portal</span>
           </div>
