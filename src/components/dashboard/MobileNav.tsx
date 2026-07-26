@@ -12,7 +12,7 @@ export default function MobileNav({ user }: { user: any }) {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 z-50 px-2 transition-colors duration-200">
-      <div className="flex items-center justify-between h-full max-w-md mx-auto relative">
+      <div className="flex items-center justify-evenly h-full max-w-md mx-auto relative">
         {navLinks.map((link, index) => {
           if (link.roles && !link.roles.includes(user?.role)) return null;
           
