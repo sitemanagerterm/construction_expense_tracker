@@ -6,6 +6,7 @@ import { deleteStaff, toggleStaffStatus } from "@/app/actions/staff";
 import AddStaffModal from "@/components/staff/AddStaffModal";
 import toast from "react-hot-toast";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
+import { useSiteContext } from "@/components/providers/SiteProvider";
 
 type Staff = {
   id: string;
@@ -26,7 +27,8 @@ export default function StaffClientPage({
   initialRoles = [],
   activeProjects = [],
   userRole = "OWNER",
-  userPermissions = []
+  userPermissions = [],
+  plan = "PRO"
 }: { 
   initialStaff: Staff[],
   staffLimit: number,
@@ -34,7 +36,8 @@ export default function StaffClientPage({
   initialRoles?: any[],
   activeProjects?: any[],
   userRole?: string,
-  userPermissions?: string[]
+  userPermissions?: string[],
+  plan?: string
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState<Staff | null>(null);
@@ -42,6 +45,11 @@ export default function StaffClientPage({
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; actionText: string; actionStyle: string; hideCancel?: boolean; onConfirm: () => void } | null>(null);
   const router = useRouter();
   const { t } = useTenantPreferences();
+  const { activeSiteId } = useSiteContext();
+
+  const filteredStaff = activeSiteId === "ALL" 
+    ? initialStaff 
+    : initialStaff.filter(staff => staff.allocatedProjects?.some(p => p.id === activeSiteId));
 
   const canAddStaff = userRole === 'OWNER' || userRole === 'SUPER_ADMIN' || userPermissions.includes('staff.add');
   const canEditStaff = userRole === 'OWNER' || userRole === 'SUPER_ADMIN' || userPermissions.includes('staff.edit');
@@ -109,7 +117,7 @@ export default function StaffClientPage({
                   setEditData(null);
                   setIsModalOpen(true);
                 }}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-primary-900 text-white shadow-primary-900/20 hover:bg-primary-800 hover:-translate-y-0.5"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-primary-900 dark:bg-accent text-white shadow-primary-900/20 dark:shadow-accent/20 hover:opacity-90 hover:-translate-y-0.5"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                 {t('add_staff')}
@@ -118,8 +126,24 @@ export default function StaffClientPage({
           </div>
         </div>
 
+      {plan === "FREE" ? (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden p-8 sm:p-12 text-center animate-in fade-in">
+          <div className="w-24 h-24 bg-accent-50 dark:bg-accent-900/30 rounded-full flex items-center justify-center text-accent-500 mx-auto mb-6">
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4">Team Management is a Pro Feature</h2>
+          <p className="text-gray-500 dark:text-slate-400 text-lg mb-8 max-w-lg mx-auto">
+            Upgrade to the Pro Plan to invite your staff, assign them specific roles, and allocate them to different projects with restricted access.
+          </p>
+          <a href="/pricing" className="inline-block px-8 py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-bold shadow-lg shadow-accent-500/30 transition-all active:scale-[0.98]">
+            Upgrade to Pro - Just ₹299/mo
+          </a>
+        </div>
+      ) : (
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
-        {initialStaff.length === 0 ? (
+        {filteredStaff.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
             <div className="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -142,7 +166,7 @@ export default function StaffClientPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                {initialStaff.map(staff => (
+                {filteredStaff.map(staff => (
                   <tr key={staff.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{staff.name}</td>
                     <td className="px-6 py-4">{staff.mobileNumber}</td>
@@ -232,48 +256,47 @@ export default function StaffClientPage({
           </div>
         )}
       </div>
+      )}
 
-      {/* Custom Confirmation Modal */}
-      {confirmModal && confirmModal.isOpen && (
-        <div className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center bg-white sm:bg-slate-900/50 backdrop-blur-sm p-0 sm:p-4 animate-fade-in" onClick={() => setConfirmModal(null)}>
-          <div className="bg-white dark:bg-slate-900 w-full h-full sm:h-auto sm:max-w-sm rounded-none sm:rounded-2xl shadow-none sm:shadow-xl overflow-hidden flex flex-col scale-100 sm:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{confirmModal.title}</h3>
-              <p className="text-gray-500 dark:text-slate-400 text-sm mb-6 leading-relaxed">
-                {confirmModal.message}
-              </p>
-              <div className="flex gap-3 justify-end">
-                {!confirmModal.hideCancel && (
-                  <button 
-                    onClick={() => setConfirmModal(null)}
-                    className="px-4 py-2 rounded-xl font-semibold text-gray-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                  >
-                    {t('cancel') || "Cancel"}
-                  </button>
-                )}
+      <AddStaffModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditData(null);
+        }}
+        onSuccess={() => {
+          router.refresh();
+        }}
+        editData={editData}
+        roles={initialRoles}
+        activeProjects={activeProjects}
+      />
+      
+      {/* Confirmation Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in" onClick={() => confirmModal.hideCancel ? confirmModal.onConfirm() : setConfirmModal(null)}>
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center animate-in zoom-in-95 border border-gray-100 dark:border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{confirmModal.title}</h3>
+            <p className="text-gray-500 dark:text-slate-400 mb-8">{confirmModal.message}</p>
+            <div className="flex gap-3">
+              {!confirmModal.hideCancel && (
                 <button 
-                  onClick={confirmModal.onConfirm}
-                  className={`px-4 py-2 rounded-xl font-bold text-white shadow-sm transition-colors ${confirmModal.actionStyle}`}
+                  onClick={() => setConfirmModal(null)}
+                  className="flex-1 py-3 rounded-xl font-bold text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
                 >
-                  {confirmModal.actionText}
+                  {t('cancel')}
                 </button>
-              </div>
+              )}
+              <button 
+                onClick={confirmModal.onConfirm}
+                className={`flex-1 py-3 rounded-xl font-bold text-white transition-all shadow-md active:scale-95 ${confirmModal.actionStyle}`}
+              >
+                {confirmModal.actionText}
+              </button>
             </div>
           </div>
         </div>
       )}
-
-        <AddStaffModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={() => {
-            setIsModalOpen(false);
-            window.location.reload();
-          }}
-          editData={editData}
-          roles={initialRoles}
-          activeProjects={activeProjects}
-        />
     </div>
   );
 }

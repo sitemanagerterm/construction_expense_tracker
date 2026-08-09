@@ -2,9 +2,12 @@
 
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { FaHistory, FaSearch, FaTrash, FaEdit, FaArchive } from "react-icons/fa";
+import { FaHistory, FaTrash, FaEdit, FaArchive, FaCalendar } from "react-icons/fa";
 import { formatCurrency } from "@/lib/utils";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
+import { useSiteContext } from "@/components/providers/SiteProvider";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 type AuditLog = {
   id: string;
@@ -29,64 +32,52 @@ type AuditLog = {
   };
 };
 
-export default function AuditLogsClient({ initialLogs, allProjects }: { initialLogs: any[], allProjects?: any[] }) {
+export default function AuditLogsClient({ initialLogs, allProjects, plan }: { initialLogs: any[], allProjects?: any[], plan?: any }) {
   const { currency, t } = useTenantPreferences();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterProject, setFilterProject] = useState("ALL");
-
-  const uniqueProjects = allProjects
-    ? Array.from(new Set(allProjects.map(p => p.name)))
-    : Array.from(new Set(initialLogs.map(log => log.expense?.project.name || log.credit?.project.name)));
+  const { activeSiteId, activeProjects } = useSiteContext();
+  const [filterDate, setFilterDate] = useState<Date | null>(null);
 
   const filteredLogs = initialLogs.filter(log => {
     const projectName = log.expense?.project.name || log.credit?.project.name || "";
-    const matchesSearch = log.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          log.modifierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          projectName.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesProject = filterProject === "ALL" || projectName === filterProject;
+    // Project Match
+    const selectedProjectObj = activeProjects.find(p => p.id === activeSiteId);
+    const matchesProject = activeSiteId === "ALL" || (selectedProjectObj && projectName === selectedProjectObj.name);
 
-    return matchesSearch && matchesProject;
+    // Date Match
+    let matchesDate = true;
+    if (filterDate) {
+      const logDate = format(new Date(log.createdAt), "yyyy-MM-dd");
+      const selectedDate = format(filterDate, "yyyy-MM-dd");
+      matchesDate = logDate === selectedDate;
+    }
+
+    return matchesProject && matchesDate;
   });
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
             <FaHistory className="text-primary-600 dark:text-primary-400" /> {t('audit_logs')}
           </h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1 text-sm">{t('audit_logs_desc') || "Review deleted expenses and modification history"}</p>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col justify-center">
-          <label className="text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">{t('search_logs')}</label>
-          <div className="flex items-center gap-3">
-            <FaSearch className="text-gray-400 dark:text-slate-500" />
-            <input 
-              type="text" 
-              placeholder={t('search_reason_or_user') || "Search reason or user..."} 
-              className="w-full text-sm font-semibold text-gray-900 dark:text-white bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        <div className="w-full sm:w-auto bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center gap-3">
+          <FaCalendar className="text-gray-400 dark:text-slate-500 shrink-0" />
+          <div className="relative custom-datepicker w-32">
+            <DatePicker 
+              selected={filterDate}
+              onChange={(date: Date | null) => setFilterDate(date)}
+              placeholderText="Filter by Date"
+              dateFormat="dd MMM yyyy"
+              className="w-full text-sm font-semibold text-gray-900 dark:text-white bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-slate-500 cursor-pointer"
+              isClearable
+              maxDate={new Date()}
             />
           </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col justify-center">
-          <label className="text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">{t('filter_by_project') || "Filter by Project"}</label>
-          <select 
-            value={filterProject} 
-            onChange={(e) => setFilterProject(e.target.value)}
-            className="w-full text-sm font-semibold text-gray-900 dark:text-white border-none outline-none bg-transparent cursor-pointer"
-          >
-            <option value="ALL" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{t('all_projects') || "All Projects"}</option>
-            {uniqueProjects.map((projectName: any) => (
-              <option key={projectName} value={projectName} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{projectName}</option>
-            ))}
-          </select>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { getQueuedExpenses, syncOfflineExpenses, QueuedExpense } from "@/lib/offlineSync";
 import { deleteExpense } from "@/app/actions/expenses";
 import toast from "react-hot-toast";
+import { useSiteContext } from "@/components/providers/SiteProvider";
 
 type Project = { id: string; name: string };
 type Expense = {
@@ -40,7 +41,7 @@ export default function ExpenseList({
   const [queuedExpenses, setQueuedExpenses] = useState<QueuedExpense[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [filterProjectId, setFilterProjectId] = useState<string>("ALL");
+  const { activeSiteId } = useSiteContext();
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; expenseId: string | null; reason: string }>({ isOpen: false, expenseId: null, reason: "" });
   const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
 
@@ -122,9 +123,9 @@ export default function ExpenseList({
     ...expenses
   ];
 
-  const filteredExpenses = filterProjectId === "ALL" 
+  const filteredExpenses = activeSiteId === "ALL" 
     ? allExpenses 
-    : allExpenses.filter(e => e.project.id === filterProjectId || (!e.project.id && activeProjects.find(p => p.id === filterProjectId)?.name === e.project.name));
+    : allExpenses.filter(e => e.project.id === activeSiteId || (!e.project.id && activeProjects.find(p => p.id === activeSiteId)?.name === e.project.name));
 
   const totalFilteredAmount = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
 
@@ -165,23 +166,9 @@ export default function ExpenseList({
         </div>
       </div>
 
-      {/* Filter and Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
-        <div className="col-span-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
-          <label className="text-xs font-semibold text-gray-500 mb-1">Filter by Project</label>
-          <select 
-            value={filterProjectId} 
-            onChange={(e) => setFilterProjectId(e.target.value)}
-            className="w-full text-sm font-semibold text-gray-900 border-none bg-gray-50 p-2 rounded-lg outline-none focus:ring-2 focus:ring-primary-500/20"
-          >
-            <option value="ALL">All Projects</option>
-            {activeProjects.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="col-span-1 sm:col-span-2 grid grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
+      {/* Summary */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
              <p className="text-xs font-semibold text-gray-500 mb-1">Filtered Total</p>
              <h3 className="text-xl font-bold text-gray-900 break-words">{formatCurrency(totalFilteredAmount, currency)}</h3>
           </div>
@@ -190,7 +177,6 @@ export default function ExpenseList({
              <h3 className="text-xl font-bold text-gray-900 break-words">{filteredExpenses.length} Expense(s)</h3>
           </div>
         </div>
-      </div>
 
       {/* Data Table / List */}
       {filteredExpenses.length === 0 ? (

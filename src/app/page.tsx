@@ -430,6 +430,7 @@ export default function LandingPage() {
                 <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
               </ul>
             </div>
@@ -454,8 +455,12 @@ export default function LandingPage() {
           </div>
           
           <div className="mt-8 pt-5 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-[13px] font-medium text-gray-400">© 2026 MySiteBook. All rights reserved.</p>
-            <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Made with <span className="text-red-500">❤️</span> in India</p>
+            <p className="text-[13px] font-medium text-gray-400">© 2026 MySiteBook. All Rights Reserved.</p>
+            <div className="flex items-center gap-4">
+              <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Secure Payments Powered by <span className="text-white font-bold">Razorpay</span></p>
+              <div className="hidden md:block w-px h-4 bg-gray-700/50"></div>
+              <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Made with <span className="text-red-500">❤️</span> in India</p>
+            </div>
           </div>
         </div>
       </footer>

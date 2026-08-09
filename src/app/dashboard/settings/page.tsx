@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import SettingsClientPage from "./SettingsClientPage";
+import { getTenantPlan } from "@/lib/subscription";
 
 export const metadata = {
   title: "Settings | MySiteBook",
@@ -16,39 +17,44 @@ export default async function SettingsPage() {
 
   let user = null;
 
-  if (session?.user?.id) {
-    user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        mobileNumber: true,
-        role: true,
-        tenantRole: { select: { permissions: true } },
-        tenant: {
-          select: {
-            name: true,
-            currency: true,
-            language: true,
-            contactPerson: true,
-            mobileNo: true,
-            address: true,
-            pincode: true,
-            businessType: true
+  try {
+    if (session?.user?.id) {
+      user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          mobileNumber: true,
+          role: true,
+          tenantRole: { select: { permissions: true } },
+          tenant: {
+            select: {
+              name: true,
+              currency: true,
+              language: true,
+              contactPerson: true,
+              mobileNo: true,
+              address: true,
+              pincode: true,
+              businessType: true
+            }
           }
         }
-      }
-    });
+      });
 
     const hasAccess = 
       user?.role === "OWNER" || 
       user?.role === "SUPER_ADMIN" || 
       (user?.role === "STAFF" && user?.tenantRole?.permissions?.includes("settings.view"));
 
-    if (!hasAccess) {
-      redirect("/dashboard");
+      if (!hasAccess) {
+        redirect("/dashboard");
+      }
     }
+  } catch (err: any) {
+    console.error("Settings page error:", err);
+    // Ignore and let it render with user = null
   }
 
   const lang = user?.tenant?.language || "en";
@@ -56,17 +62,23 @@ export default async function SettingsPage() {
   const t = (key: string) => dictionaries[lang]?.[key] || dictionaries["en"][key] || key;
 
   let roles: any[] = [];
-  if (user?.tenant?.name) {
-    roles = await prisma.tenantRole.findMany({
-      where: { tenantId: session?.user?.tenantId as string },
-      include: {
-        _count: {
-          select: { users: true }
-        }
-      },
-      orderBy: { createdAt: 'asc' }
-    });
+  try {
+    if (user?.tenant?.name && session?.user?.tenantId) {
+      roles = await prisma.tenantRole.findMany({
+        where: { tenantId: session.user.tenantId },
+        include: {
+          _count: {
+            select: { users: true }
+          }
+        },
+        orderBy: { createdAt: 'asc' }
+      });
+    }
+  } catch (err: any) {
+    console.error("Settings error fetching roles:", err);
   }
+
+  const { plan } = session?.user?.tenantId ? await getTenantPlan(session.user.tenantId) : { plan: "FREE" };
 
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -78,7 +90,7 @@ export default async function SettingsPage() {
       </div>
       
       {user ? (
-        <SettingsClientPage initialUser={user} initialRoles={roles} />
+        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} />
       ) : (
         <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-4 rounded-xl">Error loading user profile.</div>
       )}

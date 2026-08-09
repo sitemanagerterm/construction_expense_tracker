@@ -14,6 +14,7 @@ export default function MobileNav({ user }: { user: any }) {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 z-50 px-2 transition-colors duration-200">
       <div className="flex items-center justify-evenly h-full max-w-md mx-auto relative">
         {navLinks.map((link, index) => {
+          if (link.name === "Settings") return null;
           if (link.roles && !link.roles.includes(user?.role)) {
             const hasPermission = user?.role === "STAFF" && link.permission && user?.tenantRole?.permissions?.includes(link.permission);
             if (!hasPermission) {
@@ -34,8 +35,8 @@ export default function MobileNav({ user }: { user: any }) {
               <div className={`transition-all duration-300 ${isActive ? '-translate-y-1' : 'group-active:scale-95'}`}>
                 {link.icon}
               </div>
-              <span className={`text-[10px] font-semibold transition-all duration-300 ${isActive ? 'opacity-100 font-bold' : 'opacity-70'}`}>
-                {(link as any).translationKey ? t((link as any).translationKey) : link.name}
+              <span className={`text-[10px] font-semibold transition-all duration-300 truncate w-full text-center px-1 ${isActive ? 'opacity-100 font-bold' : 'opacity-70'}`}>
+                {link.name === "Payment Request" ? t("payment_request_short") || "Requests" : (link as any).translationKey ? t((link as any).translationKey) : link.name}
               </span>
               
               {/* Active Indicator Dot */}

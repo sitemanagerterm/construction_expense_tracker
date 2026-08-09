@@ -7,15 +7,16 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { BadgeIndianRupee, Home, Users, History, FileText, ShieldAlert, Settings } from "lucide-react";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
-import { updateLanguage } from "@/app/actions/settings";
 import { useState } from "react";
+import { updateLanguage } from "@/app/actions/settings";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useSiteContext } from "@/components/providers/SiteProvider";
 
 export const navLinks = [
   { name: "Dashboard", href: "/dashboard", icon: <Home className="w-5 h-5" />, translationKey: "dashboard" },
   { name: "Staff & Team", href: "/dashboard/staff", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "staff.view", translationKey: "staff" },
   { name: "Audit Logs", href: "/dashboard/audit-logs", icon: <History className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "audit_log.view", translationKey: "audit_logs" },
-  { name: "Documents", href: "/dashboard/documents", icon: <FileText className="w-5 h-5" />, translationKey: "documents" },
+  { name: "Payment Request", href: "/dashboard/payment-request", icon: <FileText className="w-5 h-5" />, translationKey: "payment_request" },
   { name: "Super Admin", href: "/dashboard/super-admin", icon: <ShieldAlert className="w-5 h-5" />, roles: ["SUPER_ADMIN"], translationKey: "super_admin" },
   { name: "Settings", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "settings.view", translationKey: "settings" }
 ];
@@ -23,6 +24,7 @@ export const navLinks = [
 export default function Sidebar({ user, tenantName }: { user: any, tenantName?: string }) {
   const pathname = usePathname();
   const { language, t } = useTenantPreferences();
+  const { activeSiteId, activeProjects } = useSiteContext();
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
 
   const handleLanguageChange = async (lang: string) => {

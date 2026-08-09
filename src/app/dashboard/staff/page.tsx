@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import StaffClientPage from "./StaffClientPage";
+import { getTenantPlan } from "@/lib/subscription";
 
 export const metadata = {
   title: "Staff & Team | MySiteBook",
@@ -62,6 +63,8 @@ export default async function StaffPage() {
     select: { id: true, name: true }
   });
 
+  const { plan } = await getTenantPlan(session.user.tenantId as string);
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
@@ -82,6 +85,7 @@ export default async function StaffPage() {
           activeProjects={activeProjects}
           userRole={session.user.role}
           userPermissions={userPermissions}
+          plan={plan}
         />
       )}
     </div>

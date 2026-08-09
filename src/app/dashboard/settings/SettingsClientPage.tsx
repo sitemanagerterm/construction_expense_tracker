@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { updateProfile, ProfileFormData, updateTenantSettings, TenantSettingsFormData, updateTenantInformation, TenantInfoFormData } from "@/app/actions/settings";
 import toast from "react-hot-toast";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
-import { saveTenantRole, deleteTenantRole, RoleFormData } from "@/app/actions/roles";
-import { useRouter } from "next/navigation";
+import { saveTenantRole, deleteTenantRole } from "@/app/actions/roles";
+import { PERMISSIONS_LIST } from "@/components/settings/RoleModal";
+import { useRouter, useSearchParams } from "next/navigation";
+import RoleModal, { RoleData } from "@/components/settings/RoleModal";
 
 type UserData = {
   id: string;
@@ -26,65 +28,30 @@ type UserData = {
   tenantRole?: { permissions: string } | null;
 };
 
-export type RoleData = {
-  id: string;
-  name: string;
-  description: string | null;
-  permissions: string;
-  isDefault: boolean;
-  _count: { users: number };
-};
+// RoleData is now imported from RoleModal
 
-type ValidationErrors = {
-  name?: string;
-  mobileNumber?: string;
-};
-
-export const PERMISSIONS_LIST = [
-  { id: "projects.view", label: "View Projects", module: "Projects" },
-  { id: "projects.add", label: "Add Project", module: "Projects" },
-  { id: "projects.edit", label: "Edit Project", module: "Projects" },
-  { id: "projects.delete", label: "Delete Project", module: "Projects" },
-  { id: "projects.view_value", label: "View Project Value/Budget", module: "Projects" },
-  { id: "expenses.view", label: "View Expenses", module: "Expenses" },
-  { id: "expenses.add", label: "Add Expense", module: "Expenses" },
-  { id: "expenses.edit", label: "Edit Expense", module: "Expenses" },
-  { id: "expenses.delete", label: "Delete Expense", module: "Expenses" },
-  { id: "credits.view", label: "View Credits", module: "Credits" },
-  { id: "credits.add", label: "Add Credit", module: "Credits" },
-  { id: "credits.edit", label: "Edit Credit", module: "Credits" },
-  { id: "credits.delete", label: "Delete Credit", module: "Credits" },
-  { id: "staff.view", label: "View Staff", module: "Staff" },
-  { id: "staff.add", label: "Add Staff", module: "Staff" },
-  { id: "staff.edit", label: "Edit Staff", module: "Staff" },
-  { id: "staff.delete", label: "Delete Staff", module: "Staff" },
-  { id: "audit_log.view", label: "View Audit Logs", module: "Audit Logs" },
-  { id: "settings.view", label: "View Settings", module: "Settings" },
-  { id: "settings.edit", label: "Edit Settings", module: "Settings" },
-];
-
-export default function SettingsClientPage({ initialUser, initialRoles = [] }: { initialUser: UserData, initialRoles?: RoleData[] }) {
-  const [activeTab, setActiveTab] = useState<"general" | "roles">("general");
+export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string }) {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "roles" ? "roles" : "general";
+  const [activeTab, setActiveTab] = useState<"general" | "roles">(initialTab);
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [tenantLoading, setTenantLoading] = useState(false);
-  
+type ValidationErrors = {
+  [key: string]: string;
+};
+
   // Roles State
   const router = useRouter();
   const [roles, setRoles] = useState<RoleData[]>(initialRoles);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleData | null>(null);
-  const [roleSaving, setRoleSaving] = useState(false);
   
   React.useEffect(() => {
     setRoles(initialRoles);
-  }, [initialRoles]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialRoles?.length]);
   
-  // Role Form State
-  const [roleName, setRoleName] = useState("");
-  const [roleDescription, setRoleDescription] = useState("");
-  const [rolePermissions, setRolePermissions] = useState<string[]>([]);
-
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const { t } = useTenantPreferences();
   
@@ -187,81 +154,20 @@ export default function SettingsClientPage({ initialUser, initialRoles = [] }: {
 
   const openNewRoleModal = () => {
     setEditingRole(null);
-    setRoleName("");
-    setRoleDescription("");
-    setRolePermissions([]);
     setRoleModalOpen(true);
   };
 
   const openEditRoleModal = (role: RoleData) => {
     setEditingRole(role);
-    setRoleName(role.name);
-    setRoleDescription(role.description || "");
-    try {
-      setRolePermissions(JSON.parse(role.permissions));
-    } catch {
-      setRolePermissions([]);
-    }
     setRoleModalOpen(true);
   };
 
-  const togglePermission = (id: string) => {
-    setRolePermissions(prev => {
-      const isCurrentlyOn = prev.includes(id);
-      
-      if (isCurrentlyOn) {
-        // Turning OFF
-        let next = prev.filter(p => p !== id);
-        
-        // If turning OFF a "view" permission, automatically turn off add/edit/delete for that module
-        if (id.endsWith('.view')) {
-          const prefix = id.split('.')[0];
-          next = next.filter(p => !p.startsWith(`${prefix}.`));
-        }
-        return next;
-      } else {
-        // Turning ON
-        let next = [...prev, id];
-        
-        // If turning ON add/edit/delete, automatically ensure "view" is ON for that module
-        if (id.includes('.') && !id.endsWith('.view')) {
-          const prefix = id.split('.')[0];
-          const viewId = `${prefix}.view`;
-          if (!next.includes(viewId)) {
-            next.push(viewId);
-          }
-        }
-        return next;
-      }
-    });
-  };
-
-  const handleSaveRole = async () => {
-    if (!roleName.trim()) {
-      toast.error("Role name is required");
-      return;
-    }
-    if (rolePermissions.length === 0) {
-      toast.error("Select at least one permission");
-      return;
-    }
-
-    setRoleSaving(true);
-    const res = await saveTenantRole({
-      id: editingRole?.id,
-      name: roleName.trim(),
-      description: roleDescription.trim(),
-      permissions: rolePermissions
-    });
-
-    if (res.success) {
-      toast.success(editingRole ? "Role updated!" : "Role created!");
-      setRoleModalOpen(false);
-      router.refresh();
+  const handleRoleSuccess = (savedRole: RoleData) => {
+    if (editingRole) {
+      setRoles(prev => prev.map(r => r.id === savedRole.id ? savedRole : r));
     } else {
-      toast.error(res.error || "Failed to save role");
+      setRoles(prev => [...prev, savedRole]);
     }
-    setRoleSaving(false);
   };
 
   const handleDeleteRole = async (id: string) => {
@@ -374,7 +280,7 @@ export default function SettingsClientPage({ initialUser, initialRoles = [] }: {
       </div>
       
       {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden lg:col-span-2">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
           <div className="p-6 border-b border-gray-100 dark:border-slate-800">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('site_owner_info') || "Site Owner Information"}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('site_owner_info_desc') || "Update the company details provided during registration."}</p>
@@ -455,6 +361,8 @@ export default function SettingsClientPage({ initialUser, initialRoles = [] }: {
       )}
       </div>
 
+      <div className="space-y-6">
+
       {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
           <div className="p-6 border-b border-gray-100 dark:border-slate-800">
@@ -518,21 +426,75 @@ export default function SettingsClientPage({ initialUser, initialRoles = [] }: {
           </div>
         </div>
       )}
+
+        {/* Help & Support Card */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden h-fit">
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('Help & Support')}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('Contact us for queries, suggestions, or feedback.')}</p>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
+              <div className="w-12 h-12 flex items-center justify-center bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-full shrink-0">
+                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('WhatsApp Support')}</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('Quickest way to get help or share feedback')}</p>
+              </div>
+              <a href="https://wa.me/919025068407" target="_blank" rel="noreferrer" className="ml-auto px-4 py-2 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors whitespace-nowrap shrink-0">
+                {t('Chat Now')}
+              </a>
+            </div>
+
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
+              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 rounded-full shrink-0">
+                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('Email Us')}</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('For detailed queries or suggestions')}</p>
+              </div>
+              <a href="mailto:support@mysitebook.in" className="ml-auto px-4 py-2 bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors whitespace-nowrap shrink-0">
+                {t('Send Email')}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        </div>
+      </div>
+      )}
+
+      {activeTab === "roles" && plan === "FREE" && (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden p-8 sm:p-12 text-center animate-in fade-in">
+          <div className="w-24 h-24 bg-accent-50 dark:bg-accent-900/30 rounded-full flex items-center justify-center text-accent-500 mx-auto mb-6">
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4">Roles & Permissions is a Pro Feature</h2>
+          <p className="text-gray-500 dark:text-slate-400 text-lg mb-8 max-w-lg mx-auto">
+            Upgrade to the Pro Plan to create custom roles and define exactly what each staff member can see and do on your account.
+          </p>
+          <a href="/pricing" className="inline-block px-8 py-3 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-bold shadow-lg shadow-accent-500/30 transition-all active:scale-[0.98]">
+            Upgrade to Pro - Just ₹299/mo
+          </a>
         </div>
       )}
 
-      {activeTab === "roles" && (
+      {activeTab === "roles" && plan !== "FREE" && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">Role Settings</h2>
               <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Create custom roles and manage module-based permissions.</p>
             </div>
-            <button onClick={openNewRoleModal} className="bg-primary-900 dark:bg-accent text-white px-4 py-2 rounded-xl font-bold text-sm">
+            <button onClick={openNewRoleModal} className="w-full sm:w-auto bg-primary-900 dark:bg-accent text-white px-4 py-2 rounded-xl font-bold text-sm shadow-sm hover:opacity-90 transition-opacity">
               + Create Role
             </button>
           </div>
-          <div className="p-0">
+          <div className="p-0 overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 text-xs uppercase tracking-wider text-gray-500 dark:text-slate-400">
@@ -545,16 +507,29 @@ export default function SettingsClientPage({ initialUser, initialRoles = [] }: {
               <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                 {roles.map(role => (
                   <tr key={role.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="p-4 font-bold text-gray-900 dark:text-white">{role.name}</td>
+                    <td className="p-4 font-bold text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-2">
+                        {role.name}
+                        {role.isDefault && (
+                          <span className="bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold">Default</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="p-4 text-sm text-gray-500 dark:text-slate-400">{role.description || "-"}</td>
                     <td className="p-4 text-sm text-gray-600 dark:text-slate-300">
                       <span className="bg-primary-50 dark:bg-accent-900/30 text-primary-700 dark:text-accent-400 py-1 px-2.5 rounded-lg font-bold text-xs">
-                        {role._count.users} Users
+                        {role._count?.users || 0} Users
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <button onClick={() => openEditRoleModal(role)} className="text-blue-600 hover:text-blue-800 text-sm font-bold mr-4">Edit</button>
-                      <button onClick={() => handleDeleteRole(role.id)} className="text-red-600 hover:text-red-800 text-sm font-bold disabled:opacity-50" disabled={role._count.users > 0}>Delete</button>
+                      {!role.isDefault ? (
+                        <>
+                          <button onClick={() => openEditRoleModal(role)} className="text-blue-600 hover:text-blue-800 text-sm font-bold mr-4">Edit</button>
+                          <button onClick={() => handleDeleteRole(role.id)} className="text-red-600 hover:text-red-800 text-sm font-bold disabled:opacity-50" disabled={(role._count?.users || 0) > 0}>Delete</button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-gray-400 font-medium italic">System Role</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -570,75 +545,12 @@ export default function SettingsClientPage({ initialUser, initialRoles = [] }: {
       )}
 
       {/* Role Modal */}
-      {roleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-100 dark:border-slate-800">
-            <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {editingRole ? 'Edit Role' : 'Create New Role'}
-              </h2>
-              <button onClick={() => setRoleModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-white dark:bg-slate-800 rounded-full shadow-sm">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Role Name <span className="text-red-500">*</span></label>
-                  <input type="text" value={roleName} onChange={(e) => setRoleName(e.target.value)} placeholder="e.g. Accountant, Site Supervisor"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Description</label>
-                  <input type="text" value={roleDescription} onChange={(e) => setRoleDescription(e.target.value)} placeholder="What can this role do?"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-white" 
-                  />
-                </div>
-              </div>
-              
-              <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-4">Module Permissions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {modules.map(module => (
-                  <div key={module} className="bg-gray-50 dark:bg-slate-800/30 rounded-2xl p-5 border border-gray-100 dark:border-slate-800">
-                    <h4 className="font-bold text-gray-800 dark:text-slate-200 mb-4 pb-2 border-b border-gray-200 dark:border-slate-700">{module}</h4>
-                    <div className="space-y-3">
-                      {PERMISSIONS_LIST.filter(p => p.module === module).map(p => (
-                        <div key={p.id} className="flex items-center justify-between">
-                          <label htmlFor={p.id} className="text-sm text-gray-600 dark:text-slate-400 font-medium cursor-pointer flex-1">
-                            {p.label}
-                          </label>
-                          <button
-                            type="button"
-                            role="switch"
-                            aria-checked={rolePermissions.includes(p.id)}
-                            onClick={() => togglePermission(p.id)}
-                            className={`${
-                              rolePermissions.includes(p.id) ? 'bg-primary-600 dark:bg-accent' : 'bg-gray-300 dark:bg-slate-700'
-                            } relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
-                          >
-                            <span className={`${rolePermissions.includes(p.id) ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="p-6 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 flex justify-end gap-3 rounded-b-3xl">
-              <button onClick={() => setRoleModalOpen(false)} className="px-6 py-2.5 rounded-xl font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-600 transition-colors">
-                Cancel
-              </button>
-              <button onClick={handleSaveRole} disabled={roleSaving} className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-600 hover:bg-primary-700 dark:bg-accent dark:hover:bg-accent-600 transition-colors flex items-center gap-2 ${roleSaving ? 'opacity-70 cursor-wait' : ''}`}>
-                {roleSaving ? 'Saving...' : 'Save Role'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RoleModal 
+        isOpen={roleModalOpen} 
+        onClose={() => setRoleModalOpen(false)} 
+        onSuccess={handleRoleSuccess} 
+        editingRole={editingRole} 
+      />
 
     </div>
   );

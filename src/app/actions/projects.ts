@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { getTenantPlan } from "@/lib/subscription";
 
 // Type for creating a new project
 export type ProjectFormData = {
@@ -57,6 +58,19 @@ export async function getProjects() {
 export async function createProject(data: ProjectFormData) {
   try {
     const tenantId = await getAuthTenant();
+    
+    // Enforce Pro/Free Limits
+    const { plan } = await getTenantPlan(tenantId);
+    
+    if (plan === "FREE") {
+      const activeProjectsCount = await prisma.project.count({
+        where: { tenantId, isDeleted: false }
+      });
+      
+      if (activeProjectsCount >= 2) {
+        return { success: false, error: "FREE_PLAN_LIMIT_REACHED" };
+      }
+    }
     
     const newProject = await prisma.project.create({
       data: {

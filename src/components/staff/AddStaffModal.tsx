@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { addStaff, updateStaff, checkMobileNumberExists, StaffFormData } from "@/app/actions/staff";
 import toast from "react-hot-toast";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
+import RoleModal, { RoleData } from "@/components/settings/RoleModal";
+import { useRouter } from "next/navigation";
 
 type AddStaffModalProps = {
   isOpen: boolean;
@@ -22,18 +24,28 @@ type ValidationErrors = {
 
 export default function AddStaffModal({ isOpen, onClose, onSuccess, editData, roles = [], activeProjects = [] }: AddStaffModalProps) {
   const { t } = useTenantPreferences();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [localRoles, setLocalRoles] = useState<any[]>(roles);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string>("");
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [mobileInput, setMobileInput] = useState("");
 
-  const [allocationMode, setAllocationMode] = useState<"ALL" | "SPECIFIC">("ALL");
+  const [allocationMode, setAllocationMode] = useState<"ALL" | "SPECIFIC">("SPECIFIC");
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [siteSearchQuery, setSiteSearchQuery] = useState("");
 
   useEffect(() => {
+    setLocalRoles(roles);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, roles?.length]);
+
+  useEffect(() => {
     if (isOpen) {
       setMobileInput(editData?.mobileNumber || "");
+      setSelectedRole(editData?.tenantRoleId || "");
       setValidationErrors({});
       setError("");
       
@@ -46,11 +58,12 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, editData, ro
           setSelectedProjects(editData.allocatedProjects.map(p => p.id));
         }
       } else {
-        setAllocationMode("ALL");
+        setAllocationMode("SPECIFIC");
         setSelectedProjects(activeProjects.map(p => p.id));
       }
     }
-  }, [isOpen, editData, activeProjects]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, editData]);
 
   useEffect(() => {
     if (mobileInput.length === 10 && mobileInput !== editData?.mobileNumber) {
@@ -216,15 +229,21 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, editData, ro
             </div>
 
             <div>
-              <label htmlFor="tenantRoleId" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Assign Role (Optional)</label>
+              <div className="flex justify-between items-center mb-1">
+                <label htmlFor="tenantRoleId" className="block text-sm font-bold text-gray-700 dark:text-slate-300">Assign Role (Optional)</label>
+                <button type="button" onClick={() => setIsRoleModalOpen(true)} className="text-xs font-bold text-primary-600 dark:text-accent-400 hover:underline hover:text-primary-700 dark:hover:text-accent-300 transition-colors">
+                  + Create New Role
+                </button>
+              </div>
               <select 
                 id="tenantRoleId" 
                 name="tenantRoleId"
-                defaultValue={editData?.tenantRoleId || ""}
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
               >
                 <option value="">No Role (Default Staff)</option>
-                {roles.map((r: any) => (
+                {localRoles.map((r: any) => (
                   <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
               </select>
@@ -378,6 +397,17 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, editData, ro
         </div>
 
       </div>
+      
+      <RoleModal 
+        isOpen={isRoleModalOpen} 
+        onClose={() => setIsRoleModalOpen(false)} 
+        onSuccess={(newRole) => {
+          setLocalRoles(prev => [...prev, newRole]);
+          setSelectedRole(newRole.id);
+          router.refresh();
+        }} 
+        editingRole={null} 
+      />
     </div>
   );
 }

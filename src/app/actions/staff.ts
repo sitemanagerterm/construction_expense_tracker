@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { getTenantPlan } from "@/lib/subscription";
 
 export type StaffFormData = {
   name: string;
@@ -67,6 +68,13 @@ export async function checkMobileNumberExists(mobileNumber: string) {
 export async function addStaff(data: StaffFormData) {
   try {
     const tenantId = await getAuthTenant();
+    
+    // Enforce Pro/Free Limits
+    const { plan } = await getTenantPlan(tenantId);
+    
+    if (plan === "FREE") {
+      return { success: false, error: "FREE_PLAN_STAFF_RESTRICTED" };
+    }
     
     // Check Staff Limit
     const tenant = await prisma.tenant.findUnique({

@@ -16,6 +16,7 @@ import { Sun, Moon } from "lucide-react";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useSiteContext } from "@/components/providers/SiteProvider";
 
 // This is a placeholder structure based on the video. 
 // We will refine the layout, add the modals, and implement the real actions later.
@@ -54,7 +55,16 @@ function DesktopThemeToggle() {
 
 export default function ProjectDashboardClient({ project, allProjects, currency, userRole, currentUserId, userPermissions = [] }: any) {
   const { t } = useTenantPreferences();
+  const { setActiveSiteId } = useSiteContext();
   const router = useRouter();
+
+  // Sync current project as the globally active site
+  React.useEffect(() => {
+    if (project?.id) {
+      setActiveSiteId(project.id);
+    }
+  }, [project?.id, setActiveSiteId]);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [projectSearchQuery, setProjectSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);

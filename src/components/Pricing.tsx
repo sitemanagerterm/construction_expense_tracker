@@ -2,27 +2,40 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, X, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Pricing() {
   const freeFeatures = [
-    '1 Project',
-    'Expense Tracking',
-    'Credit Tracking',
-    'Profit Dashboard',
-    'Basic Reports'
+    'Maximum 2 Projects',
+    'Expense & Credit Entry',
+    'Dashboard',
+    'PDF Report (Watermark உடன்)',
+    'Month-wise Filters',
+    'Dark/Light Mode',
+    'Tamil / English / Hindi',
+    'Currency Change'
+  ];
+
+  const freeLimitations = [
+    'Staff Management',
+    'Site-wise Staff Allocation',
+    'Audit Logs',
+    'Role & Permissions',
+    'Advanced Reports',
+    'Unlimited Projects',
+    'Priority Support'
   ];
 
   const proFeatures = [
     'Unlimited Projects',
-    'Unlimited Expenses',
-    'Unlimited Credits',
-    'Material Tracking',
+    'Staff Management',
+    'Site-wise Staff Allocation',
+    'Role & Permission',
+    'Audit Logs',
     'Advanced Reports',
-    'Priority Support',
-    'Team Access',
-    'Future Premium Features'
+    'Full PDF Export',
+    'Priority Support'
   ];
 
   return (
@@ -51,11 +64,11 @@ export default function Pricing() {
           className="max-w-4xl mx-auto bg-gradient-to-r from-[#0B1F4D] to-[#0A1629] rounded-2xl p-6 md:p-8 mb-12 flex flex-col md:flex-row items-center justify-between shadow-2xl border border-gray-800"
         >
           <div className="mb-6 md:mb-0 text-center md:text-left">
-            <div className="inline-block bg-accent/20 text-accent px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Special Launch Offer</div>
-            <h3 className="text-white text-2xl font-bold mb-2">Get 90 Days FREE Trial on the Pro Plan.</h3>
-            <p className="text-gray-300 font-medium">No Credit Card Required.</p>
+            <div className="inline-block bg-accent/20 text-accent px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Launch Offer</div>
+            <h3 className="text-white text-2xl font-bold mb-2">30 Days FREE Trial on the Pro Plan.</h3>
+            <p className="text-gray-300 font-medium">Credit Card தேவையில்லை. 30 நாள் முடிந்ததும் Free Plan-க்கு automatically downgrade ஆகிவிடும்.</p>
           </div>
-          <Link href="/register" className="shrink-0 bg-accent hover:bg-accent-600 text-[#0B1F4D] font-bold px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-lg">
+          <Link href="/register" className="shrink-0 bg-accent hover:bg-accent-600 text-[#0B1F4D] font-bold px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-lg whitespace-nowrap">
             Start Free Trial
           </Link>
         </motion.div>
@@ -71,17 +84,29 @@ export default function Pricing() {
             <div className="text-gray-500 font-bold tracking-wider uppercase mb-2">Free Plan</div>
             <div className="flex items-end gap-2 mb-8">
               <span className="text-5xl font-black text-gray-900">₹0</span>
-              <span className="text-gray-500 font-medium mb-1">Forever</span>
+              <span className="text-gray-500 font-medium mb-1">Lifetime</span>
             </div>
             
-            <ul className="space-y-4 mb-10 flex-grow">
+            <ul className="space-y-4 mb-6">
               {freeFeatures.map((feature, idx) => (
                 <li key={idx} className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-gray-400 shrink-0" strokeWidth={3} />
-                  <span className="text-gray-600 font-medium">{feature}</span>
+                  <Check className="w-5 h-5 text-[#22C55E] shrink-0" strokeWidth={3} />
+                  <span className="text-gray-700 font-medium">{feature}</span>
                 </li>
               ))}
             </ul>
+
+            <div className="mt-4 mb-10 flex-grow">
+              <p className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">Limitations</p>
+              <ul className="space-y-3">
+                {freeLimitations.map((limit, idx) => (
+                  <li key={idx} className="flex items-center gap-3 opacity-60">
+                    <X className="w-5 h-5 text-red-500 shrink-0" strokeWidth={3} />
+                    <span className="text-gray-500 font-medium line-through decoration-gray-300">{limit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             
             <Link href="/register" className="w-full block text-center py-4 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">
               Get Started for Free
@@ -99,7 +124,7 @@ export default function Pricing() {
             
             <div className="text-accent font-bold tracking-wider uppercase mb-2">Pro Plan</div>
             <div className="flex items-end gap-2 mb-8">
-              <span className="text-5xl font-black text-gray-900">₹999</span>
+              <span className="text-5xl font-black text-gray-900">₹299</span>
               <span className="text-gray-500 font-medium mb-1">/ Month</span>
             </div>
             
@@ -107,7 +132,7 @@ export default function Pricing() {
               {proFeatures.map((feature, idx) => (
                 <li key={idx} className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-accent shrink-0" strokeWidth={3} />
+                    <Check className="w-3.5 h-3.5 text-[#F4B400] shrink-0" strokeWidth={3} />
                   </div>
                   <span className="text-gray-900 font-semibold">{feature}</span>
                 </li>
@@ -115,7 +140,7 @@ export default function Pricing() {
             </ul>
             
             <Link href="/register" className="w-full block text-center py-4 rounded-xl font-bold text-[#0B1F4D] bg-accent hover:bg-accent-600 transition-all hover:shadow-lg">
-              Start 90-Day Free Trial
+              Start 30-Day Free Trial
             </Link>
           </motion.div>
 

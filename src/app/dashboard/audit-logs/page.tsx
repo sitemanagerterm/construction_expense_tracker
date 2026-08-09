@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AuditLogsClient from "./AuditLogsClient";
+import { getTenantPlan } from "@/lib/subscription";
 
 export default async function AuditLogsPage() {
   const session = await getServerSession(authOptions);
@@ -93,9 +94,11 @@ export default async function AuditLogsPage() {
     select: { id: true, name: true, status: true }
   });
 
+  const { plan } = await getTenantPlan(session.user.tenantId as string);
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
-      <AuditLogsClient initialLogs={logsWithUsers} allProjects={allProjects} />
+      <AuditLogsClient initialLogs={logsWithUsers} allProjects={allProjects} plan={plan} />
     </div>
   );
 }

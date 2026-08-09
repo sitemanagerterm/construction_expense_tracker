@@ -23,9 +23,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Calculate 90-day expiry
+    // Calculate 30-day expiry
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 90);
+    expiryDate.setDate(expiryDate.getDate() + 30);
     
     // Get max staff limit from env, default to 1
     const staffLimit = parseInt(process.env.DEFAULT_MAX_STAFF || "1", 10);
@@ -55,6 +55,41 @@ export async function POST(req: Request) {
           mobileNumber: mobile,
           role: "OWNER",
         },
+      });
+
+      // Create default roles
+      await tx.tenantRole.createMany({
+        data: [
+          {
+            tenantId: newTenant.id,
+            name: "Basic Control",
+            description: "Default role with basic expense tracking",
+            permissions: JSON.stringify(["dashboard.view", "expenses.view", "expenses.add"]),
+            isDefault: true,
+          },
+          {
+            tenantId: newTenant.id,
+            name: "Advanced Control",
+            description: "Default role with project and credit tracking",
+            permissions: JSON.stringify(["dashboard.view", "projects.view", "expenses.view", "expenses.add", "credits.view", "credits.add"]),
+            isDefault: true,
+          },
+          {
+            tenantId: newTenant.id,
+            name: "Full Control",
+            description: "Default master role with full access",
+            permissions: JSON.stringify([
+              "dashboard.view", 
+              "projects.view", "projects.add", "projects.edit", "projects.delete", 
+              "expenses.view", "expenses.add", "expenses.edit", "expenses.delete", 
+              "credits.view", "credits.add", "credits.edit", "credits.delete", 
+              "staff.view", "staff.add", "staff.edit", "staff.delete", 
+              "audit_log.view", 
+              "settings.view", "settings.edit"
+            ]),
+            isDefault: true,
+          }
+        ]
       });
 
       return newTenant;
