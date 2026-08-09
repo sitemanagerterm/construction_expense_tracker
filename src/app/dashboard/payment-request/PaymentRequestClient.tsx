@@ -158,12 +158,6 @@ export default function PaymentRequestClient({ currency, tenantName }: PaymentRe
             
             {/* Project Summary Card */}
             <div className="mt-6 flex flex-col sm:flex-row gap-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
-              <div className="w-full sm:w-1/3 h-32 bg-gray-200 dark:bg-slate-700 rounded-lg overflow-hidden relative">
-                {/* Placeholder Image for Project */}
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                  <Building2 className="w-10 h-10 opacity-50" />
-                </div>
-              </div>
               <div className="flex-1 flex flex-col justify-center">
                 <div className="flex justify-between items-start mb-1">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Project Name</p>
@@ -171,10 +165,6 @@ export default function PaymentRequestClient({ currency, tenantName }: PaymentRe
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{project.name}</h3>
                 
-                <p className="text-sm text-gray-600 dark:text-slate-400 mb-1">
-                  <span className="font-semibold text-gray-800 dark:text-slate-200 mr-2">Project Code:</span> 
-                  {project.id.substring(0,8).toUpperCase()}
-                </p>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
                   <span className="font-semibold text-gray-800 dark:text-slate-200 mr-2">Project Location:</span> 
                   {project.location}

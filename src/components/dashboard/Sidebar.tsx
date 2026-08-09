@@ -55,9 +55,16 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
             className="w-[150px] lg:w-[170px] h-auto object-contain drop-shadow-sm hidden dark:block" 
           />
         </Link>
-        <div className="mt-1 px-1 pb-2 border-b border-gray-100 dark:border-slate-800 mb-1">
+        <div className="mt-1 px-1 pb-3 border-b border-gray-100 dark:border-slate-800 mb-1">
           <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Company</p>
-          <p className="text-sm font-black text-gray-800 dark:text-white truncate capitalize">{tenantName}</p>
+          <p className="text-sm font-black text-gray-800 dark:text-white truncate capitalize mb-3">{tenantName}</p>
+          
+          {/* Desktop Language Toggle */}
+          <div className="flex bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700 w-full justify-between">
+            <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
+            <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>தமிழ்</button>
+            <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हिंदी</button>
+          </div>
         </div>
       </div>
 
@@ -103,13 +110,6 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
       </nav>
 
       <div className="p-3 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
-        
-        {/* Desktop Language Toggle */}
-        <div className="flex bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700 w-full justify-between">
-          <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
-          <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>தமிழ்</button>
-          <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हिंदी</button>
-        </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-lg p-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">

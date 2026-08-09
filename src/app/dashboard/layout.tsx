@@ -47,21 +47,20 @@ export default async function DashboardLayout({
     }
   }
 
-  // Fetch active projects for global site selector
-  const activeProjects = await prisma.project.findMany({
+  // Fetch all projects for global site selector
+  const allProjects = await prisma.project.findMany({
     where: {
       tenantId: session.user.tenantId,
-      status: "ACTIVE",
       isDeleted: false,
       ...(session.user.role === "STAFF" ? { allocatedUsers: { some: { id: session.user.id } } } : {})
     },
-    select: { id: true, name: true },
+    select: { id: true, name: true, status: true },
     orderBy: { createdAt: 'desc' }
   });
 
   return (
     <TenantPreferencesProvider language={tenant?.language || "en"} currency={tenant?.currency || "INR"}>
-      <SiteProvider initialProjects={activeProjects}>
+      <SiteProvider initialProjects={allProjects}>
         <div className="flex h-screen bg-slate-50 dark:bg-brandbg overflow-hidden text-gray-900 dark:text-slate-200 font-sans transition-colors duration-200">
         {/* Desktop Sidebar */}
         <Sidebar user={userWithRole} tenantName={tenant?.name || "Company"} />

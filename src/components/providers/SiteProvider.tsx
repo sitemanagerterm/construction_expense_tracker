@@ -5,12 +5,14 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 type Project = {
   id: string;
   name: string;
+  status?: string;
 };
 
 type SiteContextType = {
   activeSiteId: string; // "ALL" represents all sites
   setActiveSiteId: (id: string) => void;
   activeProjects: Project[];
+  allProjects: Project[];
 };
 
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
@@ -32,7 +34,7 @@ export function SiteProvider({
     return initialProjects.length > 0 ? initialProjects[0].id : "ALL";
   });
   
-  const [activeProjects, setActiveProjects] = useState<Project[]>(initialProjects);
+  const [allProjects, setAllProjects] = useState<Project[]>(initialProjects);
 
   // Persist activeSiteId to localStorage
   useEffect(() => {
@@ -44,11 +46,14 @@ export function SiteProvider({
   // Sync projects if they change on the server
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setActiveProjects(initialProjects);
+    setAllProjects(initialProjects);
   }, [initialProjects?.length]);
 
+  // activeProjects only contains ACTIVE ones + the current activeSiteId if it happens to be COMPLETED
+  const activeProjects = allProjects.filter(p => p.status === 'ACTIVE' || p.id === activeSiteId);
+
   return (
-    <SiteContext.Provider value={{ activeSiteId, setActiveSiteId, activeProjects }}>
+    <SiteContext.Provider value={{ activeSiteId, setActiveSiteId, activeProjects, allProjects }}>
       {children}
     </SiteContext.Provider>
   );

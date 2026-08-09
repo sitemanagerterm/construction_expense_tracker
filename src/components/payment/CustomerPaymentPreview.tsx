@@ -54,19 +54,19 @@ export default function CustomerPaymentPreview({
   const numericRequestAmount = Number(requestAmount) || 0;
 
   return (
-    <div className="font-sans text-[#1e293b] bg-[#f8fafc] w-[1200px] h-auto min-h-[1400px] p-8 overflow-hidden relative" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="font-sans text-[#1e293b] bg-[#f8fafc] w-full max-w-[1200px] mx-auto h-auto min-h-screen p-4 sm:p-8 overflow-hidden relative" style={{ fontFamily: "'Inter', sans-serif" }}>
         
-        <div className="flex gap-8 items-start h-full">
+        <div className="flex flex-col lg:flex-row gap-8 items-start h-full">
             
             {/* LEFT COLUMN: MAIN CONTENT */}
-            <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 px-8 pb-8 pt-6 w-full h-full flex flex-col">
+            <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:px-8 sm:pb-8 sm:pt-6 w-full h-full flex flex-col">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-100 pb-4 sm:pb-2 mb-5 gap-3 sm:gap-0">
                     <div className="flex items-center gap-3">
-                        <img src="/mysitebook-logo-dark.png" alt="MySiteBook" className="h-[75px] scale-110 origin-left object-contain" />
+                        <img src="/mysitebook-logo-dark.png" alt="MySiteBook" className="h-[60px] sm:h-[75px] scale-100 sm:scale-110 origin-left object-contain" />
                     </div>
-                    <div className="bg-[#eaf5ef] text-[#168a4a] px-3 py-1.5 rounded-lg font-bold text-[13px] flex items-center gap-1.5 shadow-sm border border-[#d1e8db]">
+                    <div className="bg-[#eaf5ef] text-[#168a4a] px-3 py-1.5 rounded-lg font-bold text-[13px] flex items-center gap-1.5 shadow-sm border border-[#d1e8db] shrink-0">
                         <ShieldCheck className="w-4 h-4" />
                         Secure Payment Link
                     </div>
@@ -78,8 +78,7 @@ export default function CustomerPaymentPreview({
                 <p className="text-[14px] font-medium text-slate-600 mb-6">We have raised a payment request. Please find the details below.</p>
 
                 {/* Project Image & Info */}
-                <div className="border border-gray-200 rounded-xl flex mb-6 bg-white shadow-sm overflow-hidden h-40 shrink-0">
-                    <img src="/generic_building.jpg" alt="Building" className="w-64 h-full object-cover" />
+                <div className="border border-gray-200 rounded-xl flex mb-6 bg-white shadow-sm overflow-hidden min-h-[140px] shrink-0">
                     <div className="flex-1 flex flex-col justify-center py-4 px-6">
                         <p className="text-[11px] font-bold text-slate-600 mb-1">Project Name</p>
                         <div className="flex items-center gap-3 mb-3">
@@ -87,7 +86,6 @@ export default function CustomerPaymentPreview({
                             <span className="bg-[#eaf5ef] text-[#168a4a] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{project.status}</span>
                         </div>
                         <div className="space-y-2 text-[13px]">
-                            <p><span className="font-bold text-slate-700 w-32 inline-block">Project Code:</span> <span className="text-slate-600">{project.id.substring(0,8).toUpperCase()}</span></p>
                             <p><span className="font-bold text-slate-700 w-32 inline-block">Project Location:</span> <span className="text-slate-600">{project.location || '-'}</span></p>
                         </div>
                     </div>
@@ -95,35 +93,35 @@ export default function CustomerPaymentPreview({
 
                 {/* Stats & Progress Box */}
                 <div className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm mb-6 shrink-0">
-                    <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                         <div className="border border-gray-100 rounded-xl p-3.5 flex flex-col bg-white">
                             <div className="flex justify-between items-start mb-2">
                                 <p className="text-[12px] font-semibold text-slate-600">Project Value</p>
-                                <div className="bg-blue-50 text-blue-600 w-7 h-7 rounded flex items-center justify-center">
+                                <div className="bg-blue-50 text-blue-600 w-7 h-7 rounded flex items-center justify-center shrink-0">
                                     <Briefcase className="w-[12px] h-[12px]" />
                                 </div>
                             </div>
-                            <p className="text-[22px] font-bold text-[#1d4ed8] tracking-tight">{formatCurrency(project.budget || 0, currency)}</p>
+                            <p className="text-[20px] sm:text-[22px] font-bold text-[#1d4ed8] tracking-tight truncate">{formatCurrency(project.budget || 0, currency)}</p>
                         </div>
                         
                         <div className="border border-gray-100 rounded-xl p-3.5 flex flex-col bg-white">
                             <div className="flex justify-between items-start mb-2">
                                 <p className="text-[12px] font-semibold text-slate-600">Total Received</p>
-                                <div className="bg-emerald-50 text-emerald-600 w-7 h-7 rounded flex items-center justify-center">
+                                <div className="bg-emerald-50 text-emerald-600 w-7 h-7 rounded flex items-center justify-center shrink-0">
                                     <FileText className="w-[12px] h-[12px]" />
                                 </div>
                             </div>
-                            <p className="text-[22px] font-bold text-[#15803d] tracking-tight">{formatCurrency(financials.totalReceived || 0, currency)}</p>
+                            <p className="text-[20px] sm:text-[22px] font-bold text-[#15803d] tracking-tight truncate">{formatCurrency(financials.totalReceived || 0, currency)}</p>
                         </div>
                         
                         <div className="border border-gray-100 rounded-xl p-3.5 flex flex-col bg-white">
                             <div className="flex justify-between items-start mb-2">
                                 <p className="text-[12px] font-semibold text-slate-600">Current Balance</p>
-                                <div className="bg-red-50 text-red-500 w-7 h-7 rounded flex items-center justify-center">
+                                <div className="bg-red-50 text-red-500 w-7 h-7 rounded flex items-center justify-center shrink-0">
                                     <Wrench className="w-[12px] h-[12px]" />
                                 </div>
                             </div>
-                            <p className="text-[22px] font-bold text-[#dc2626] tracking-tight">{formatCurrency(financials.balanceAmount || 0, currency)}</p>
+                            <p className="text-[20px] sm:text-[22px] font-bold text-[#dc2626] tracking-tight truncate">{formatCurrency(financials.balanceAmount || 0, currency)}</p>
                         </div>
                     </div>
                     
@@ -177,17 +175,17 @@ export default function CustomerPaymentPreview({
                     </div>
                     
                     <div className="px-5 pb-5 pt-3 flex flex-col gap-3">
-                        <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-5 py-3.5 flex justify-between items-center">
+                        <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-5 py-3.5 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">
                             <span className="font-bold text-[#15803d] text-[15px]">Total Payment Received</span>
-                            <span className="font-black text-[#15803d] text-[17px]">{formatCurrency(financials.totalReceived || 0, currency)}</span>
+                            <span className="font-black text-[#15803d] text-[17px] break-all">{formatCurrency(financials.totalReceived || 0, currency)}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Payment Request Details */}
-                <div className="border border-gray-200 rounded-xl p-6 lg:p-8 bg-white shrink-0 mt-auto">
-                    <div className="flex gap-8 justify-between items-center">
-                        <div className="flex-1">
+                <div className="border border-gray-200 rounded-xl p-5 sm:p-6 lg:p-8 bg-white shrink-0 mt-auto">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 justify-between items-start md:items-center">
+                        <div className="flex-1 w-full">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="text-blue-700">
                                     <FileText className="w-[22px] h-[22px]" />
@@ -222,7 +220,7 @@ export default function CustomerPaymentPreview({
                             </div>
                         </div>
                         
-                        <div className="flex w-[210px] h-[180px] bg-[#f8fafc] rounded-[16px] items-center justify-center">
+                        <div className="hidden md:flex w-[210px] h-[180px] bg-[#f8fafc] rounded-[16px] items-center justify-center shrink-0">
                             <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <defs>
                                     <filter id="shadow_doc" x="-10%" y="-10%" width="130%" height="130%">
@@ -280,16 +278,12 @@ export default function CustomerPaymentPreview({
                             <Copy className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
                         </div>
                     </div>
-                    <div className="flex items-start gap-2 text-[13px] text-gray-600 bg-white p-3.5 rounded-lg border border-blue-100">
-                        <Info className="w-[16px] h-[16px] text-blue-500 shrink-0 mt-0.5" />
-                        <p>Please include the <strong className="text-gray-800">Project Code ({project.id.substring(0,8).toUpperCase()})</strong> in your transfer remarks for faster processing.</p>
-                    </div>
                 </div>
 
             </div>
 
             {/* RIGHT COLUMN: SIDEBAR */}
-            <div className="w-[380px] shrink-0 space-y-6">
+            <div className="w-full lg:w-[380px] shrink-0 space-y-6">
                 
                 {/* Project Summary */}
                 <div className="bg-white rounded-[12px] shadow-sm border border-gray-100 p-6">
@@ -300,11 +294,6 @@ export default function CustomerPaymentPreview({
                             <span className="font-bold text-[#1e293b]">Project Name</span>
                             <span className="text-slate-400 text-center">:</span>
                             <span className="font-medium text-[#1e293b]">{project.name}</span>
-                        </div>
-                        <div className="grid grid-cols-[140px_15px_1fr] items-center">
-                            <span className="font-bold text-[#1e293b]">Project Code</span>
-                            <span className="text-slate-400 text-center">:</span>
-                            <span className="font-medium text-[#1e293b]">{project.id.substring(0,8).toUpperCase()}</span>
                         </div>
                         <div className="grid grid-cols-[140px_15px_1fr] items-center">
                             <span className="font-bold text-[#1e293b]">Project Value</span>

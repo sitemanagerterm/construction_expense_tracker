@@ -52,6 +52,13 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
         </div>
         
         <div className="flex items-center gap-2">
+          {/* Language Toggle */}
+          <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-full p-0.5 border border-gray-200 dark:border-slate-700 shrink-0">
+            <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`px-2 py-1 rounded-full text-[9px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
+            <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`px-2 py-1 rounded-full text-[9px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>த</button>
+            <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`px-2 py-1 rounded-full text-[9px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हि</button>
+          </div>
+
           <ThemeToggle />
           
           {/* Profile Dropdown */}
@@ -96,10 +103,9 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
         </div>
       </div>
       
-      {/* Bottom Tier: Active Site & Language */}
-      <div className="flex items-center justify-between px-4 h-12 bg-slate-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 overflow-x-auto no-scrollbar gap-3">
-        {/* Active Site Indicator (Mobile) */}
-        {!isDashboardRoot ? (
+      {/* Bottom Tier: Active Site Indicator (only if not dashboard root) */}
+      {!isDashboardRoot && (
+        <div className="flex items-center px-4 h-12 bg-slate-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 overflow-x-auto no-scrollbar">
           <div className="relative flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-accent-500 dark:to-accent-400 shadow-sm shadow-primary-500/20 dark:shadow-accent-500/20 px-3 py-1.5 rounded-full shrink-0" title="Switch Active Site">
              <div className="relative flex h-2 w-2 shrink-0 ml-1">
                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-primary-900 opacity-75"></span>
@@ -119,16 +125,8 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
               </select>
               <svg className="w-3 h-3 text-white dark:text-primary-900 absolute right-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
           </div>
-        ) : (
-          <div></div>
-        )}
-
-        <div className="flex items-center bg-gray-200/50 dark:bg-slate-900 rounded-full p-1 border border-gray-200 dark:border-slate-700 shrink-0">
-          <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
-          <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'} ${isChangingLanguage ? 'opacity-50' : ''}`}>த</button>
-          <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हि</button>
         </div>
-      </div>
+      )}
     </header>
   );
 }

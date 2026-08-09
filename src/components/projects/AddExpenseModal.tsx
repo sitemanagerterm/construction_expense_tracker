@@ -143,27 +143,55 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
     setImagePreview(objectUrl);
 
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Data = (reader.result as string).split(',')[1];
-        const res = await parseExpenseFromImage(base64Data, file.type);
-        if (res && res.success) {
-          const exp = res.data;
-          setDetectedExpenses([{
-            id: Math.random().toString(36).substr(2, 9),
-            category: exp.category,
-            amount: exp.amount,
-            notes: exp.notes || exp.category
-          }]);
-          toast.success(t('image_parsed') || "Receipt scanned successfully!");
-        } else {
-          toast.error(res.error || t('image_parsed_err') || "AI couldn't read this receipt.");
+      const img = new Image();
+      img.src = objectUrl;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement("canvas");
+      const MAX_WIDTH = 1200;
+      const MAX_HEIGHT = 1200;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
         }
-        setIsProcessing(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      toast.error(t('audio_error') || "Error processing image");
+      } else {
+        if (height > MAX_HEIGHT) {
+          width = Math.round((width * MAX_HEIGHT) / height);
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      const base64Data = canvas.toDataURL("image/jpeg", 0.7).split(',')[1];
+      
+      const res = await parseExpenseFromImage(base64Data, "image/jpeg");
+      if (res && res.success) {
+        const exp = res.data;
+        setDetectedExpenses([{
+          id: Math.random().toString(36).substr(2, 9),
+          category: exp.category,
+          amount: exp.amount,
+          notes: exp.notes || exp.category
+        }]);
+        toast.success(t('image_parsed') || "Receipt scanned successfully!");
+      } else {
+        toast.error(res?.error || t('image_parsed_err') || "AI couldn't read this receipt.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Error connecting to AI. Image might be too large.");
+    } finally {
       setIsProcessing(false);
     }
   };

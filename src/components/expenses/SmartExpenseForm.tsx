@@ -107,27 +107,63 @@ export default function SmartExpenseForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
     setIsProcessing(true);
+    const objectUrl = URL.createObjectURL(file);
+
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Data = (reader.result as string).split(',')[1];
-        const res = await parseExpenseFromImage(base64Data, file.type);
-        if (res.success && res.data) {
-          if (res.data.amount) setAmount(res.data.amount.toString());
-          if (res.data.category) setCategory(res.data.category);
-          if (res.data.notes) setNotes(res.data.notes);
-          toast.success("Receipt scanned successfully!");
-          setActiveTab("manual"); // Switch back to manual so they can review and submit
-        } else {
-          toast.error(res.error || "AI couldn't parse the receipt properly.");
+      const img = new Image();
+      img.src = objectUrl;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement("canvas");
+      const MAX_WIDTH = 1200;
+      const MAX_HEIGHT = 1200;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
         }
-        setIsProcessing(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      toast.error("Error processing image");
+      } else {
+        if (height > MAX_HEIGHT) {
+          width = Math.round((width * MAX_HEIGHT) / height);
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      const base64Data = canvas.toDataURL("image/jpeg", 0.7).split(',')[1];
+      const res = await parseExpenseFromImage(base64Data, "image/jpeg");
+      
+      if (res.success && res.data) {
+        if (res.data.amount) setAmount(res.data.amount.toString());
+        if (res.data.category) setCategory(res.data.category);
+        if (res.data.notes) setNotes(res.data.notes);
+        toast.success("Receipt scanned successfully!");
+        setActiveTab("manual"); // Switch back to manual so they can review and submit
+      } else {
+        toast.error(res.error || "AI couldn't parse the receipt properly.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Error connecting to AI. Image might be too large.");
+    } finally {
       setIsProcessing(false);
+      URL.revokeObjectURL(objectUrl);
     }
   };
 
