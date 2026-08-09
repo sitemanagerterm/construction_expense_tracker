@@ -16,7 +16,7 @@ export const navLinks = [
   { name: "Dashboard", href: "/dashboard", icon: <Home className="w-5 h-5" />, translationKey: "dashboard" },
   { name: "Staff & Team", href: "/dashboard/staff", icon: <Users className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "staff.view", translationKey: "staff" },
   { name: "Audit Logs", href: "/dashboard/audit-logs", icon: <History className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "audit_log.view", translationKey: "audit_logs" },
-  { name: "Payment Request", href: "/dashboard/payment-request", icon: <FileText className="w-5 h-5" />, translationKey: "payment_request" },
+  { name: "Payment Request", href: "/dashboard/payment-request", icon: <FileText className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "payment_requests.view", translationKey: "payment_request" },
   { name: "Super Admin", href: "/dashboard/super-admin", icon: <ShieldAlert className="w-5 h-5" />, roles: ["SUPER_ADMIN"], translationKey: "super_admin" },
   { name: "Settings", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" />, roles: ["SUPER_ADMIN", "OWNER"], permission: "settings.view", translationKey: "settings" }
 ];

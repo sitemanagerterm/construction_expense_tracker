@@ -22,6 +22,8 @@ export const PERMISSIONS_LIST = [
   { id: "staff.add", label: "Add Staff", module: "Staff" },
   { id: "staff.edit", label: "Edit Staff", module: "Staff" },
   { id: "staff.delete", label: "Delete Staff", module: "Staff" },
+  { id: "payment_requests.view", label: "View Payment Requests", module: "Payment Requests" },
+  { id: "payment_requests.manage", label: "Manage Payment Requests", module: "Payment Requests" },
   { id: "audit_log.view", label: "View Audit Logs", module: "Audit Logs" },
   { id: "settings.view", label: "View Settings", module: "Settings" },
   { id: "settings.edit", label: "Edit Settings", module: "Settings" },
