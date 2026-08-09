@@ -399,10 +399,10 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         )}
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="flex flex-wrap gap-4 sm:gap-6 items-stretch">
           {/* Project Value Inline Edit Card */}
           {canViewProjectValue && (
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center h-full transition-colors">
+            <div className="flex-1 min-w-[240px] bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center transition-colors">
             <div className="w-full mr-4">
               <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('project_value')}</p>
               {isEditingBudget ? (
@@ -464,7 +464,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
 
         {/* Amount Received / Credit */}
         {canViewCredits && (
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col justify-center h-full transition-colors">
+          <div className="flex-1 min-w-[240px] bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col justify-center transition-colors">
             <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('credit_received')}</p>
             <div className="flex items-center justify-between mt-1 w-full gap-4">
               <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{formatCurrency(totalCredits, currency)}</p>
@@ -484,7 +484,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         {canViewExpenses && (
           <div 
             onClick={() => setIsExpenseHistoryModalOpen(true)}
-            className="bg-accent-50 dark:bg-accent/10 p-5 rounded-2xl border border-accent-100 dark:border-accent/20 cursor-pointer hover:bg-accent-100 dark:hover:bg-accent/20 transition-colors flex justify-between items-center group h-full"
+            className="flex-1 min-w-[240px] bg-accent-50 dark:bg-accent/10 p-5 rounded-2xl border border-accent-100 dark:border-accent/20 cursor-pointer hover:bg-accent-100 dark:hover:bg-accent/20 transition-colors flex justify-between items-center group"
           >
             <div>
               <p className="text-accent-700 dark:text-accent-400 text-[10px] font-bold mb-1 uppercase tracking-wider">{t('total_expenses')}</p>
@@ -496,7 +496,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
           </div>
         )}
           {canViewCredits && canViewExpenses && (
-            <div className={`p-5 rounded-2xl border flex flex-col justify-center h-full ${remainingBalance < 0 ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20'}`}>
+            <div className={`flex-1 min-w-[240px] p-5 rounded-2xl border flex flex-col justify-center ${remainingBalance < 0 ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20'}`}>
               <p className={`text-[11px] font-bold mb-1 uppercase tracking-wider ${remainingBalance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {project.status === 'ACTIVE' ? (t('cash_flow_trend') || 'Available Balance') : remainingBalance < 0 ? (t('project_loss') || 'Project Loss') : (t('project_profit') || 'Project Profit')}
               </p>

@@ -60,8 +60,7 @@ export async function getSecurePaymentRequestData(requestId: string) {
           include: {
             credits: {
               where: { isDeleted: false },
-              orderBy: { date: 'desc' },
-              take: 10
+              orderBy: { date: 'desc' }
             }
           }
         }

@@ -70,8 +70,8 @@ export async function POST(req: Request) {
           {
             tenantId: newTenant.id,
             name: "Advanced Control",
-            description: "Default role with project and credit tracking",
-            permissions: JSON.stringify(["dashboard.view", "projects.view", "expenses.view", "expenses.add", "credits.view", "credits.add"]),
+            description: "Can view and add all records, plus edit existing expenses and credits.",
+            permissions: JSON.stringify(["dashboard.view", "projects.view", "expenses.view", "expenses.add", "expenses.edit", "credits.view", "credits.add", "credits.edit"]),
             isDefault: true,
           },
           {
@@ -80,10 +80,11 @@ export async function POST(req: Request) {
             description: "Default master role with full access",
             permissions: JSON.stringify([
               "dashboard.view", 
-              "projects.view", "projects.add", "projects.edit", "projects.delete", 
+              "projects.view", "projects.add", "projects.edit", "projects.delete", "projects.view_value",
               "expenses.view", "expenses.add", "expenses.edit", "expenses.delete", 
               "credits.view", "credits.add", "credits.edit", "credits.delete", 
               "staff.view", "staff.add", "staff.edit", "staff.delete", 
+              "payment_requests.view", "payment_requests.manage",
               "audit_log.view", 
               "settings.view", "settings.edit"
             ]),

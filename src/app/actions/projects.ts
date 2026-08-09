@@ -16,18 +16,18 @@ export type ProjectFormData = {
   endDate?: Date;
 };
 
-// Ensure user is authenticated and get their tenantId
+// Ensure user is authenticated and get their tenantId and role
 async function getAuthTenant() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.tenantId) {
     throw new Error("Unauthorized or missing Tenant ID");
   }
-  return session.user.tenantId;
+  return { tenantId: session.user.tenantId, userId: session.user.id, role: session.user.role };
 }
 
 export async function getProjects() {
   try {
-    const tenantId = await getAuthTenant();
+    const { tenantId } = await getAuthTenant();
     const projects = await prisma.project.findMany({
       where: {
         tenantId,
@@ -57,7 +57,7 @@ export async function getProjects() {
 
 export async function createProject(data: ProjectFormData) {
   try {
-    const tenantId = await getAuthTenant();
+    const { tenantId, userId, role } = await getAuthTenant();
     
     // Enforce Pro/Free Limits
     const { plan } = await getTenantPlan(tenantId);
@@ -82,6 +82,11 @@ export async function createProject(data: ProjectFormData) {
         startDate: data.startDate,
         endDate: data.endDate,
         status: "ACTIVE",
+        ...(role === "STAFF" ? {
+          allocatedUsers: {
+            connect: { id: userId }
+          }
+        } : {})
       },
     });
 
@@ -96,7 +101,7 @@ export async function createProject(data: ProjectFormData) {
 
 export async function updateProject(projectId: string, data: ProjectFormData) {
   try {
-    const tenantId = await getAuthTenant();
+    const { tenantId } = await getAuthTenant();
 
     // Verify ownership
     const project = await prisma.project.findFirst({
@@ -152,7 +157,7 @@ export async function updateProjectStatus(projectId: string, status: string) {
 
 export async function deleteProject(projectId: string) {
   try {
-    const tenantId = await getAuthTenant();
+    const { tenantId } = await getAuthTenant();
 
     const project = await prisma.project.findFirst({
       where: { id: projectId, tenantId },

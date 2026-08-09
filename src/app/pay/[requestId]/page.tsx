@@ -2,6 +2,9 @@ import React from "react";
 import CustomerPaymentPreview from "@/components/payment/CustomerPaymentPreview";
 import { getSecurePaymentRequestData } from "@/app/actions/payment-links";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function SecurePaymentRequestPage({ 
   params
 }: { 
