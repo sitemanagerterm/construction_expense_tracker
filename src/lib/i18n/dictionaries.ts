@@ -227,9 +227,6 @@ export const dictionaries: Record<string, Dictionary> = {
     cash_flow_trend: "Available Balance",
     project_loss: "Project Loss",
     roles_permissions: "Roles & Permissions",
-    total_expenses: "Total Expenses",
-    project_profit: "Project Profit",
-    new_project: "New Project",
     subscription_billing: "Subscription & Billing"
   },
   ta: {
@@ -439,9 +436,6 @@ export const dictionaries: Record<string, Dictionary> = {
     cash_flow_trend: "கையிருப்பு",
     project_loss: "திட்ட இழப்பு",
     roles_permissions: "பங்குகள் மற்றும் அனுமதிகள்",
-    total_expenses: "மொத்த செலவுகள்",
-    project_profit: "திட்ட லாபம்",
-    new_project: "புதிய திட்டம்",
     subscription_billing: "சந்தா மற்றும் கட்டணம்"
   },
   hi: {
@@ -650,9 +644,6 @@ export const dictionaries: Record<string, Dictionary> = {
     cash_flow_trend: "उपलब्ध शेष",
     project_loss: "प्रोजेक्ट नुकसान",
     roles_permissions: "भूमिकाएँ और अनुमतियाँ",
-    total_expenses: "कुल खर्च",
-    project_profit: "प्रोजेक्ट का लाभ",
-    new_project: "नया प्रोजेक्ट",
     subscription_billing: "सदस्यता और बिलिंग"
   }
 };
