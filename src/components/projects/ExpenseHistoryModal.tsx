@@ -107,11 +107,12 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
     if (isCompleted) return false;
     
     if (userRole === "SUPER_ADMIN" || userRole === "OWNER") return true;
-    if (canEditExpense) return true;
     
-    // Fallback original logic for staff without explicit 'edit any' permission
+    // For STAFF, they must have edit permission AND it must be their own expense from today
     if (userRole === "STAFF") {
-      if (exp.userId !== currentUserId) return false;
+      if (!canEditExpense) return false; // Must have role permission
+      if (exp.userId !== currentUserId) return false; // Must be their own
+      
       const today = new Date();
       const createdDate = exp.createdAt ? new Date(exp.createdAt) : new Date();
       return (
@@ -126,11 +127,12 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
   const canDelete = (exp: any) => {
     if (isCompleted) return false;
     if (userRole === "SUPER_ADMIN" || userRole === "OWNER") return true;
-    if (canDeleteExpense) return true;
     
-    // Fallback logic for delete
+    // For STAFF, they must have delete permission AND it must be their own expense from today
     if (userRole === "STAFF") {
-      if (exp.userId !== currentUserId) return false;
+      if (!canDeleteExpense) return false; // Must have role permission
+      if (exp.userId !== currentUserId) return false; // Must be their own
+      
       const today = new Date();
       const createdDate = exp.createdAt ? new Date(exp.createdAt) : new Date();
       return (
