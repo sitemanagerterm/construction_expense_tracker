@@ -235,7 +235,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
               onClick={() => { setIsDropdownOpen(!isDropdownOpen); setProjectSearchQuery(""); }}
             >
               <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">{t('project_label')}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">{t('project_label') || "Project"}</p>
                 <div className={`w-1.5 h-1.5 rounded-full ${project.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-slate-400'}`}></div>
                 <span className={`text-[10px] font-bold uppercase tracking-wider ${project.status === 'ACTIVE' ? 'text-emerald-600' : 'text-slate-500'}`}>
                   {project.status === 'ACTIVE' ? t('active') : t('completed')}
@@ -289,7 +289,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                       className="w-full flex items-center gap-2 px-5 py-3.5 border-t border-gray-50 dark:border-slate-700 text-[15px] font-bold text-accent-500 dark:text-accent hover:bg-accent-50 dark:hover:bg-accent/10 transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
-                      {t('new_project')}
+                      {t('new_project') || "New Project"}
                     </button>
                   )}
                 </div>
@@ -321,7 +321,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                         className="w-full text-left px-5 py-3.5 text-[13px] whitespace-nowrap font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-3"
                       >
                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        {t('view_report')}
+                        {t('view_report') || "View Report"}
                       </button>
                     )}
                     {canEditProject && (
@@ -404,7 +404,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
           {canViewProjectValue && (
             <div className="flex-1 min-w-[240px] bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center transition-colors">
             <div className="w-full mr-4">
-              <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('project_value')}</p>
+              <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('project_value') || "Project Value"}</p>
               {isEditingBudget ? (
                 <div className="flex items-center mt-1 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 overflow-hidden focus-within:ring-2 focus-within:ring-accent-500/20 focus-within:border-accent-500 transition-all w-full">
                   <span className="pl-3 pr-1 text-gray-400 font-bold">{getCurrencySymbol(currency)}</span>
@@ -465,7 +465,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
         {/* Amount Received / Credit */}
         {canViewCredits && (
           <div className="flex-1 min-w-[240px] bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col justify-center transition-colors">
-            <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('credit_received')}</p>
+            <p className="text-gray-700 dark:text-slate-400 text-[11px] font-bold mb-1 uppercase tracking-wider">{t('credit_received') || "Credit Received"}</p>
             <div className="flex items-center justify-between mt-1 w-full gap-4">
               <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500">{formatCurrency(totalCredits, currency)}</p>
               {canAddCredit && project.status !== "COMPLETED" && (
@@ -473,7 +473,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                   onClick={() => setIsCreditModalOpen(true)}
                   className="text-xs font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors shrink-0"
                 >
-                  + {t('add_credit')}
+                  + {t('add_credit') || "Add Credit"}
                 </button>
               )}
             </div>
@@ -487,7 +487,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
             className="flex-1 min-w-[240px] bg-accent-50 dark:bg-accent/10 p-5 rounded-2xl border border-accent-100 dark:border-accent/20 cursor-pointer hover:bg-accent-100 dark:hover:bg-accent/20 transition-colors flex justify-between items-center group"
           >
             <div>
-              <p className="text-accent-700 dark:text-accent-400 text-[10px] font-bold mb-1 uppercase tracking-wider">{t('total_expenses')}</p>
+              <p className="text-accent-700 dark:text-accent-400 text-[10px] font-bold mb-1 uppercase tracking-wider">{t('total_expenses') || "Total Expenses"}</p>
               <p className="text-2xl sm:text-3xl font-bold text-accent-700 dark:text-accent-400">{formatCurrency(totalExpenses, currency)}</p>
             </div>
             <div className="text-accent-600 dark:text-accent-500 group-hover:text-accent-800 dark:group-hover:text-accent-400 transition-colors shrink-0">
@@ -525,7 +525,7 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 px-1">{t('recent_expenses') || "Recent Expenses"}</h3>
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
               {project.expenses.length === 0 ? (
-                <p className="p-5 text-center text-gray-500 dark:text-slate-400 text-sm font-medium">{t('no_expenses_yet')}</p>
+                <p className="p-5 text-center text-gray-500 dark:text-slate-400 text-sm font-medium">{t('no_expenses_yet') || "No expenses recorded yet."}</p>
               ) : (
                 [...project.expenses]
                   .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
