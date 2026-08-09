@@ -64,7 +64,7 @@ export async function POST(req: Request) {
             tenantId: newTenant.id,
             name: "Basic Control",
             description: "Default role with basic expense tracking",
-            permissions: JSON.stringify(["dashboard.view", "expenses.view", "expenses.add"]),
+            permissions: JSON.stringify(["dashboard.view", "projects.view", "expenses.view", "expenses.add", "expenses.edit"]),
             isDefault: true,
           },
           {

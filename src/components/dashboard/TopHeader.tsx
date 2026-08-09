@@ -46,9 +46,32 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
               className="w-[130px] h-auto object-contain drop-shadow-sm -ml-1 hidden dark:block" 
             />
           </Link>
-          <span className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-widest truncate max-w-[140px] ml-1 mt-0.5">
-            {tenantName}
-          </span>
+          <div className="flex items-center gap-2 mt-0.5 ml-1">
+            <span className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-widest truncate max-w-[120px]">
+              {tenantName}
+            </span>
+            {!isDashboardRoot && (
+              <div className="relative flex items-center gap-1.5 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-accent-500 dark:to-accent-400 shadow-sm shadow-primary-500/10 px-2 py-0.5 rounded-full shrink-0" title="Switch Active Site">
+                 <div className="relative flex h-1.5 w-1.5 shrink-0 ml-0.5">
+                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-primary-900 opacity-75"></span>
+                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white dark:bg-primary-900"></span>
+                 </div>
+                 <select 
+                    value={activeSiteId} 
+                    onChange={(e) => setActiveSiteId(e.target.value)}
+                    className="text-[9px] font-bold text-white dark:text-primary-900 uppercase tracking-widest bg-transparent outline-none appearance-none cursor-pointer pr-3.5 drop-shadow-sm dark:drop-shadow-none max-w-[90px] truncate"
+                  >
+                    <option value="ALL" className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">ALL SITES</option>
+                    {activeProjects.map(p => (
+                      <option key={p.id} value={p.id} className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                  <svg className="w-2.5 h-2.5 text-white dark:text-primary-900 absolute right-1 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -103,30 +126,6 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
         </div>
       </div>
       
-      {/* Bottom Tier: Active Site Indicator (only if not dashboard root) */}
-      {!isDashboardRoot && (
-        <div className="flex items-center px-4 h-12 bg-slate-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 overflow-x-auto no-scrollbar">
-          <div className="relative flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-accent-500 dark:to-accent-400 shadow-sm shadow-primary-500/20 dark:shadow-accent-500/20 px-3 py-1.5 rounded-full shrink-0" title="Switch Active Site">
-             <div className="relative flex h-2 w-2 shrink-0 ml-1">
-               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-primary-900 opacity-75"></span>
-               <span className="relative inline-flex rounded-full h-2 w-2 bg-white dark:bg-primary-900"></span>
-             </div>
-             <select 
-                value={activeSiteId} 
-                onChange={(e) => setActiveSiteId(e.target.value)}
-                className="text-[10px] font-bold text-white dark:text-primary-900 uppercase tracking-widest bg-transparent outline-none appearance-none cursor-pointer pr-4 drop-shadow-sm dark:drop-shadow-none max-w-[150px] truncate"
-              >
-                <option value="ALL" className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">ALL SITES</option>
-                {activeProjects.map(p => (
-                  <option key={p.id} value={p.id} className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <svg className="w-3 h-3 text-white dark:text-primary-900 absolute right-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
