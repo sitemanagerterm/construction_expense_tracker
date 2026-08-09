@@ -38,7 +38,7 @@ type UserData = {
 export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string }) {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") === "roles" ? "roles" : searchParams.get("tab") === "bank" ? "bank" : "general";
-  const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank">(initialTab);
+  const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank" | "subscription">(initialTab as "general" | "roles" | "bank" | "subscription" || "general");
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [tenantLoading, setTenantLoading] = useState(false);
