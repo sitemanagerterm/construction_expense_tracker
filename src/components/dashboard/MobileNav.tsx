@@ -21,8 +21,9 @@ export default function MobileNav({ user }: { user: any }) {
               return null;
             }
           }
-          
-          const isActive = pathname === link.href || (link.href !== "/dashboard" && pathname.startsWith(`${link.href}/`));
+          const isActive = link.href === "/dashboard"  
+            ? pathname === "/dashboard" || pathname.startsWith("/dashboard/projects")
+            : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
           return (
             <Link

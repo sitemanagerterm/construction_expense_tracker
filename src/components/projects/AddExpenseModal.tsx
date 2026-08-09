@@ -328,7 +328,7 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
             <div className="flex bg-gray-100/80 dark:bg-slate-800 rounded-2xl p-1 gap-1 border border-gray-200/50 dark:border-slate-700/50">
               {[
                 { id: "MANUAL", icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>, label: t('manual') || "Manual Entry" },
-                { id: "SMART", icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>, label: "Smart Entry (Beta)" },
+                { id: "SMART", icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>, label: <>Smart Entry <span className="text-[10px] opacity-70 ml-0.5">(Beta)</span></> },
               ].map(({ id, icon, label }) => (
                 <button
                   key={id}
@@ -340,7 +340,7 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                   }`}
                 >
                   {icon}
-                  <span>{label}</span>
+                  <span className="flex items-baseline">{label}</span>
                 </button>
               ))}
             </div>

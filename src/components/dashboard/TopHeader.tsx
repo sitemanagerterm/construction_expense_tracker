@@ -27,59 +27,31 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
 
   return (
     <header className="md:hidden flex flex-col bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 shrink-0 sticky top-0 z-40 transition-colors duration-200">
-      {/* Top Tier: Logo, Theme, Profile */}
-      <div className="flex items-center justify-between px-4 py-3 w-full">
-        <div className="flex flex-col justify-center">
-          <Link href="/dashboard" className="block outline-none shrink-0">
-            <Image 
-              src="/mysitebook-logo-dark.png" 
-              alt="MySiteBook" 
-              width={300} 
-              height={100} 
-              className="w-[130px] h-auto object-contain drop-shadow-sm -ml-1 dark:hidden" 
-            />
-            <Image 
-              src="/mysitebook-logo-light.png" 
-              alt="MySiteBook" 
-              width={300} 
-              height={100} 
-              className="w-[130px] h-auto object-contain drop-shadow-sm -ml-1 hidden dark:block" 
-            />
-          </Link>
-          <div className="flex items-center gap-2 mt-0.5 ml-1">
-            <span className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-widest truncate max-w-[120px]">
-              {tenantName}
-            </span>
-            {!isDashboardRoot && (
-              <div className="relative flex items-center gap-1.5 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-accent-500 dark:to-accent-400 shadow-sm shadow-primary-500/10 px-2 py-0.5 rounded-full shrink-0" title="Switch Active Site">
-                 <div className="relative flex h-1.5 w-1.5 shrink-0 ml-0.5">
-                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-primary-900 opacity-75"></span>
-                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white dark:bg-primary-900"></span>
-                 </div>
-                 <select 
-                    value={activeSiteId} 
-                    onChange={(e) => setActiveSiteId(e.target.value)}
-                    className="text-[9px] font-bold text-white dark:text-primary-900 uppercase tracking-widest bg-transparent outline-none appearance-none cursor-pointer pr-3.5 drop-shadow-sm dark:drop-shadow-none max-w-[90px] truncate"
-                  >
-                    <option value="ALL" className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">ALL SITES</option>
-                    {activeProjects.map(p => (
-                      <option key={p.id} value={p.id} className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                  <svg className="w-2.5 h-2.5 text-white dark:text-primary-900 absolute right-1 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Row 1: Logo and Tools */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-1 w-full gap-2">
+        <Link href="/dashboard" className="block outline-none shrink-0 w-fit">
+          <Image 
+            src="/mysitebook-logo-dark.png" 
+            alt="MySiteBook" 
+            width={300} 
+            height={100} 
+            className="w-[120px] sm:w-[130px] h-auto object-contain drop-shadow-sm -ml-1 dark:hidden" 
+          />
+          <Image 
+            src="/mysitebook-logo-light.png" 
+            alt="MySiteBook" 
+            width={300} 
+            height={100} 
+            className="w-[120px] sm:w-[130px] h-auto object-contain drop-shadow-sm -ml-1 hidden dark:block" 
+          />
+        </Link>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Language Toggle */}
           <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-full p-0.5 border border-gray-200 dark:border-slate-700 shrink-0">
-            <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`px-2 py-1 rounded-full text-[9px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
-            <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`px-2 py-1 rounded-full text-[9px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>த</button>
-            <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`px-2 py-1 rounded-full text-[9px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हि</button>
+            <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>
+            <button onClick={() => handleLanguageChange('ta')} disabled={isChangingLanguage} className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold transition-colors ${language === 'ta' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>த</button>
+            <button onClick={() => handleLanguageChange('hi')} disabled={isChangingLanguage} className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold transition-colors ${language === 'hi' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'} ${isChangingLanguage ? 'opacity-50' : ''}`}>हि</button>
           </div>
 
           <ThemeToggle />
@@ -126,6 +98,34 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
         </div>
       </div>
       
+      {/* Row 2: Company Name and Site Pill */}
+      <div className="flex items-center justify-between px-4 pb-3 w-full gap-2 mt-1">
+        <span className="text-[11px] font-black text-gray-800 dark:text-white uppercase tracking-widest truncate">
+          {tenantName}
+        </span>
+        
+        {!isDashboardRoot && (
+          <div className="relative flex items-center gap-1.5 bg-gradient-to-r from-accent-400 to-accent-500 shadow-sm px-2.5 py-1 rounded-full shrink-0" title="Switch Active Site">
+             <div className="relative flex h-2 w-2 shrink-0">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-900 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900"></span>
+             </div>
+             <select 
+                value={activeSiteId} 
+                onChange={(e) => setActiveSiteId(e.target.value)}
+                className="text-[10px] font-bold text-slate-900 uppercase tracking-widest bg-transparent outline-none appearance-none cursor-pointer pr-4 ml-0.5 drop-shadow-sm max-w-[140px] truncate"
+              >
+                <option value="ALL" className="text-gray-900 bg-white font-bold uppercase">ALL SITES</option>
+                {activeProjects.map(p => (
+                  <option key={p.id} value={p.id} className="text-gray-900 bg-white font-bold uppercase">
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <svg className="w-3 h-3 text-slate-900 absolute right-1.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        )}
+      </div>
     </header>
   );
 }
