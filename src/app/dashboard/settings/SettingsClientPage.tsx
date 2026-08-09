@@ -217,37 +217,39 @@ type ValidationErrors = {
 
   return (
     <div className="w-full">
-      <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 dark:border-slate-800 mb-6 pb-[1px] scrollbar-hide">
-        <button 
-          onClick={() => setActiveTab("general")}
-          className={`pb-4 px-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'general' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
-        >
-          General Settings
-        </button>
-        {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+      <div className="border-b border-gray-200 dark:border-slate-800 mb-6">
+        <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide">
           <button 
-            onClick={() => setActiveTab("bank")}
-            className={`pb-4 px-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'bank' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            onClick={() => setActiveTab("general")}
+            className={`shrink-0 pb-4 px-4 text-sm font-bold transition-all border-b-2 -mb-[1px] ${activeTab === 'general' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
           >
-            Bank Details
+            General Settings
           </button>
-        )}
-        {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
-          <button 
-            onClick={() => setActiveTab("roles")}
-            className={`pb-4 px-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'roles' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
-          >
-            {t('roles_permissions') || 'Roles & Permissions'}
-          </button>
-        )}
-        {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
-          <button
-            onClick={() => setActiveTab("subscription")}
-            className={`pb-4 px-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'subscription' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
-          >
-            Subscription & Billing
-          </button>
-        )}
+          {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+            <button 
+              onClick={() => setActiveTab("bank")}
+              className={`shrink-0 pb-4 px-4 text-sm font-bold transition-all border-b-2 -mb-[1px] ${activeTab === 'bank' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            >
+              Bank Details
+            </button>
+          )}
+          {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+            <button 
+              onClick={() => setActiveTab("roles")}
+              className={`shrink-0 pb-4 px-4 text-sm font-bold transition-all border-b-2 -mb-[1px] ${activeTab === 'roles' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            >
+              {t('roles_permissions') || 'Roles & Permissions'}
+            </button>
+          )}
+          {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+            <button
+              onClick={() => setActiveTab("subscription")}
+              className={`shrink-0 pb-4 px-4 text-sm font-bold transition-all border-b-2 -mb-[1px] ${activeTab === 'subscription' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+            >
+              Subscription & Billing
+            </button>
+          )}
+        </div>
       </div>
 
       {activeTab === "general" && (
