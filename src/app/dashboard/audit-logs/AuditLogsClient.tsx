@@ -86,18 +86,18 @@ export default function AuditLogsClient({ initialLogs, allProjects, plan }: { in
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/80 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
-                <th className="p-4 font-semibold whitespace-nowrap">{t('date_time') || "Date / Time"}</th>
-                <th className="p-4 font-semibold whitespace-nowrap">{t('action_header') || "Action"}</th>
-                <th className="p-4 font-semibold whitespace-nowrap">{t('original_record') || "Original Record"}</th>
-                <th className="p-4 font-semibold whitespace-nowrap">Modified By</th>
-                <th className="p-4 font-semibold min-w-[200px]">Reason</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('date_time')}</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('action')}</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('original_expense')}</th>
+                <th className="p-4 font-semibold whitespace-nowrap">{t('modified_by')}</th>
+                <th className="p-4 font-semibold min-w-[200px]">{t('reason')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
               {filteredLogs.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-8 text-center text-gray-500 dark:text-slate-400 text-sm">
-                    No audit logs found.
+                    {t('no_audit_logs_found')}
                   </td>
                 </tr>
               ) : (
