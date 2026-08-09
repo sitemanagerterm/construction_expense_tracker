@@ -86,7 +86,7 @@ export default function SuperAdminSidebar({ user }: { user: any }) {
             </div>
             <div className="flex flex-col overflow-hidden">
               <span className="text-sm font-bold text-white truncate capitalize">{user?.name || "Super Admin"}</span>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{user?.role}</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{(user?.role || "").replace("_", " ")}</span>
             </div>
           </div>
         </div>

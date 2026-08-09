@@ -74,6 +74,11 @@ export type TenantInfoFormData = {
   address?: string;
   pincode?: string;
   businessType?: string;
+  bankAccountName?: string;
+  bankAccountNumber?: string;
+  bankIfscCode?: string;
+  bankUpiId?: string;
+  bankGpayNumber?: string;
 };
 
 export async function updateTenantInformation(data: TenantInfoFormData) {
@@ -97,6 +102,11 @@ export async function updateTenantInformation(data: TenantInfoFormData) {
         address: data.address || null,
         pincode: data.pincode || null,
         businessType: data.businessType || null,
+        bankAccountName: data.bankAccountName || null,
+        bankAccountNumber: data.bankAccountNumber || null,
+        bankIfscCode: data.bankIfscCode || null,
+        bankUpiId: data.bankUpiId || null,
+        bankGpayNumber: data.bankGpayNumber || null,
       },
     });
 

@@ -110,7 +110,12 @@ export async function getSecurePaymentRequestData(requestId: string) {
         })),
         tenant: {
           name: request.tenant.name,
-          currency: request.tenant.currency
+          currency: request.tenant.currency,
+          bankAccountName: request.tenant.bankAccountName,
+          bankAccountNumber: request.tenant.bankAccountNumber,
+          bankIfscCode: request.tenant.bankIfscCode,
+          bankUpiId: request.tenant.bankUpiId,
+          bankGpayNumber: request.tenant.bankGpayNumber
         }
       }
     };

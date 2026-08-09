@@ -36,6 +36,13 @@ export interface CustomerPaymentPreviewProps {
   notes: string;
   currency: string;
   tenantName: string;
+  bankDetails?: {
+    accountName?: string | null;
+    accountNumber?: string | null;
+    ifscCode?: string | null;
+    upiId?: string | null;
+    gpayNumber?: string | null;
+  };
 }
 
 export default function CustomerPaymentPreview({
@@ -47,7 +54,8 @@ export default function CustomerPaymentPreview({
   dueDate,
   notes,
   currency,
-  tenantName
+  tenantName,
+  bankDetails
 }: CustomerPaymentPreviewProps) {
   
   const formattedDueDate = dueDate ? dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
@@ -160,13 +168,19 @@ export default function CustomerPaymentPreview({
                                 </tr>
                             </thead>
                             <tbody className="text-slate-700 font-medium divide-y divide-gray-100">
-                                {recentCredits.slice(0, 3).map((credit, idx) => (
+                                {recentCredits.map((credit, idx) => {
+                                    const formatPaymentLabel = (label: string) => {
+                                        if (!label) return 'Payment';
+                                        return label.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+                                    };
+                                    return (
                                     <tr key={credit.id || idx}>
                                         <td className="py-4 px-5 whitespace-nowrap">{new Date(credit.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                                        <td className="py-4 px-5">{credit.notes || credit.method || 'Payment'}</td>
+                                        <td className="py-4 px-5">{credit.notes || formatPaymentLabel(credit.method || '')}</td>
                                         <td className="py-4 px-5 text-right text-[#15803d] font-bold whitespace-nowrap">{formatCurrency(credit.amount, currency)}</td>
                                     </tr>
-                                ))}
+                                    );
+                                })}
                                 {recentCredits.length === 0 && (
                                     <tr><td colSpan={3} className="py-6 text-center text-gray-500">No payment history available.</td></tr>
                                 )}
@@ -261,22 +275,44 @@ export default function CustomerPaymentPreview({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div className="bg-white rounded-lg p-3.5 border border-gray-100 shadow-sm">
                             <p className="text-[11px] text-gray-500 font-semibold mb-1 uppercase tracking-wider">Account Name</p>
-                            <p className="font-bold text-[#1e293b] text-[14px]">{tenantName || 'Joe Construction'}</p>
+                            <p className="font-bold text-[#1e293b] text-[14px]">{bankDetails?.accountName || tenantName || '-'}</p>
                         </div>
                         <div className="bg-white rounded-lg p-3.5 border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer hover:border-blue-300 transition-colors">
                             <div>
                                 <p className="text-[11px] text-gray-500 font-semibold mb-1 uppercase tracking-wider">Account Number</p>
-                                <p className="font-bold text-[#1e293b] text-[14px]">31234567890</p>
+                                <p className="font-bold text-[#1e293b] text-[14px]">{bankDetails?.accountNumber || '-'}</p>
                             </div>
                             <Copy className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
                         </div>
                         <div className="bg-white rounded-lg p-3.5 border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer hover:border-blue-300 transition-colors">
                             <div>
                                 <p className="text-[11px] text-gray-500 font-semibold mb-1 uppercase tracking-wider">IFSC Code</p>
-                                <p className="font-bold text-[#1e293b] text-[14px]">SBIN0001234</p>
+                                <p className="font-bold text-[#1e293b] text-[14px]">{bankDetails?.ifscCode || '-'}</p>
                             </div>
                             <Copy className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
                         </div>
+                        {(bankDetails?.upiId || bankDetails?.gpayNumber) && (
+                            <>
+                                {bankDetails.upiId && (
+                                    <div className="bg-white rounded-lg p-3.5 border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer hover:border-blue-300 transition-colors">
+                                        <div>
+                                            <p className="text-[11px] text-gray-500 font-semibold mb-1 uppercase tracking-wider">UPI ID</p>
+                                            <p className="font-bold text-[#1e293b] text-[14px]">{bankDetails.upiId}</p>
+                                        </div>
+                                        <Copy className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
+                                    </div>
+                                )}
+                                {bankDetails.gpayNumber && (
+                                    <div className="bg-white rounded-lg p-3.5 border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer hover:border-blue-300 transition-colors">
+                                        <div>
+                                            <p className="text-[11px] text-gray-500 font-semibold mb-1 uppercase tracking-wider">GPay Number</p>
+                                            <p className="font-bold text-[#1e293b] text-[14px]">{bankDetails.gpayNumber}</p>
+                                        </div>
+                                        <Copy className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
 

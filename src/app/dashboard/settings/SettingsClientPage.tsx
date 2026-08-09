@@ -24,6 +24,11 @@ type UserData = {
     address?: string | null;
     pincode?: string | null;
     businessType?: string | null;
+    bankAccountName?: string | null;
+    bankAccountNumber?: string | null;
+    bankIfscCode?: string | null;
+    bankUpiId?: string | null;
+    bankGpayNumber?: string | null;
   } | null;
   tenantRole?: { permissions: string } | null;
 };
@@ -134,6 +139,9 @@ type ValidationErrors = {
       address: (formData.get("address") as string)?.trim() || undefined,
       pincode: (formData.get("pincode") as string)?.trim() || undefined,
       businessType: (formData.get("businessType") as string) || undefined,
+      bankAccountName: (formData.get("bankAccountName") as string)?.trim() || undefined,
+      bankAccountNumber: (formData.get("bankAccountNumber") as string)?.trim() || undefined,
+      bankIfscCode: (formData.get("bankIfscCode") as string)?.trim() || undefined,
     };
 
     if (!data.name) {
@@ -347,6 +355,49 @@ type ValidationErrors = {
                   />
                 </div>
 
+              </div>
+
+              {/* Bank Details for Payment Links */}
+              <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-800">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Bank Details for Payment Links</h3>
+                <p className="text-sm text-gray-500 mb-6">These details will be shown to your customers when you send them a Secure Payment Link.</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label htmlFor="bankAccountName" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Account Name</label>
+                    <input type="text" id="bankAccountName" name="bankAccountName" defaultValue={initialUser.tenant?.bankAccountName || ""} placeholder="Joe Construction"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bankAccountNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Account Number</label>
+                    <input type="text" id="bankAccountNumber" name="bankAccountNumber" defaultValue={initialUser.tenant?.bankAccountNumber || ""} placeholder="31234567890"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bankIfscCode" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">IFSC / Routing Code</label>
+                    <input type="text" id="bankIfscCode" name="bankIfscCode" defaultValue={initialUser.tenant?.bankIfscCode || ""} placeholder="SBIN0001234"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bankUpiId" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">UPI ID</label>
+                    <input type="text" id="bankUpiId" name="bankUpiId" defaultValue={initialUser.tenant?.bankUpiId || ""} placeholder="joe@upi"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bankGpayNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">GPay Number</label>
+                    <input type="text" id="bankGpayNumber" name="bankGpayNumber" defaultValue={initialUser.tenant?.bankGpayNumber || ""} placeholder="9876543210"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                    />
+                  </div>
+                </div>
               </div>
               
               <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 flex justify-end">

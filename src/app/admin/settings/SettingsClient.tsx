@@ -61,7 +61,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                 value={supportPhone} 
                 onChange={(e) => setSupportPhone(e.target.value)}
                 placeholder="+1 234 567 8900"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none text-slate-900"
               />
             </div>
 
@@ -72,7 +72,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                 value={supportEmail} 
                 onChange={(e) => setSupportEmail(e.target.value)}
                 placeholder="support@mysitebook.com"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none text-slate-900"
               />
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
               <select 
                 value={activeGateway}
                 onChange={(e) => setActiveGateway(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 font-medium transition-all outline-none"
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 font-medium transition-all outline-none text-slate-900"
               >
                 <option value="OFFLINE">Offline Payments Only (Manual Verification)</option>
                 <option value="RAZORPAY">Razorpay (India / Global)</option>
@@ -108,7 +108,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                   onChange={(e) => setOfflinePaymentInstructions(e.target.value)}
                   rows={4}
                   placeholder="Please transfer the subscription amount to Account No: XXXXXXXX, IFSC: XXXXXXX"
-                  className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none resize-none"
+                  className="w-full px-4 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none resize-none text-slate-900"
                 />
               </div>
             )}
@@ -122,7 +122,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                     value={razorpayKeyId} 
                     onChange={(e) => setRazorpayKeyId(e.target.value)}
                     placeholder="rzp_test_..."
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none text-slate-900"
                   />
                 </div>
                 <div>
@@ -132,7 +132,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                     value={razorpayKeySecret} 
                     onChange={(e) => setRazorpayKeySecret(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none text-slate-900"
                   />
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                     value={stripePublicKey} 
                     onChange={(e) => setStripePublicKey(e.target.value)}
                     placeholder="pk_test_..."
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none text-slate-900"
                   />
                 </div>
                 <div>
@@ -157,7 +157,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
                     value={stripeSecretKey} 
                     onChange={(e) => setStripeSecretKey(e.target.value)}
                     placeholder="sk_test_..."
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-white transition-all outline-none text-slate-900"
                   />
                 </div>
               </div>

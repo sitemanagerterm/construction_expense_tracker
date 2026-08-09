@@ -118,7 +118,7 @@ export default function Sidebar({ user, tenantName }: { user: any, tenantName?: 
             </div>
             <div className="flex flex-col overflow-hidden">
               <span className="text-sm font-bold text-gray-900 dark:text-white truncate capitalize">{user?.name || "User"}</span>
-              <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{user?.role || "OWNER"}</span>
+              <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{(user?.role || "OWNER").replace("_", " ")}</span>
             </div>
           </div>
         </div>

@@ -26,7 +26,7 @@ export default async function SecurePaymentRequestPage({
   const { project, financials, recentCredits, tenant, requestDetails } = response.data;
   
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 md:p-8">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <CustomerPaymentPreview
         project={project}
         financials={financials}
@@ -37,6 +37,13 @@ export default async function SecurePaymentRequestPage({
         notes={requestDetails.notes || ""}
         currency={tenant.currency}
         tenantName={tenant.name}
+        bankDetails={{
+          accountName: tenant.bankAccountName,
+          accountNumber: tenant.bankAccountNumber,
+          ifscCode: tenant.bankIfscCode,
+          upiId: tenant.bankUpiId,
+          gpayNumber: tenant.bankGpayNumber
+        }}
       />
     </div>
   );

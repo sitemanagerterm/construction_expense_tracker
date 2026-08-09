@@ -157,6 +157,23 @@ export async function createSubscriptionPlan(data: any) {
   }
 }
 
+export async function updateSubscriptionPlan(id: string, data: any) {
+  await verifySuperAdmin();
+  try {
+    if (!prisma.subscriptionPlan) {
+      return { success: false, error: "Database update pending. Please restart your Next.js server!" };
+    }
+    await prisma.subscriptionPlan.update({
+      where: { id },
+      data
+    });
+    revalidatePath("/admin/plans");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Failed to update plan" };
+  }
+}
+
 export async function getPlatformSettings() {
   await verifySuperAdmin();
   try {

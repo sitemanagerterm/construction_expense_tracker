@@ -37,7 +37,12 @@ export default async function SettingsPage() {
               mobileNo: true,
               address: true,
               pincode: true,
-              businessType: true
+              businessType: true,
+              bankAccountName: true,
+              bankAccountNumber: true,
+              bankIfscCode: true,
+              bankUpiId: true,
+              bankGpayNumber: true
             }
           }
         }

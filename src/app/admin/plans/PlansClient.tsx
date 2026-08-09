@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { createSubscriptionPlan } from "@/app/actions/admin";
+import { createSubscriptionPlan, updateSubscriptionPlan } from "@/app/actions/admin";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
+import { Edit2 } from "lucide-react";
 
 export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
   const [plans, setPlans] = useState(initialPlans);
   const [isCreating, setIsCreating] = useState(false);
+  const [isEditing, setIsEditing] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Form State
@@ -15,22 +17,42 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
   const [durationMonths, setDurationMonths] = useState(1);
   const [price, setPrice] = useState(0);
 
+  const handleCreate = () => {
+    setIsEditing(null);
+    setName("");
+    setDurationMonths(1);
+    setPrice(0);
+    setIsCreating(true);
+  };
+
+  const handleEdit = (plan: any) => {
+    setIsEditing(plan);
+    setName(plan.name);
+    setDurationMonths(plan.durationMonths);
+    setPrice(plan.price);
+    setIsCreating(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    const toastId = toast.loading("Creating plan...");
+    const toastId = toast.loading(isEditing ? "Updating plan..." : "Creating plan...");
 
-    const result = await createSubscriptionPlan({
+    const payload = {
       name,
       durationMonths: parseInt(durationMonths as any) || 1,
       price: parseFloat(price as any) || 0
-    });
+    };
+
+    const result = isEditing 
+      ? await updateSubscriptionPlan(isEditing.id, payload)
+      : await createSubscriptionPlan(payload);
 
     if (result.success) {
-      toast.success("Plan created!", { id: toastId });
+      toast.success(isEditing ? "Plan updated!" : "Plan created!", { id: toastId });
       window.location.reload(); // Simple reload to get updated list
     } else {
-      toast.error(result.error || "Failed to create plan", { id: toastId });
+      toast.error(result.error || (isEditing ? "Failed to update plan" : "Failed to create plan"), { id: toastId });
       setIsSaving(false);
     }
   };
@@ -40,7 +62,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
       <div className="p-6 flex justify-between items-center border-b border-gray-100">
         <h2 className="text-lg font-bold text-gray-900">Available Plans</h2>
         <button 
-          onClick={() => setIsCreating(true)}
+          onClick={handleCreate}
           className="px-4 py-2 bg-accent text-slate-900 rounded-xl text-sm font-bold hover:bg-accent-400 transition-colors shadow-sm"
         >
           + Add New Plan
@@ -56,6 +78,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Price</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Created Date</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -80,6 +103,15 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
                 <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                   {format(new Date(plan.createdAt), 'MMM d, yyyy')}
                 </td>
+                <td className="px-6 py-4 text-right">
+                  <button 
+                    onClick={() => handleEdit(plan)}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Edit Plan"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -95,7 +127,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
       {isCreating && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl border border-slate-100">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Create Subscription Plan</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-4">{isEditing ? "Edit Subscription Plan" : "Create Subscription Plan"}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -105,7 +137,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
                   value={name} 
                   onChange={(e) => setName(e.target.value.toUpperCase())}
                   required
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 text-slate-900"
                 />
               </div>
 
@@ -117,7 +149,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
                   onChange={(e) => setDurationMonths(e.target.value === "" ? ("" as any) : parseInt(e.target.value))}
                   min="1"
                   required
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 outline-none"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 outline-none text-slate-900"
                 />
               </div>
 
@@ -129,7 +161,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
                   onChange={(e) => setPrice(e.target.value === "" ? ("" as any) : parseFloat(e.target.value))}
                   min="0"
                   required
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 outline-none"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 outline-none text-slate-900"
                 />
               </div>
 
@@ -147,7 +179,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
                   disabled={isSaving || !name}
                   className="px-4 py-2 text-sm font-bold text-slate-900 bg-accent hover:bg-accent-400 rounded-xl transition-colors disabled:opacity-50 shadow-sm"
                 >
-                  {isSaving ? "Creating..." : "Create Plan"}
+                  {isSaving ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Plan" : "Create Plan")}
                 </button>
               </div>
             </form>

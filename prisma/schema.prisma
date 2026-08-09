@@ -37,6 +37,14 @@ model Tenant {
   subscriptionTier      String             @default("TRIAL") // TRIAL, QUARTERLY, 6_MONTH, YEARLY
   subscriptionExpiry    DateTime?
   paymentGatewayEnabled Boolean            @default(false)
+  
+  // Bank Details for Payment Links
+  bankAccountName       String?
+  bankAccountNumber     String?
+  bankIfscCode          String?
+  bankUpiId             String?
+  bankGpayNumber        String?
+
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
 
