@@ -133,7 +133,7 @@ export async function updateProject(projectId: string, data: ProjectFormData) {
 
 export async function updateProjectStatus(projectId: string, status: string) {
   try {
-    const tenantId = await getAuthTenant();
+    const { tenantId } = await getAuthTenant();
 
     // Ensure the project belongs to the tenant
     const project = await prisma.project.findFirst({
