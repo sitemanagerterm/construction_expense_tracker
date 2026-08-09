@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Lock, Menu, X } from "lucide-react";
 import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaRegEnvelope, FaHardHat } from "react-icons/fa";
+import { getPublicPlatformSettings } from '@/app/actions/public';
 
 export default function MarketingLayout({
   children,
@@ -17,6 +18,15 @@ export default function MarketingLayout({
   subtitle?: string;
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState<{ supportPhone?: string | null, supportEmail?: string | null }>({});
+
+  useEffect(() => {
+    getPublicPlatformSettings().then(res => {
+      if (res.success && res.settings) {
+        setSettings(res.settings);
+      }
+    });
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-primary text-brandtext-inverse font-sans overflow-x-hidden">
@@ -153,15 +163,15 @@ export default function MarketingLayout({
               <ul className="space-y-4 text-sm font-semibold text-white">
                 <li className="flex items-center gap-3">
                   <FaWhatsapp className="w-5 h-5 text-[#25D366] shrink-0" />
-                  +91 12345 67890
+                  {settings.supportPhone || '+91 12345 67890'}
                 </li>
                 <li className="flex items-center gap-3">
                   <FaPhoneAlt className="w-4 h-4 text-white shrink-0 ml-0.5" />
-                  <span className="ml-0.5">+91 12345 67890</span>
+                  <span className="ml-0.5">{settings.supportPhone || '+91 12345 67890'}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <FaRegEnvelope className="w-5 h-5 text-white shrink-0" />
-                  support@mysitebook.com
+                  {settings.supportEmail || 'support@mysitebook.com'}
                 </li>
               </ul>
             </div>

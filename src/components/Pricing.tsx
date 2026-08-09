@@ -1,11 +1,34 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, ArrowRight } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import Link from 'next/link';
+import { getActiveSubscriptionPlans } from '@/app/actions/public';
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  durationMonths: number;
+  isActive: boolean;
+}
 
 export default function Pricing() {
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      const res = await getActiveSubscriptionPlans();
+      if (res.success && res.plans) {
+        setPlans(res.plans);
+      }
+      setLoading(false);
+    };
+    fetchPlans();
+  }, []);
+
   const freeFeatures = [
     'Maximum 2 Projects',
     'Expense & Credit Entry',
@@ -74,77 +97,92 @@ export default function Pricing() {
         </motion.div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          
-          {/* Free Plan */}
-          <motion.div 
-            whileHover={{ y: -8 }}
-            className="bg-white rounded-[2rem] p-8 lg:p-10 shadow-lg border border-gray-200 flex flex-col"
-          >
-            <div className="text-gray-500 font-bold tracking-wider uppercase mb-2">Free Plan</div>
-            <div className="flex items-end gap-2 mb-8">
-              <span className="text-5xl font-black text-gray-900">₹0</span>
-              <span className="text-gray-500 font-medium mb-1">Lifetime</span>
-            </div>
+        {loading ? (
+           <div className="flex justify-center items-center py-20">
+             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+           </div>
+        ) : (
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${plans.length > 1 ? 'lg:grid-cols-4 max-w-7xl' : 'max-w-5xl'} gap-8 mx-auto`}>
             
-            <ul className="space-y-4 mb-6">
-              {freeFeatures.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-[#22C55E] shrink-0" strokeWidth={3} />
-                  <span className="text-gray-700 font-medium">{feature}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-4 mb-10 flex-grow">
-              <p className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">Limitations</p>
-              <ul className="space-y-3">
-                {freeLimitations.map((limit, idx) => (
-                  <li key={idx} className="flex items-center gap-3 opacity-60">
-                    <X className="w-5 h-5 text-red-500 shrink-0" strokeWidth={3} />
-                    <span className="text-gray-500 font-medium line-through decoration-gray-300">{limit}</span>
+            {/* Free Plan */}
+            <motion.div 
+              whileHover={{ y: -8 }}
+              className="bg-white rounded-[2rem] p-8 shadow-lg border border-gray-200 flex flex-col h-full"
+            >
+              <div className="text-gray-500 font-bold tracking-wider uppercase mb-2">Free Plan</div>
+              <div className="flex items-end gap-2 mb-8 flex-wrap">
+                <span className="text-5xl font-black text-gray-900 leading-none">₹0</span>
+                <span className="text-gray-500 font-medium text-sm mb-1 whitespace-nowrap">30 days only</span>
+              </div>
+              
+              <ul className="space-y-4 mb-6">
+                {freeFeatures.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-[#22C55E] shrink-0" strokeWidth={3} />
+                    <span className="text-gray-700 font-medium text-sm">{feature}</span>
                   </li>
                 ))}
               </ul>
-            </div>
-            
-            <Link href="/register" className="w-full block text-center py-4 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">
-              Get Started for Free
-            </Link>
-          </motion.div>
 
-          {/* Pro Plan */}
-          <motion.div 
-            whileHover={{ y: -8 }}
-            className="bg-white rounded-[2rem] p-8 lg:p-10 shadow-2xl border-2 border-accent relative flex flex-col"
-          >
-            <div className="absolute top-0 right-8 bg-accent text-[#0B1F4D] text-[11px] font-black px-4 py-1.5 rounded-b-lg uppercase tracking-widest shadow-md">
-              Most Popular
-            </div>
-            
-            <div className="text-accent font-bold tracking-wider uppercase mb-2">Pro Plan</div>
-            <div className="flex items-end gap-2 mb-8">
-              <span className="text-5xl font-black text-gray-900">₹299</span>
-              <span className="text-gray-500 font-medium mb-1">/ Month</span>
-            </div>
-            
-            <ul className="space-y-4 mb-10 flex-grow">
-              {proFeatures.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-[#F4B400] shrink-0" strokeWidth={3} />
+              <div className="mt-4 mb-10">
+                <p className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">Limitations</p>
+                <ul className="space-y-3">
+                  {freeLimitations.map((limit, idx) => (
+                    <li key={idx} className="flex items-center gap-3 opacity-60">
+                      <X className="w-5 h-5 text-red-500 shrink-0" strokeWidth={3} />
+                      <span className="text-gray-500 font-medium text-sm line-through decoration-gray-300">{limit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <Link href="/register" className="mt-auto w-full block text-center py-4 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">
+                Get Started for Free
+              </Link>
+            </motion.div>
+
+            {/* Dynamic Paid Plans */}
+            {plans.map((plan, index) => {
+              const isPopular = index === 1 || (plans.length === 1 && index === 0);
+              
+              return (
+                <motion.div 
+                  key={plan.id}
+                  whileHover={{ y: -8 }}
+                  className={`bg-white rounded-[2rem] p-8 shadow-2xl relative flex flex-col h-full ${isPopular ? 'border-2 border-accent' : 'border border-gray-200'}`}
+                >
+                  {isPopular && (
+                    <div className="absolute top-0 right-8 bg-accent text-[#0B1F4D] text-[11px] font-black px-4 py-1.5 rounded-b-lg uppercase tracking-widest shadow-md">
+                      Most Popular
+                    </div>
+                  )}
+                  
+                  <div className={`${isPopular ? 'text-accent' : 'text-gray-800'} font-bold tracking-wider uppercase mb-2`}>{plan.name}</div>
+                  <div className="flex items-end gap-1 mb-8 flex-wrap">
+                    <span className="text-4xl font-black text-gray-900 leading-none">₹{plan.price}</span>
+                    <span className="text-gray-500 font-medium text-sm mb-1 whitespace-nowrap">/ {plan.durationMonths === 1 ? 'Month' : plan.durationMonths === 12 ? 'Year' : `${plan.durationMonths} Months`}</span>
                   </div>
-                  <span className="text-gray-900 font-semibold">{feature}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <Link href="/register" className="w-full block text-center py-4 rounded-xl font-bold text-[#0B1F4D] bg-accent hover:bg-accent-600 transition-all hover:shadow-lg">
-              Start 30-Day Free Trial
-            </Link>
-          </motion.div>
+                  
+                  <ul className="space-y-4 mb-10">
+                    {proFeatures.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full ${isPopular ? 'bg-accent/20' : 'bg-gray-100'} flex items-center justify-center shrink-0`}>
+                          <Check className={`w-3.5 h-3.5 ${isPopular ? 'text-[#F4B400]' : 'text-gray-500'} shrink-0`} strokeWidth={3} />
+                        </div>
+                        <span className="text-gray-900 font-semibold text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Link href="/register" className={`mt-auto w-full block text-center py-4 rounded-xl font-bold transition-all hover:shadow-lg ${isPopular ? 'text-[#0B1F4D] bg-accent hover:bg-accent-600' : 'text-white bg-[#0B1F4D] hover:bg-[#0A1629]'}`}>
+                    Start 30-Day Free Trial
+                  </Link>
+                </motion.div>
+              );
+            })}
 
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

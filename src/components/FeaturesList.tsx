@@ -26,6 +26,7 @@ export default function FeaturesList() {
       description: "Know your project's financial health in real time without waiting until completion.",
       icon: <LineChart className="w-6 h-6 text-accent" />
     },
+    /*
     {
       title: "Material Tracking",
       description: "Monitor purchases of cement, steel, sand, bricks, and other construction materials.",
@@ -36,6 +37,7 @@ export default function FeaturesList() {
       description: "Store receipts and invoices securely for future reference.",
       icon: <FileText className="w-6 h-6 text-accent" />
     },
+    */
     {
       title: "Multi-Project Management",
       description: "Manage multiple construction projects from a single dashboard.",

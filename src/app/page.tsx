@@ -19,6 +19,7 @@ import Comparison from "@/components/Comparison";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
 import RecentSignups from "@/components/RecentSignups";
+import { getPublicPlatformSettings } from '@/app/actions/public';
 
 // Shared Animation Variants
 const fadeInUp: Variants = {
@@ -38,6 +39,15 @@ export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [settings, setSettings] = useState<{ supportPhone?: string | null, supportEmail?: string | null }>({});
+
+  useEffect(() => {
+    getPublicPlatformSettings().then(res => {
+      if (res.success && res.settings) {
+        setSettings(res.settings);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (isPaused) return;
@@ -440,15 +450,15 @@ export default function LandingPage() {
               <ul className="space-y-4 text-sm font-semibold text-white">
                 <li className="flex items-center gap-3">
                   <FaWhatsapp className="w-5 h-5 text-[#25D366] shrink-0" />
-                  +91 12345 67890
+                  {settings.supportPhone || '+91 12345 67890'}
                 </li>
                 <li className="flex items-center gap-3">
                   <FaPhoneAlt className="w-4 h-4 text-white shrink-0 ml-0.5" />
-                  <span className="ml-0.5">+91 12345 67890</span>
+                  <span className="ml-0.5">{settings.supportPhone || '+91 12345 67890'}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <FaRegEnvelope className="w-5 h-5 text-white shrink-0" />
-                  support@mysitebook.com
+                  {settings.supportEmail || 'support@mysitebook.com'}
                 </li>
               </ul>
             </div>
