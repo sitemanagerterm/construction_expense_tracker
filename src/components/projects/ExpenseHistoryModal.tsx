@@ -211,7 +211,12 @@ export default function ExpenseHistoryModal({ isOpen, onClose, project, currency
                         <p className="font-bold text-gray-900 dark:text-white text-sm sm:text-base capitalize truncate">
                           {t(exp.category.toLowerCase()) || exp.category}
                         </p>
-                        <p className="text-[11px] sm:text-xs text-gray-500 dark:text-slate-400 mt-0.5 font-medium flex items-center flex-wrap gap-1.5">
+                        {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() && (
+                          <p className="text-[12px] sm:text-[13px] text-gray-600 dark:text-slate-400 mt-0.5 truncate max-w-full">
+                            {exp.notes}
+                          </p>
+                        )}
+                        <p className="text-[10px] sm:text-[11px] text-gray-400 dark:text-slate-500 mt-0.5 font-medium flex items-center flex-wrap gap-1.5">
                           <span className="truncate max-w-[120px]">{exp.user?.name || "Unknown"}</span>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-slate-600 rounded-full" />
                           <span>{new Date(exp.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }).toLowerCase()}</span>

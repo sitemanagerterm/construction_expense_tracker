@@ -534,11 +534,11 @@ export default function ProjectDashboardClient({ project, allProjects, currency,
                   <div key={idx} className="p-5 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div>
                       <p className="font-bold text-gray-900 dark:text-white text-sm capitalize">
-                        {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() ? exp.notes : (t(exp.category.toLowerCase()) || exp.category)}
+                        {t(exp.category.toLowerCase()) || exp.category}
                       </p>
                       {exp.notes && exp.notes.toUpperCase() !== exp.category.toUpperCase() && (
-                        <p className="text-[11px] text-gray-400 dark:text-slate-500 uppercase tracking-wide mt-0.5">
-                          {t(exp.category.toLowerCase()) || exp.category}
+                        <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">
+                          {exp.notes}
                         </p>
                       )}
                     </div>
