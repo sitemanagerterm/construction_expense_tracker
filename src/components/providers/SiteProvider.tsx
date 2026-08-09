@@ -24,15 +24,20 @@ export function SiteProvider({
   children: React.ReactNode;
   initialProjects?: Project[];
 }) {
-  const [activeSiteId, setActiveSiteId] = useState<string>(() => {
+  const [activeSiteId, setActiveSiteId] = useState<string>(
+    initialProjects.length > 0 ? initialProjects[0].id : "ALL"
+  );
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("activeSiteId");
       if (saved && (saved === "ALL" || initialProjects.some(p => p.id === saved))) {
-        return saved;
+        setActiveSiteId(saved);
       }
     }
-    return initialProjects.length > 0 ? initialProjects[0].id : "ALL";
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const [allProjects, setAllProjects] = useState<Project[]>(initialProjects);
 

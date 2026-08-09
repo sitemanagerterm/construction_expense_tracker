@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { updateProfile, ProfileFormData, updateTenantSettings, TenantSettingsFormData, updateTenantInformation, TenantInfoFormData } from "@/app/actions/settings";
+import { updateProfile, ProfileFormData, updateTenantSettings, TenantSettingsFormData, updateTenantInformation, TenantInfoFormData, updateTenantBankDetails, TenantBankFormData } from "@/app/actions/settings";
 import toast from "react-hot-toast";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 import { saveTenantRole, deleteTenantRole } from "@/app/actions/roles";
@@ -37,11 +37,12 @@ type UserData = {
 
 export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string }) {
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab") === "roles" ? "roles" : "general";
-  const [activeTab, setActiveTab] = useState<"general" | "roles">(initialTab);
+  const initialTab = searchParams.get("tab") === "roles" ? "roles" : searchParams.get("tab") === "bank" ? "bank" : "general";
+  const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank">(initialTab);
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [tenantLoading, setTenantLoading] = useState(false);
+  const [bankLoading, setBankLoading] = useState(false);
 type ValidationErrors = {
   [key: string]: string;
 };
@@ -160,6 +161,29 @@ type ValidationErrors = {
     setTenantLoading(false);
   };
 
+  const handleBankSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setBankLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const data: TenantBankFormData = {
+      bankAccountName: (formData.get("bankAccountName") as string)?.trim() || undefined,
+      bankAccountNumber: (formData.get("bankAccountNumber") as string)?.trim() || undefined,
+      bankIfscCode: (formData.get("bankIfscCode") as string)?.trim() || undefined,
+      bankUpiId: (formData.get("bankUpiId") as string)?.trim() || undefined,
+      bankGpayNumber: (formData.get("bankGpayNumber") as string)?.trim() || undefined,
+    };
+
+    const res = await updateTenantBankDetails(data);
+    
+    if (res.success) {
+      toast.success("Bank Details updated successfully!");
+    } else {
+      toast.error(res.error || "Failed to update bank details");
+    }
+    setBankLoading(false);
+  };
+
   const openNewRoleModal = () => {
     setEditingRole(null);
     setRoleModalOpen(true);
@@ -200,6 +224,14 @@ type ValidationErrors = {
         >
           General Settings
         </button>
+        {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+          <button 
+            onClick={() => setActiveTab("bank")}
+            className={`pb-4 px-4 text-sm font-bold transition-all border-b-2 ${activeTab === 'bank' ? 'border-primary-600 text-primary-600 dark:border-accent dark:text-accent' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300'}`}
+          >
+            Bank Details
+          </button>
+        )}
         {(initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
           <button 
             onClick={() => setActiveTab("roles")}
@@ -356,49 +388,6 @@ type ValidationErrors = {
                 </div>
 
               </div>
-
-              {/* Bank Details for Payment Links */}
-              <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-800">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Bank Details for Payment Links</h3>
-                <p className="text-sm text-gray-500 mb-6">These details will be shown to your customers when you send them a Secure Payment Link.</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label htmlFor="bankAccountName" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Account Name</label>
-                    <input type="text" id="bankAccountName" name="bankAccountName" defaultValue={initialUser.tenant?.bankAccountName || ""} placeholder="Joe Construction"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="bankAccountNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Account Number</label>
-                    <input type="text" id="bankAccountNumber" name="bankAccountNumber" defaultValue={initialUser.tenant?.bankAccountNumber || ""} placeholder="31234567890"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="bankIfscCode" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">IFSC / Routing Code</label>
-                    <input type="text" id="bankIfscCode" name="bankIfscCode" defaultValue={initialUser.tenant?.bankIfscCode || ""} placeholder="SBIN0001234"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="bankUpiId" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">UPI ID</label>
-                    <input type="text" id="bankUpiId" name="bankUpiId" defaultValue={initialUser.tenant?.bankUpiId || ""} placeholder="joe@upi"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="bankGpayNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">GPay Number</label>
-                    <input type="text" id="bankGpayNumber" name="bankGpayNumber" defaultValue={initialUser.tenant?.bankGpayNumber || ""} placeholder="9876543210"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
-                    />
-                  </div>
-                </div>
-              </div>
               
               <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 flex justify-end">
                 <button type="submit" disabled={tenantLoading}
@@ -515,6 +504,64 @@ type ValidationErrors = {
 
         </div>
       </div>
+      )}
+
+      {activeTab === "bank" && (initialUser.role === "OWNER" || initialUser.role === "ADMIN") && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden w-full">
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Bank & Payment Details</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">These details will be shown to your customers when you send them a Secure Payment Link.</p>
+          </div>
+
+          <div className="p-6">
+            <form onSubmit={handleBankSubmit} className="space-y-6">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label htmlFor="bankAccountName" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Account Name</label>
+                  <input type="text" id="bankAccountName" name="bankAccountName" defaultValue={initialUser.tenant?.bankAccountName || ""} placeholder="Joe Construction"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="bankAccountNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">Account Number</label>
+                  <input type="text" id="bankAccountNumber" name="bankAccountNumber" defaultValue={initialUser.tenant?.bankAccountNumber || ""} placeholder="31234567890"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="bankIfscCode" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">IFSC / Routing Code</label>
+                  <input type="text" id="bankIfscCode" name="bankIfscCode" defaultValue={initialUser.tenant?.bankIfscCode || ""} placeholder="SBIN0001234"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="bankUpiId" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">UPI ID</label>
+                  <input type="text" id="bankUpiId" name="bankUpiId" defaultValue={initialUser.tenant?.bankUpiId || ""} placeholder="joe@upi"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="bankGpayNumber" className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">GPay Number</label>
+                  <input type="text" id="bankGpayNumber" name="bankGpayNumber" defaultValue={initialUser.tenant?.bankGpayNumber || ""} placeholder="9876543210"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-accent-500/20 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-slate-800" 
+                  />
+                </div>
+              </div>
+              
+              <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 flex justify-end">
+                <button type="submit" disabled={bankLoading}
+                  className={`px-6 py-2.5 rounded-xl font-bold text-white bg-primary-900 dark:bg-accent hover:bg-primary-800 dark:hover:bg-accent-600 transition-all flex items-center gap-2 ${bankLoading ? 'opacity-70 cursor-wait' : 'shadow-md shadow-primary-900/20 dark:shadow-accent-500/20'}`}>
+                  {bankLoading ? (t('saving') || "Saving...") : (t('save_changes') || "Save Changes")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {activeTab === "roles" && plan === "FREE" && (

@@ -119,6 +119,45 @@ export async function updateTenantInformation(data: TenantInfoFormData) {
   }
 }
 
+export type TenantBankFormData = {
+  bankAccountName?: string;
+  bankAccountNumber?: string;
+  bankIfscCode?: string;
+  bankUpiId?: string;
+  bankGpayNumber?: string;
+};
+
+export async function updateTenantBankDetails(data: TenantBankFormData) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id || !session?.user?.tenantId) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (user?.role !== "OWNER" && user?.role !== "ADMIN") {
+       throw new Error("Only owners or admins can update bank details.");
+    }
+
+    const updated = await prisma.tenant.update({
+      where: { id: session.user.tenantId },
+      data: {
+        bankAccountName: data.bankAccountName || null,
+        bankAccountNumber: data.bankAccountNumber || null,
+        bankIfscCode: data.bankIfscCode || null,
+        bankUpiId: data.bankUpiId || null,
+        bankGpayNumber: data.bankGpayNumber || null,
+      },
+    });
+
+    revalidatePath("/dashboard/settings");
+    return { success: true, data: updated };
+  } catch (error: any) {
+    console.error("Error updating bank details:", error);
+    return { success: false, error: error.message || "Failed to update bank details" };
+  }
+}
+
 export async function updateLanguage(language: string) {
   try {
     const session = await getServerSession(authOptions);
