@@ -54,11 +54,17 @@ export default function Pricing() {
     'Unlimited Projects',
     'Staff Management',
     'Site-wise Staff Allocation',
-    'Role & Permission',
+    'Role & Permissions',
     'Audit Logs',
     'Advanced Reports',
     'Full PDF Export',
-    'Priority Support'
+    'Expense & Credit Entry',
+    'Dashboard',
+    'Month-wise Filters',
+    'Tamil / English / Hindi',
+    'Currency Change',
+    'Dark/Light Mode',
+    '24/7 Priority Support'
   ];
 
   return (
@@ -162,7 +168,6 @@ export default function Pricing() {
                     <span className="text-4xl font-black text-gray-900 leading-none">₹{plan.price}</span>
                     <span className="text-gray-500 font-medium text-sm mb-1 whitespace-nowrap">/ {plan.durationMonths === 1 ? 'Month' : plan.durationMonths === 12 ? 'Year' : `${plan.durationMonths} Months`}</span>
                   </div>
-                  
                   <ul className="space-y-4 mb-10">
                     {proFeatures.map((feature, idx) => (
                       <li key={idx} className="flex items-center gap-3">
