@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import { FaMicrophone, FaCamera, FaKeyboard, FaTimes, FaSpinner, FaStop, FaExclamationCircle, FaChevronDown } from "react-icons/fa";
 import { parseExpenseFromImage, parseExpenseFromAudio } from "@/app/actions/ai-parser";
-import { createExpense, updateExpense } from "@/app/actions/expenses";
+import { createExpense, updateExpense, getTenantCategories } from "@/app/actions/expenses";
 import { queueExpenseForSync } from "@/lib/offlineSync";
 import toast from "react-hot-toast";
 import DatePicker from "react-datepicker";
@@ -45,6 +45,37 @@ export default function SmartExpenseForm({
   const [date, setDate] = useState<Date | null>(expenseToEdit ? new Date(expenseToEdit.date) : new Date());
   const [editReason, setEditReason] = useState("");
   const [errors, setErrors] = useState<{ projectId?: string; amount?: string; date?: string; category?: string; editReason?: string }>({});
+  
+  const [categoryOptions, setCategoryOptions] = useState([
+    { value: "MATERIALS", label: "Materials" },
+    { value: "LABOR", label: "Labor" },
+    { value: "TRANSPORT", label: "Transport" },
+    { value: "EQUIPMENT", label: "Equipment" },
+    { value: "OTHER", label: "Other" }
+  ]);
+
+  React.useEffect(() => {
+    async function fetchCategories() {
+      const res = await getTenantCategories();
+      if (res.success && res.categories) {
+        const defaultVals = ["MATERIALS", "LABOR", "TRANSPORT", "EQUIPMENT", "OTHER"];
+        const newOpts = res.categories
+          .filter((c: string) => !defaultVals.includes(c.toUpperCase()))
+          .map((c: string) => ({ 
+            value: c.toUpperCase(), 
+            label: c.charAt(0).toUpperCase() + c.slice(1).toLowerCase() 
+          }));
+        
+        setCategoryOptions(prev => {
+          // Filter out any duplicates just in case
+          const existingValues = prev.map(p => p.value);
+          const uniqueNewOpts = newOpts.filter((n: any) => !existingValues.includes(n.value));
+          return [...prev, ...uniqueNewOpts];
+        });
+      }
+    }
+    fetchCategories();
+  }, []);
 
   // Voice State
   const [isRecording, setIsRecording] = useState(false);
@@ -344,14 +375,9 @@ export default function SmartExpenseForm({
                   <label className="block text-sm font-semibold text-primary-800 mb-1.5">Category</label>
                   <div className="relative">
                       <CreatableSelect
-                        options={[
-                          { value: "MATERIALS", label: "Materials" },
-                          { value: "LABOR", label: "Labor" },
-                          { value: "TRANSPORT", label: "Transport" },
-                          { value: "EQUIPMENT", label: "Equipment" },
-                          { value: "OTHER", label: "Other" }
-                        ]}
-                        value={category ? { value: category, label: category } : null}
+                        instanceId="expense-category-select"
+                        options={categoryOptions}
+                        value={category ? { value: category, label: categoryOptions.find(o => o.value === category)?.label || category } : null}
                         onChange={(val: any) => { setCategory(val?.value?.toUpperCase() || ""); setErrors(prev => ({ ...prev, category: undefined })); }}
                         placeholder="Select..."
                         formatCreateLabel={(inputValue) => `+ Create new category "${inputValue}"`}

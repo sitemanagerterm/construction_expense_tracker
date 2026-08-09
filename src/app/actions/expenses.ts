@@ -259,3 +259,28 @@ export async function parseExpenseFromAudio(base64Data: string, mimeType: string
     }
   };
 }
+
+export async function getTenantCategories() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.tenantId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const categories = await prisma.expense.findMany({
+      where: {
+        project: { tenantId: session.user.tenantId },
+        isDeleted: false
+      },
+      select: { category: true },
+      distinct: ['category']
+    });
+
+    const categoryList = categories.map(c => c.category).filter(Boolean);
+    return { success: true, categories: categoryList };
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    return { success: false, error: "Failed to fetch categories" };
+  }
+}
+
