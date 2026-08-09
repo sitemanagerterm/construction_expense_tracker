@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { addStaff, updateStaff, checkMobileNumberExists, StaffFormData } from "@/app/actions/staff";
 import toast from "react-hot-toast";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
-import RoleModal, { RoleData } from "@/components/settings/RoleModal";
+import RoleModal, { RoleData, PERMISSIONS_LIST } from "@/components/settings/RoleModal";
 import { useRouter } from "next/navigation";
 
 type AddStaffModalProps = {
@@ -59,7 +59,7 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, editData, ro
         }
       } else {
         setAllocationMode("SPECIFIC");
-        setSelectedProjects(activeProjects.map(p => p.id));
+        setSelectedProjects([]);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -235,19 +235,64 @@ export default function AddStaffModal({ isOpen, onClose, onSuccess, editData, ro
                   + Create New Role
                 </button>
               </div>
-              <select 
-                id="tenantRoleId" 
-                name="tenantRoleId"
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
-              >
-                <option value="">No Role (Default Staff)</option>
-                {localRoles.map((r: any) => (
-                  <option key={r.id} value={r.id}>{r.name}</option>
-                ))}
-              </select>
-              <p className="text-gray-500 dark:text-slate-400 text-xs mt-1.5">Roles give users specific module permissions.</p>
+              <div className="relative">
+                <select 
+                  id="tenantRoleId" 
+                  name="tenantRoleId"
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 focus:border-primary-500 dark:focus:border-accent-500 focus:ring-2 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-white appearance-none pr-10"
+                >
+                  <option value="">No Role (Default Staff)</option>
+                  {localRoles.map((r: any) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+                <svg className="w-5 h-5 text-gray-400 dark:text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+              
+              {selectedRole ? (
+                <div className="mt-2.5 p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl text-xs border border-gray-100 dark:border-slate-700/50">
+                  <div className="font-bold text-gray-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Role Permissions:
+                  </div>
+                  {(() => {
+                    const role = localRoles.find(r => r.id === selectedRole);
+                    if (!role) return <span className="text-gray-500">None</span>;
+                    try {
+                      const perms = JSON.parse(role.permissions);
+                      if (!Array.isArray(perms) || perms.length === 0) return <span className="text-gray-500">No specific permissions.</span>;
+                      return (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                            {perms.filter((p: string) => !p.startsWith('party.')).map((p: string) => {
+                              // Normalize legacy singular keys to match current plural keys in PERMISSIONS_LIST
+                              const normalizedP = p
+                                .replace(/^project\./, 'projects.')
+                                .replace(/^expense\./, 'expenses.')
+                                .replace(/^credit\./, 'credits.');
+                                
+                              const permDef = PERMISSIONS_LIST.find(pl => pl.id === normalizedP);
+                              
+                              // Fallback formatter for unknown keys (e.g. "custom.action" -> "Custom Action")
+                              const fallbackLabel = p.split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                              
+                              return (
+                                <span key={p} className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-slate-300 shadow-sm">
+                                  {permDef ? permDef.label : (p.includes('.') ? fallbackLabel : p)}
+                                </span>
+                              );
+                            })}
+                        </div>
+                      );
+                    } catch {
+                      return <span className="text-red-500">Invalid permissions format.</span>;
+                    }
+                  })()}
+                </div>
+              ) : (
+                <p className="text-gray-500 dark:text-slate-400 text-xs mt-1.5">Roles give users specific module permissions.</p>
+              )}
             </div>
 
             {/* Site Allocation Section */}

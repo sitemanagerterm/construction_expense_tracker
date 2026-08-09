@@ -35,7 +35,7 @@ type AuditLog = {
 export default function AuditLogsClient({ initialLogs, allProjects, plan }: { initialLogs: any[], allProjects?: any[], plan?: any }) {
   const { currency, t } = useTenantPreferences();
   const { activeSiteId, activeProjects } = useSiteContext();
-  const [filterDate, setFilterDate] = useState<Date | null>(null);
+  const [filterDate, setFilterDate] = useState<Date | null>(new Date());
 
   const filteredLogs = initialLogs.filter(log => {
     const projectName = log.expense?.project.name || log.credit?.project.name || "";

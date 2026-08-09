@@ -14,8 +14,7 @@ const expenseSchema: Schema = {
     },
     category: {
       type: Type.STRING,
-      description: "Must be exactly one of: MATERIALS, LABOR, TRANSPORT, EQUIPMENT, OTHER",
-      enum: ["MATERIALS", "LABOR", "TRANSPORT", "EQUIPMENT", "OTHER"]
+      description: "The name of the item or expense type (e.g., Cement, Sand, Labor, Transport, Petrol, Diesel, Tools, Paint). Output this in clear English with the first letter capitalized. Do NOT use broad categories like 'MATERIALS'."
     },
     notes: {
       type: Type.STRING,
@@ -101,8 +100,7 @@ const multipleExpensesSchema: Schema = {
           },
           category: {
             type: Type.STRING,
-            description: "Must be exactly one of: MATERIALS, LABOR, TRANSPORT, EQUIPMENT, OTHER",
-            enum: ["MATERIALS", "LABOR", "TRANSPORT", "EQUIPMENT", "OTHER"]
+            description: "The specific name of the item or expense type (e.g., Cement, Sand, Steel, Brick, Labor, Diesel). Output this in clear English with the first letter capitalized. Do NOT use broad categories like 'MATERIALS'."
           },
           notes: {
             type: Type.STRING,

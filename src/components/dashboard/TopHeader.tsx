@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useTenantPreferences } from "@/components/providers/TenantProvider";
 import { updateLanguage } from "@/app/actions/settings";
@@ -13,7 +14,9 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
   const { language, t } = useTenantPreferences();
-  const { activeSiteId, activeProjects } = useSiteContext();
+  const { activeSiteId, setActiveSiteId, activeProjects } = useSiteContext();
+  const pathname = usePathname();
+  const isDashboardRoot = pathname === "/dashboard" || pathname?.startsWith("/dashboard/projects");
 
   const handleLanguageChange = async (lang: string) => {
     if (language === lang || isChangingLanguage) return;
@@ -96,15 +99,29 @@ export default function TopHeader({ user, tenantName }: { user: any, tenantName?
       {/* Bottom Tier: Active Site & Language */}
       <div className="flex items-center justify-between px-4 h-12 bg-slate-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-800 overflow-x-auto no-scrollbar gap-3">
         {/* Active Site Indicator (Mobile) */}
-        <div className="flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-accent-500 dark:to-accent-400 shadow-sm shadow-primary-500/20 dark:shadow-accent-500/20 px-3 py-1.5 rounded-full shrink-0" title="Active Site">
-           <div className="relative flex h-2 w-2 shrink-0">
-             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-primary-900 opacity-75"></span>
-             <span className="relative inline-flex rounded-full h-2 w-2 bg-white dark:bg-primary-900"></span>
-           </div>
-           <span className="text-[10px] font-bold text-white dark:text-primary-900 uppercase tracking-widest truncate max-w-[150px] drop-shadow-sm dark:drop-shadow-none">
-             {activeSiteId === "ALL" ? "All Sites" : activeProjects.find(p => p.id === activeSiteId)?.name || "All Sites"}
-           </span>
-        </div>
+        {!isDashboardRoot ? (
+          <div className="relative flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-accent-500 dark:to-accent-400 shadow-sm shadow-primary-500/20 dark:shadow-accent-500/20 px-3 py-1.5 rounded-full shrink-0" title="Switch Active Site">
+             <div className="relative flex h-2 w-2 shrink-0 ml-1">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-primary-900 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-2 w-2 bg-white dark:bg-primary-900"></span>
+             </div>
+             <select 
+                value={activeSiteId} 
+                onChange={(e) => setActiveSiteId(e.target.value)}
+                className="text-[10px] font-bold text-white dark:text-primary-900 uppercase tracking-widest bg-transparent outline-none appearance-none cursor-pointer pr-4 drop-shadow-sm dark:drop-shadow-none max-w-[150px] truncate"
+              >
+                <option value="ALL" className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">ALL SITES</option>
+                {activeProjects.map(p => (
+                  <option key={p.id} value={p.id} className="text-gray-900 dark:text-white bg-white dark:bg-slate-900 font-bold uppercase">
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <svg className="w-3 h-3 text-white dark:text-primary-900 absolute right-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        ) : (
+          <div></div>
+        )}
 
         <div className="flex items-center bg-gray-200/50 dark:bg-slate-900 rounded-full p-1 border border-gray-200 dark:border-slate-700 shrink-0">
           <button onClick={() => handleLanguageChange('en')} disabled={isChangingLanguage} className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${language === 'en' ? 'bg-accent-500 text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800'} ${isChangingLanguage ? 'opacity-50' : ''}`}>EN</button>

@@ -12,9 +12,11 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function AddExpenseModal({ isOpen, onClose, projectId, projectName, currency, onAddExpenses }: any) {
 
   const { t } = useTenantPreferences();
-  const [categories, setCategories] = useState(["Food", "Maligai", "Medical", "Paal", "Sand", "Steel", "Tools", "Transport"]);
+  const DEFAULT_CATEGORIES = ["Food", "Maligai", "Medical", "Paal", "Sand", "Steel", "Tools", "Transport"];
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
   const [tab, setTab] = useState<"MANUAL" | "VOICE" | "IMAGE" | "SMART">("MANUAL");
   
@@ -342,7 +344,7 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                       value={manualCategory}
                       onChange={(e) => setManualCategory(e.target.value)}
                       placeholder='Category'
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3 text-white placeholder-slate-500 focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 text-sm font-semibold h-[46px]"
+                      className="w-full bg-white dark:bg-slate-800/80 border border-gray-300 dark:border-slate-700 rounded-xl px-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 text-sm font-semibold h-[46px] shadow-sm"
                     />
                   </div>
                   <div className="flex-[2]">
@@ -353,7 +355,7 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                       value={manualAmount}
                       onChange={(e) => setManualAmount(e.target.value)}
                       placeholder="Amount"
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3 text-white placeholder-slate-500 focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 text-sm font-semibold h-[46px]"
+                      className="w-full bg-white dark:bg-slate-800/80 border border-gray-300 dark:border-slate-700 rounded-xl px-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 text-sm font-semibold h-[46px] shadow-sm"
                     />
                   </div>
                   <button
@@ -367,28 +369,42 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
 
                 {/* Predefined Categories */}
                 <div className="flex flex-wrap gap-2 pt-2">
-                  {categories.map((cat) => (
+                  {categories.map((cat, idx) => (
                     <button
-                      key={cat}
+                      key={idx}
+                      type="button"
                       onClick={() => setManualCategory(cat)}
-                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-1.5 group ${
                         manualCategory.toLowerCase() === cat.toLowerCase()
                           ? "bg-amber-500 text-gray-900 shadow-md scale-105"
-                          : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700/50"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:border-slate-700/50"
                       }`}
                     >
                       {cat}
+                      <div 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setCategoryToDelete(cat);
+                          }}
+                          className={`ml-1 p-0.5 rounded-full transition-colors ${
+                            manualCategory.toLowerCase() === cat.toLowerCase() 
+                              ? 'hover:bg-amber-600/50 text-gray-900' 
+                              : 'hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-400'
+                          }`}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </div>
                     </button>
                   ))}
                   {isAddingCategory ? (
-                    <div className="flex items-center gap-1 bg-slate-800 border border-slate-700/50 rounded-full pr-1 pl-3">
+                    <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700/50 rounded-full pr-1 pl-3 shadow-sm">
                       <input
                         type="text"
                         autoFocus
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         placeholder="New category..."
-                        className="bg-transparent text-sm text-white focus:outline-none w-28 py-1.5"
+                        className="bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none w-28 py-1.5"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             const trimmed = newCategoryName.trim();
@@ -429,7 +445,7 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                           setIsAddingCategory(false);
                           setNewCategoryName("");
                         }}
-                        className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                        className="p-1.5 rounded-full text-gray-400 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
@@ -437,13 +453,45 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                   ) : (
                     <button
                       onClick={() => setIsAddingCategory(true)}
-                      className="px-4 py-2 rounded-full text-sm font-bold border border-slate-700/50 text-slate-400 hover:bg-slate-800/80 transition-colors flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-full text-sm font-bold border border-gray-300 dark:border-slate-700/50 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/80 transition-colors flex items-center gap-1.5"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
                       Add category
                     </button>
                   )}
                 </div>
+
+                {/* Inline Confirmation for Deletion */}
+                {categoryToDelete && (
+                  <div className="mt-3 p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl flex items-center justify-between animate-in fade-in zoom-in duration-200">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-red-100 dark:bg-red-500/20 rounded-full text-red-600 dark:text-red-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </div>
+                      <span className="text-sm font-medium text-red-800 dark:text-red-200">
+                        Delete "{categoryToDelete}"?
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCategoryToDelete(null)}
+                        className="px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCategories(prev => prev.filter(c => c !== categoryToDelete));
+                          if (manualCategory === categoryToDelete) setManualCategory("");
+                          setCategoryToDelete(null);
+                        }}
+                        className="px-3 py-1.5 text-xs font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-sm"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -457,7 +505,7 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                     onChange={(e) => setSmartText(e.target.value)}
                     placeholder='e.g. "Labour 8500 cement 12000"'
                     rows={3}
-                    className="w-full bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-white placeholder-slate-400 focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-shadow resize-none font-medium"
+                    className="w-full bg-white dark:bg-slate-800/80 border border-gray-300 dark:border-slate-700 rounded-xl p-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-shadow resize-none font-medium shadow-sm"
                   />
                 </div>
 
@@ -518,16 +566,25 @@ export default function AddExpenseModal({ isOpen, onClose, projectId, projectNam
                 </div>
 
                 {isProcessing && (
-                  <div className="text-center py-2">
-                    <p className="text-sm font-bold text-violet-600 dark:text-violet-400 animate-pulse">Processing AI Input...</p>
+                  <div className="flex flex-col items-center justify-center py-6 px-4 bg-violet-50 dark:bg-violet-500/10 rounded-xl border border-violet-100 dark:border-violet-500/20 animate-in fade-in duration-300">
+                    <div className="relative mb-3">
+                      <div className="w-10 h-10 border-4 border-violet-200 dark:border-violet-500/30 border-t-violet-600 dark:border-t-violet-400 rounded-full animate-spin"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-violet-600 dark:text-violet-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      </div>
+                    </div>
+                    <p className="text-sm font-bold text-violet-700 dark:text-violet-300 animate-pulse">
+                      Analyzing with AI...
+                    </p>
+                    <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">
+                      Extracting categories and amounts
+                    </p>
                   </div>
                 )}
-
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  capture="environment"
                   className="hidden"
                   onChange={handleImageUpload}
                   disabled={isProcessing}
