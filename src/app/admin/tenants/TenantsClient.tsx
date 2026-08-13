@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { updateTenantStaffLimit, renewTenantSubscription } from "@/app/actions/admin";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
-import { FaEdit, FaTimes, FaSave, FaSync, FaHistory, FaEnvelope } from "react-icons/fa";
+import { FaEdit, FaTimes, FaSave, FaSync, FaHistory, FaEnvelope, FaInfoCircle } from "react-icons/fa";
 
 export default function TenantsClient({ initialTenants, subscriptionPlans }: { initialTenants: any[], subscriptionPlans: any[] }) {
   const [tenants, setTenants] = useState(initialTenants);
@@ -76,6 +76,7 @@ export default function TenantsClient({ initialTenants, subscriptionPlans }: { i
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [historyTenantId, setHistoryTenantId] = useState<string | null>(null);
+  const [infoTenantId, setInfoTenantId] = useState<string | null>(null);
 
   const filteredTenants = tenants.filter(t => {
     const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -238,6 +239,13 @@ export default function TenantsClient({ initialTenants, subscriptionPlans }: { i
               </td>
               <td className="px-4 py-4 align-middle text-right">
                 <div className="flex items-center justify-end gap-2">
+                  <button 
+                    onClick={() => setInfoTenantId(tenant.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                  >
+                    <FaInfoCircle className="w-3 h-3" />
+                    Info
+                  </button>
                   <button 
                     onClick={() => setHistoryTenantId(tenant.id)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
@@ -422,6 +430,67 @@ export default function TenantsClient({ initialTenants, subscriptionPlans }: { i
                     <p className="text-slate-500 font-medium">No payment history found for this tenant.</p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      {/* Info Modal */}
+      {infoTenantId && (() => {
+        const tenant = tenants.find(t => t.id === infoTenantId);
+        if (!tenant) return null;
+        
+        return (
+          <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl p-6 w-full max-w-2xl shadow-xl border border-slate-100 max-h-[80vh] flex flex-col">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">Business Details</h2>
+                  <p className="text-sm text-slate-500 mt-1">Information provided during registration for <span className="font-bold text-slate-800">{tenant.name}</span></p>
+                </div>
+                <button 
+                  onClick={() => setInfoTenantId(null)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+              
+              <div className="overflow-y-auto flex-1 pr-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Business Name</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.name}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Owner Email</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.ownerEmail}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Business Type</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.businessType}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Contact Person</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.contactPerson}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Mobile No</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.mobileNo}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Language</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.language}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 sm:col-span-2">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Address</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.address}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Pincode</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.pincode}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

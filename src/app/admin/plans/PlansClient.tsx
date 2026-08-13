@@ -16,12 +16,14 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
   const [name, setName] = useState("");
   const [durationMonths, setDurationMonths] = useState(1);
   const [price, setPrice] = useState(0);
+  const [isActive, setIsActive] = useState(true);
 
   const handleCreate = () => {
     setIsEditing(null);
     setName("");
     setDurationMonths(1);
     setPrice(0);
+    setIsActive(true);
     setIsCreating(true);
   };
 
@@ -30,6 +32,7 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
     setName(plan.name);
     setDurationMonths(plan.durationMonths);
     setPrice(plan.price);
+    setIsActive(plan.isActive ?? true);
     setIsCreating(true);
   };
 
@@ -41,7 +44,8 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
     const payload = {
       name,
       durationMonths: parseInt(durationMonths as any) || 1,
-      price: parseFloat(price as any) || 0
+      price: parseFloat(price as any) || 0,
+      isActive
     };
 
     const result = isEditing 
@@ -163,6 +167,18 @@ export default function PlansClient({ initialPlans }: { initialPlans: any[] }) {
                   required
                   className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 outline-none text-slate-900"
                 />
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={isActive} 
+                    onChange={(e) => setIsActive(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Plan is Active
+                </label>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">

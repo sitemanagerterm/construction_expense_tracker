@@ -114,8 +114,8 @@ export default function MarketingLayout({
       {/* 7. Footer (From page.tsx) */}
       <footer className="bg-[#0A1121] text-gray-300 pt-12 pb-6 border-t border-gray-800">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
-            <div className="col-span-1 md:col-span-2 pr-0 lg:pr-12">
+          <div className="flex flex-col lg:flex-row lg:justify-between gap-8 lg:gap-4">
+            <div className="w-full lg:w-[28%] xl:w-[30%] pr-0 lg:pr-8">
               <Image src="/mysitebook-logo-light.png" alt="MySiteBook" width={300} height={100} className="w-[130px] sm:w-[150px] lg:w-[170px] h-auto mb-6 drop-shadow-md" />
               <p className="text-[14px] text-gray-300 mb-5 font-medium leading-relaxed">
                 The all-in-one finance management<br/>solution for construction contractors.
@@ -128,7 +128,7 @@ export default function MarketingLayout({
               </div>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[14%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">PRODUCT</h4>
               <ul className="space-y-3 text-[13px] font-medium text-gray-300">
                 <li><Link href="/#features" className="hover:text-white transition-colors">Features</Link></li>
@@ -137,7 +137,7 @@ export default function MarketingLayout({
               </ul>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[14%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">RESOURCES</h4>
               <ul className="space-y-3 text-[13px] font-medium text-gray-300">
                 <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
@@ -147,7 +147,7 @@ export default function MarketingLayout({
               </ul>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[14%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">COMPANY</h4>
               <ul className="space-y-3 text-[13px] font-medium text-gray-300">
                 <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
@@ -158,7 +158,7 @@ export default function MarketingLayout({
               </ul>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[26%] xl:w-[25%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">Get in Touch</h4>
               <ul className="space-y-4 text-sm font-semibold text-white">
                 <li className="flex items-center gap-3">
@@ -171,7 +171,7 @@ export default function MarketingLayout({
                 </li>
                 <li className="flex items-center gap-3">
                   <FaRegEnvelope className="w-5 h-5 text-white shrink-0" />
-                  {settings.supportEmail || 'support@mysitebook.com'}
+                  <span className="whitespace-nowrap">{settings.supportEmail || 'support@mysitebook.com'}</span>
                 </li>
               </ul>
             </div>
@@ -180,8 +180,6 @@ export default function MarketingLayout({
           <div className="mt-8 pt-5 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-[13px] font-medium text-gray-400">© 2026 MySiteBook. All Rights Reserved.</p>
             <div className="flex items-center gap-4">
-              <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Secure Payments Powered by <span className="text-white font-bold">Razorpay</span></p>
-              <div className="hidden md:block w-px h-4 bg-gray-700/50"></div>
               <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Made with <span className="text-red-500">❤️</span> in India</p>
             </div>
           </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Download } from "lucide-react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -66,8 +67,13 @@ export default function PWAInstallPrompt() {
         exit={{ y: 100, opacity: 0 }}
         className="fixed bottom-[80px] md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 p-4 z-50 flex items-center gap-4"
       >
-        <div className="bg-primary-50 dark:bg-primary-900/30 p-3 rounded-full text-primary-600 dark:text-primary-400">
-          <Download size={24} />
+        <div className="flex-shrink-0 relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-slate-700">
+          <Image 
+            src="/icon-192x192.png" 
+            alt="App Logo" 
+            fill
+            className="object-cover"
+          />
         </div>
         
         <div className="flex-1">

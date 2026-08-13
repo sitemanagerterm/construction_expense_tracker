@@ -277,7 +277,7 @@ export default function LandingPage() {
         </section>
 
         {/* 3. Dark Stats Banner */}
-        <section className="bg-slate-50 pt-8 pb-4 relative z-20">
+        <section className="hidden bg-slate-50 pt-8 pb-4 relative z-20">
           <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
             <div className="bg-[#050C1B] rounded-[1.25rem] py-6 md:py-7 px-4 md:px-10 shadow-2xl border border-gray-800/60">
               <div className="grid grid-cols-2 gap-y-8 gap-x-4 md:flex md:flex-row md:items-center md:justify-between w-full">
@@ -401,8 +401,8 @@ export default function LandingPage() {
       {/* 7. Footer */}
       <footer className="bg-[#0A1121] text-gray-300 pt-12 pb-6 border-t border-gray-800">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
-            <div className="col-span-1 md:col-span-2 pr-0 lg:pr-12">
+          <div className="flex flex-col lg:flex-row lg:justify-between gap-8 lg:gap-4">
+            <div className="w-full lg:w-[28%] xl:w-[30%] pr-0 lg:pr-8">
               <img src="/mysitebook-horizontal-dark.png" alt="MySiteBook" className="h-14 sm:h-16 w-auto mb-6 drop-shadow-md" />
               <p className="text-[14px] text-gray-300 mb-5 font-medium leading-relaxed">
                 The all-in-one finance management<br/>solution for construction contractors.
@@ -415,7 +415,7 @@ export default function LandingPage() {
               </div>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[14%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">PRODUCT</h4>
               <ul className="space-y-3 text-[13px] font-medium text-gray-300">
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
@@ -424,7 +424,7 @@ export default function LandingPage() {
               </ul>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[14%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">RESOURCES</h4>
               <ul className="space-y-3 text-[13px] font-medium text-gray-300">
                 <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
@@ -434,7 +434,7 @@ export default function LandingPage() {
               </ul>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[14%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">COMPANY</h4>
               <ul className="space-y-3 text-[13px] font-medium text-gray-300">
                 <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
@@ -445,7 +445,7 @@ export default function LandingPage() {
               </ul>
             </div>
             
-            <div className="col-span-1">
+            <div className="w-full lg:w-[26%] xl:w-[25%]">
               <h4 className="text-white font-semibold text-sm mb-4 tracking-wider">Get in Touch</h4>
               <ul className="space-y-4 text-sm font-semibold text-white">
                 <li className="flex items-center gap-3">
@@ -458,7 +458,7 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <FaRegEnvelope className="w-5 h-5 text-white shrink-0" />
-                  {settings.supportEmail || 'support@mysitebook.com'}
+                  <span className="whitespace-nowrap">{settings.supportEmail || 'support@mysitebook.com'}</span>
                 </li>
               </ul>
             </div>
@@ -467,8 +467,6 @@ export default function LandingPage() {
           <div className="mt-8 pt-5 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-[13px] font-medium text-gray-400">© 2026 MySiteBook. All Rights Reserved.</p>
             <div className="flex items-center gap-4">
-              <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Secure Payments Powered by <span className="text-white font-bold">Razorpay</span></p>
-              <div className="hidden md:block w-px h-4 bg-gray-700/50"></div>
               <p className="text-[13px] font-medium text-gray-400 flex items-center gap-1.5">Made with <span className="text-red-500">❤️</span> in India</p>
             </div>
           </div>
