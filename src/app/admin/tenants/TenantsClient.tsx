@@ -468,7 +468,7 @@ export default function TenantsClient({ initialTenants, subscriptionPlans }: { i
                   </div>
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Business Type</p>
-                    <p className="text-sm font-semibold text-slate-900">{tenant.businessType}</p>
+                    <p className="text-sm font-semibold text-slate-900">{tenant.businessType?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Contact Person</p>

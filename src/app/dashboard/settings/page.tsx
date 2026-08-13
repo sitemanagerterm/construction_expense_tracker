@@ -42,7 +42,9 @@ export default async function SettingsPage() {
               bankAccountNumber: true,
               bankIfscCode: true,
               bankUpiId: true,
-              bankGpayNumber: true
+              bankGpayNumber: true,
+              subscriptionExpiry: true,
+              subscriptionTier: true
             }
           }
         }
@@ -85,6 +87,18 @@ export default async function SettingsPage() {
 
   const { plan } = session?.user?.tenantId ? await getTenantPlan(session.user.tenantId) : { plan: "FREE" };
 
+  let supportPhone = "";
+  let supportEmail = "";
+  try {
+    const platformSettings = await prisma.platformSettings.findFirst();
+    if (platformSettings) {
+      supportPhone = platformSettings.supportPhone || "";
+      supportEmail = platformSettings.supportEmail || "";
+    }
+  } catch (err) {
+    console.error("Settings error fetching platform settings:", err);
+  }
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -95,7 +109,7 @@ export default async function SettingsPage() {
       </div>
       
       {user ? (
-        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} />
+        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} supportPhone={supportPhone} supportEmail={supportEmail} />
       ) : (
         <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-4 rounded-xl">Error loading user profile.</div>
       )}

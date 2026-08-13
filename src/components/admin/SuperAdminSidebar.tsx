@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Building2, LayoutDashboard, CreditCard, Settings, LogOut } from "lucide-react";
+import { Building2, LayoutDashboard, CreditCard, Settings, LogOut, Lock } from "lucide-react";
 
 export const superAdminNavLinks = [
   {
@@ -90,6 +90,16 @@ export default function SuperAdminSidebar({ user }: { user: any }) {
             </div>
           </div>
         </div>
+
+        <Link 
+          href="/admin/settings#security"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all font-medium text-sm text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent outline-none mb-1 group"
+        >
+          <span className="text-slate-500 group-hover:text-white">
+            <Lock className="w-5 h-5" />
+          </span>
+          Change Password
+        </Link>
 
         <button 
           onClick={() => signOut({ callbackUrl: "/login" })}

@@ -29,13 +29,15 @@ type UserData = {
     bankIfscCode?: string | null;
     bankUpiId?: string | null;
     bankGpayNumber?: string | null;
+    subscriptionExpiry?: Date | string | null;
+    subscriptionTier?: string | null;
   } | null;
   tenantRole?: { permissions: string } | null;
 };
 
 // RoleData is now imported from RoleModal
 
-export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string }) {
+export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO", supportPhone = "", supportEmail = "" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string, supportPhone?: string, supportEmail?: string }) {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") === "roles" ? "roles" : searchParams.get("tab") === "bank" ? "bank" : "general";
   const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank" | "subscription">(initialTab as "general" | "roles" | "bank" | "subscription" || "general");
@@ -492,9 +494,15 @@ type ValidationErrors = {
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('WhatsApp Support')}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('Quickest way to get help or share feedback')}</p>
               </div>
-              <a href="https://wa.me/919025068407" target="_blank" rel="noreferrer" className="ml-auto px-4 py-2 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors whitespace-nowrap shrink-0">
-                {t('Chat Now')}
-              </a>
+              {supportPhone ? (
+                <a href={`https://wa.me/${supportPhone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="ml-auto px-4 py-2 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors whitespace-nowrap shrink-0">
+                  {t('Chat Now')}
+                </a>
+              ) : (
+                <span className="ml-auto px-4 py-2 bg-gray-100 text-gray-400 rounded-xl text-xs font-bold shrink-0 cursor-not-allowed">
+                  {t('Unavailable')}
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
@@ -505,9 +513,15 @@ type ValidationErrors = {
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('Email Us')}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('For detailed queries or suggestions')}</p>
               </div>
-              <a href="mailto:support@mysitebook.in" className="ml-auto px-4 py-2 bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors whitespace-nowrap shrink-0">
-                {t('Send Email')}
-              </a>
+              {supportEmail ? (
+                <a href={`mailto:${supportEmail}`} className="ml-auto px-4 py-2 bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded-xl text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors whitespace-nowrap shrink-0">
+                  {t('Send Email')}
+                </a>
+              ) : (
+                <span className="ml-auto px-4 py-2 bg-gray-100 text-gray-400 rounded-xl text-xs font-bold shrink-0 cursor-not-allowed">
+                  {t('Unavailable')}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -707,8 +721,15 @@ type ValidationErrors = {
                   <p className="font-semibold text-gray-900 dark:text-white">N/A</p>
                 ) : (
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white mb-1">December 31, 2026</p>
-                    <p className="text-sm text-gray-500 dark:text-slate-400">Auto-renews annually.</p>
+                    <p className="font-semibold text-gray-900 dark:text-white mb-1">
+                      {initialUser.tenant?.subscriptionExpiry 
+                        ? new Date(initialUser.tenant.subscriptionExpiry).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                        : "N/A"
+                      }
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">
+                      Valid until the date above.
+                    </p>
                   </div>
                 )}
               </div>

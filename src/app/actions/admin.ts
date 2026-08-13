@@ -265,3 +265,33 @@ export async function getPaymentHistory() {
     return { success: false, error: "Failed to fetch payment history" };
   }
 }
+
+export async function changeSuperAdminPassword(currentPassword: string, newPassword: string) {
+  await verifySuperAdmin();
+  try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    if (!userId) return { success: false, error: "Not logged in" };
+    
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== "SUPER_ADMIN") return { success: false, error: "Unauthorized" };
+    
+    const bcrypt = require("bcryptjs");
+    if (!user.password) return { success: false, error: "No password set" };
+    
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) return { success: false, error: "Current password is incorrect" };
+    
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Change password error:", error);
+    return { success: false, error: "Failed to change password" };
+  }
+}
+

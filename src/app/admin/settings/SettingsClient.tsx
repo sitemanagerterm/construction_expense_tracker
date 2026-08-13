@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { updatePlatformSettings } from "@/app/actions/admin";
+import { Eye, EyeOff } from "lucide-react";
+import { updatePlatformSettings, changeSuperAdminPassword } from "@/app/actions/admin";
 import toast from "react-hot-toast";
 
 export default function SettingsClient({ initialSettings }: { initialSettings: any }) {
@@ -17,6 +18,37 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
   const [stripeSecretKey, setStripeSecretKey] = useState(initialSettings.stripeSecretKey || "");
 
   const [isSaving, setIsSaving] = useState(false);
+
+  // Security State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+    
+    setIsChangingPassword(true);
+    const toastId = toast.loading("Updating password...");
+
+    const result = await changeSuperAdminPassword(currentPassword, newPassword);
+
+    if (result.success) {
+      toast.success("Password changed successfully!", { id: toastId });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } else {
+      toast.error(result.error || "Failed to change password", { id: toastId });
+    }
+    
+    setIsChangingPassword(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,6 +207,78 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
           </button>
         </div>
       </form>
+
+        {/* Security / Password Section */}
+        <div id="security" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+          <div className="bg-slate-50 border-b border-slate-200 p-5">
+            <h3 className="text-lg font-bold text-slate-900">Admin Security</h3>
+            <p className="text-sm text-slate-500 mt-1">Change your Super Admin password.</p>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Current Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={currentPassword} 
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    className="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none text-slate-900"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 outline-none">
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">New Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    className="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none text-slate-900"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 outline-none">
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Confirm New Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    className="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent bg-slate-50 transition-all outline-none text-slate-900"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 outline-none">
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-start pt-6 border-t border-slate-100 mt-6 max-w-2xl">
+              <button 
+                type="button"
+                onClick={handlePasswordSubmit}
+                disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                className="px-6 py-2.5 text-sm font-bold text-slate-900 bg-slate-200 hover:bg-slate-300 rounded-xl transition-all disabled:opacity-50 shadow-sm outline-none"
+              >
+                {isChangingPassword ? "Updating..." : "Change Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+
     </div>
   );
 }
