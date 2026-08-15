@@ -18,7 +18,7 @@ const translations = {
     'nav.contact': 'Contact',
     'nav.login': 'Log in',
     'nav.startTrial': 'Start Free Trial',
-    'hero.badge': 'The #1 Ledger for Indian Contractors',
+    'hero.badge': 'The #1 Ledger for construction business',
     'hero.title1': 'Track Every Rupee.',
     'hero.title2.secure': 'Manage Every Worker.',
     'hero.title2.margins': 'Control Every Site.',

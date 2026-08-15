@@ -20,10 +20,10 @@ export default function Login() {
   const handleStaffLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mobile.length !== 10 || pin.length !== 4) return;
-    
+
     setError("");
     setLoading(true);
-    
+
     try {
       const result = await signIn("credentials", {
         mobile,
@@ -31,7 +31,7 @@ export default function Login() {
         redirect: true,
         callbackUrl: "/dashboard",
       });
-      
+
       if (result?.error) {
         setError("Invalid mobile number or PIN. Please try again.");
       }
@@ -59,7 +59,7 @@ export default function Login() {
         {/* Ambient background blur */}
         <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-accent/20 rounded-full blur-[100px] pointer-events-none"></div>
-        
+
         {/* Decorative Grid Pattern */}
         <div className="absolute inset-0 z-0 opacity-[0.03]" style={{ backgroundImage: "url('/construction-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}></div>
 
@@ -71,16 +71,16 @@ export default function Login() {
 
         <div className="relative z-10 max-w-lg mt-8">
           <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-sm">
-            Track Every Rupee.<br/>Stop Profit Drain.
+            Track Every Rupee.<br />Stop Profit Drain.
           </h1>
           <p className="text-base lg:text-lg text-slate-300 font-light tracking-wide leading-snug">
-            Join thousands of Indian contractors who have eliminated ledger leaks and automated their site accounting.
+            Join thousands of construction business who have eliminated ledger leaks and automated their site accounting.
           </p>
         </div>
 
         {/* Dashboard Image */}
         <div className="relative z-10 flex-grow flex items-center justify-center mt-12 w-full">
-          <motion.div 
+          <motion.div
             animate={{ y: [0, -15, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             className="w-full max-w-lg relative"
@@ -109,7 +109,7 @@ export default function Login() {
 
           {/* Mode Toggle */}
           <div className="flex bg-gray-100 p-1.5 rounded-xl mb-6 border border-gray-200 shadow-inner" role="tablist">
-            <button 
+            <button
               role="tab"
               aria-selected={loginMode === "owner"}
               onClick={() => { setLoginMode("owner"); setPin(""); setMobile(""); setError(""); }}
@@ -117,7 +117,7 @@ export default function Login() {
             >
               <FaUserTie className={loginMode === "owner" ? "text-primary-600" : ""} /> <span>Site Owner</span>
             </button>
-            <button 
+            <button
               role="tab"
               aria-selected={loginMode === "staff"}
               onClick={() => { setLoginMode("staff"); setPin(""); setMobile(""); setError(""); }}
@@ -130,7 +130,7 @@ export default function Login() {
           {loginMode === "owner" ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-center mt-4">
-                <button 
+                <button
                   onClick={() => signIn('google')}
                   aria-label="Log in with Google"
                   className="w-full flex items-center justify-center space-x-3 bg-white border border-gray-300 text-gray-800 text-base font-bold py-3 px-4 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1"
@@ -152,18 +152,17 @@ export default function Login() {
                 <div>
                   <label htmlFor="staffMobile" className="block text-sm font-bold text-gray-700 mb-1">Mobile Number</label>
                   <div className="relative">
-                    <input 
+                    <input
                       id="staffMobile"
-                      type="tel" 
+                      type="tel"
                       maxLength={10}
                       value={mobile}
                       onChange={handleMobileChange}
                       onBlur={() => setTouchedMobile(true)}
-                      className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all shadow-sm bg-white text-gray-900 pr-10 ${
-                        touchedMobile && mobile.length !== 10 && mobile.length > 0
-                          ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50/30' 
+                      className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all shadow-sm bg-white text-gray-900 pr-10 ${touchedMobile && mobile.length !== 10 && mobile.length > 0
+                          ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50/30'
                           : 'border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20'
-                      }`}
+                        }`}
                       placeholder="Enter 10-digit mobile number"
                       required
                     />
@@ -178,23 +177,22 @@ export default function Login() {
                     <p className="text-red-500 text-xs mt-1 font-medium">Please enter a valid 10-digit mobile number.</p>
                   )}
                 </div>
-                
+
                 <div>
                   <label htmlFor="staffPin" className="block text-sm font-bold text-gray-700 mb-1">4-Digit Access PIN</label>
                   <div className="relative">
-                    <input 
+                    <input
                       id="staffPin"
-                      type="password" 
+                      type="password"
                       inputMode="numeric"
                       maxLength={4}
                       value={pin}
                       onChange={handlePinChange}
                       onBlur={() => setTouchedPin(true)}
-                      className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all shadow-sm tracking-widest text-lg bg-white text-gray-900 pr-10 ${
-                        touchedPin && pin.length > 0 && pin.length < 4
-                          ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50/30' 
+                      className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all shadow-sm tracking-widest text-lg bg-white text-gray-900 pr-10 ${touchedPin && pin.length > 0 && pin.length < 4
+                          ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50/30'
                           : 'border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20'
-                      }`}
+                        }`}
                       placeholder="••••"
                       required
                     />
@@ -209,9 +207,9 @@ export default function Login() {
                     <p className="text-red-500 text-xs mt-1 font-medium">PIN must be exactly 4 digits.</p>
                   )}
                 </div>
-                
-                <button 
-                  type="submit" 
+
+                <button
+                  type="submit"
                   disabled={pin.length < 4 || mobile.length !== 10 || loading}
                   className={`w-full flex justify-center items-center font-bold text-base py-3 rounded-xl transition-all mt-4 focus:outline-none focus:ring-2 focus:ring-offset-2 ${pin.length === 4 && mobile.length === 10 ? 'bg-accent text-white hover:bg-accent-600 shadow-[0_8px_25px_rgba(249,115,22,0.3)] hover:shadow-[0_8px_35px_rgba(249,115,22,0.4)] hover:-translate-y-1 border border-accent/50 focus:ring-accent' : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'}`}
                 >
