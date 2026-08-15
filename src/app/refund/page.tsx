@@ -1,7 +1,10 @@
 import React from "react";
 import MarketingLayout from "@/components/MarketingLayout";
+import { getPublicPlatformSettings } from "@/app/actions/public";
 
-export default function RefundPage() {
+export default async function RefundPage() {
+  const { settings } = await getPublicPlatformSettings();
+  const supportEmail = settings?.supportEmail || "support@mysitebook.com";
   return (
     <MarketingLayout title="Refund Policy" subtitle="Our commitment to clear and transparent billing.">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -52,9 +55,10 @@ export default function RefundPage() {
           <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900">7. Contact Us</h2>
           <p>For refund-related questions, please contact:</p>
           <p>
+            For questions or disputes regarding payments and refunds, please contact us at:<br /><br />
             <strong>MySiteBook Support</strong><br />
-            <strong>Email:</strong> support@mysitebook.com<br />
-            <strong>Website:</strong> <a href="https://mysitebook.com" className="text-primary-600 hover:underline">https://mysitebook.com</a>
+            <strong>Email:</strong> {supportEmail}<br />
+            <strong>Website:</strong> <a href="https://mysitebook.com" className="text-primary hover:underline">https://mysitebook.com</a>
           </p>
         </div>
       </div>

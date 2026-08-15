@@ -1,18 +1,28 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, CheckCircle2, XCircle } from 'lucide-react';
+import { getPublicPlatformSettings } from "@/app/actions/public";
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [supportEmail, setSupportEmail] = useState("support@mysitebook.com");
+
+  useEffect(() => {
+    getPublicPlatformSettings().then(res => {
+      if (res.success && res.settings?.supportEmail) {
+        setSupportEmail(res.settings.supportEmail);
+      }
+    });
+  }, []);
 
   const faqs = [
     { question: "1. What is MySiteBook?", answer: "MySiteBook is a construction expense management software designed for contractors, builders, and construction businesses to track project expenses, credits, balances, staff activities, and reports in one place." },
-    { question: "2. Is MySiteBook free to use?", answer: "Yes. New users receive a 30-day free trial. After the trial, you can continue with the Free Plan or upgrade to a paid plan for advanced features." },
-    { question: "3. What features are included in the Free Plan?", answer: "The Free Plan includes: Up to 2 Projects, Expense Tracking, Credit Tracking, Dashboard Access, PDF Reports, Multi-language Support, Dark & Light Mode." },
-    { question: "4. What happens after the free trial ends?", answer: "After your trial ends, your account remains active. You can continue using the Free Plan or upgrade to Pro for advanced features and unlimited projects." },
-    { question: "5. Can I manage multiple projects?", answer: "Yes. Pro users can create and manage unlimited projects. Free users can manage up to 2 projects." },
+    { question: "2. Is MySiteBook free to use?", answer: "New users receive a 30-day free trial. After 30 days, you must subscribe to a paid plan to continue using the platform." },
+    { question: "3. What features are included in the Free Trial?", answer: "During the 30-day trial, you can manage up to 2 projects and explore features like Expense Tracking, Credit Tracking, PDF Reports, and Dashboard Access." },
+    { question: "4. What happens after the free trial ends?", answer: "After your 30-day trial ends, your account access will be restricted. You must subscribe to the Pro plan to restore access and continue managing your projects." },
+    { question: "5. Can I manage multiple projects?", answer: "Yes. Pro users can create and manage unlimited projects. During the 30-day trial, you can manage up to 2 projects." },
     { question: "6. Can I add my staff members?", answer: "Yes. MySiteBook allows you to add staff members and assign them to specific projects." },
     { question: "7. Can I control what my staff can access?", answer: "Yes. Owners can assign roles and permissions, controlling which sections each staff member can view or edit." },
     { question: "8. What are Audit Logs?", answer: "Audit Logs help you track all important activities, including who added, edited, or deleted records and when those changes were made." },
@@ -25,7 +35,7 @@ export default function FAQ() {
     { question: "15. Can I use MySiteBook for multiple construction sites?", answer: "Yes. You can manage multiple projects and assign different staff members to different sites." },
     { question: "16. How much does MySiteBook cost?", answer: "Pro Plan starts at: ₹299/month (Just ₹10 per day). Includes: Unlimited Projects, Staff Management, Role Permissions, Audit Logs, Advanced Reports." },
     { question: "17. Do you offer refunds?", answer: "Please refer to our Refund Policy page for complete details regarding payment disputes and refund eligibility." },
-    { question: "18. How can I contact support?", answer: "You can contact us at: 📧 support@mysitebook.com. We typically respond within 24–48 business hours." }
+    { question: "18. How can I contact support?", answer: `You can contact us at: 📧 ${supportEmail}. We typically respond within 24–48 business hours.` }
   ];
 
   return (

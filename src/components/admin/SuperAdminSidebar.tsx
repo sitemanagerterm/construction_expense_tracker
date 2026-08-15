@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Building2, LayoutDashboard, CreditCard, Settings, LogOut, Lock } from "lucide-react";
+import { Building2, LayoutDashboard, CreditCard, Settings, LogOut, Lock, MessageSquare } from "lucide-react";
 
 export const superAdminNavLinks = [
   {
@@ -27,6 +27,11 @@ export const superAdminNavLinks = [
     name: "Platform Settings",
     href: "/admin/settings",
     icon: <Settings className="w-5 h-5" />
+  },
+  {
+    name: "Enquiries",
+    href: "/admin/enquiries",
+    icon: <MessageSquare className="w-5 h-5" />
   }
 ];
 

@@ -1,7 +1,12 @@
-import React from "react";
+import React from 'react';
 import MarketingLayout from "@/components/MarketingLayout";
+import Link from 'next/link';
+import { getPublicPlatformSettings } from "@/app/actions/public";
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const { settings } = await getPublicPlatformSettings();
+  const supportEmail = settings?.supportEmail || "support@mysitebook.com";
+
   return (
     <MarketingLayout title="Privacy Policy" subtitle="Your Data Matters. MySiteBook respects your privacy.">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -51,8 +56,8 @@ export default function PrivacyPage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900">Contact</h2>
           <p>
-            <strong>Email:</strong> support@mysitebook.com<br />
-            <strong>Website:</strong> <a href="https://mysitebook.com" className="text-primary-600 hover:underline">https://mysitebook.com</a>
+            <strong>Email:</strong> {supportEmail}<br />
+            <strong>Website:</strong> <Link href="https://mysitebook.com" className="text-primary hover:underline">https://mysitebook.com</Link>
           </p>
         </div>
       </div>

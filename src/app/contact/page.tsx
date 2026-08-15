@@ -1,9 +1,15 @@
 import React from "react";
 import MarketingLayout from "@/components/MarketingLayout";
-import { FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaCommentDots } from "react-icons/fa";
-import { Wrench, CreditCard, Lightbulb } from "lucide-react";
+import { FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { Wrench, CreditCard, Lightbulb, Clock } from "lucide-react";
+import { getPublicPlatformSettings } from "@/app/actions/public";
+import ContactForm from "./ContactForm";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { settings } = await getPublicPlatformSettings();
+  const supportEmail = settings?.supportEmail || "support@mysitebook.com";
+  const supportPhone = settings?.supportPhone || "+91 98765 43210";
+
   return (
     <MarketingLayout title="Contact Us" subtitle="Have questions? We'd love to hear from you.">
       
@@ -26,23 +32,23 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">Email Support</h4>
-                    <p className="text-lg font-medium">support@mysitebook.com</p>
+                    <p className="text-lg font-medium">{supportEmail}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-primary-400 mr-6 shrink-0">
-                    <FaCommentDots className="text-xl" />
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-green-400 mr-6 shrink-0">
+                    <FaPhoneAlt className="text-xl" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">Business Inquiries</h4>
-                    <p className="text-lg font-medium">business@mysitebook.com</p>
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">Phone Support</h4>
+                    <p className="text-lg font-medium">{supportPhone}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-green-400 mr-6 shrink-0">
-                    <FaPhoneAlt className="text-xl" />
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-primary-400 mr-6 shrink-0">
+                    <Clock className="w-6 h-6" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">Support Hours</h4>
@@ -71,48 +77,7 @@ export default function ContactPage() {
           {/* Right Side: Form */}
           <div className="lg:w-3/5 p-10 md:p-16 bg-white">
             <h3 className="text-2xl font-black text-gray-900 mb-8">Send us a message</h3>
-            
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Full Name *</label>
-                  <input type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50" placeholder="Ramesh Kumar" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Company Name (Optional)</label>
-                  <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50" placeholder="RK Builders" />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Email Address *</label>
-                  <input type="email" required className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50" placeholder="ramesh@company.com" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Phone Number (Optional)</label>
-                  <input type="tel" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50" placeholder="+91 98765 43210" />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Subject</label>
-                <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50" placeholder="How can we help?" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Message</label>
-                <textarea rows={5} required className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50 resize-none" placeholder="Tell us about your issue or sales inquiry..."></textarea>
-              </div>
-              
-              <button type="button" className="w-full bg-primary text-white font-bold text-lg py-4 rounded-xl hover:bg-primary-700 transition-colors shadow-lg hover:-translate-y-0.5">
-                Send Message
-              </button>
-              
-              <p className="text-center text-sm font-medium text-gray-500 mt-4">
-                We usually respond within 24 business hours.
-              </p>
-            </form>
+            <ContactForm />
           </div>
 
         </div>

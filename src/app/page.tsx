@@ -35,6 +35,44 @@ const staggerContainer: Variants = {
   }
 };
 
+const heroSlides = [
+  {
+    badge: "BUILT FOR INDIAN CONTRACTORS",
+    title1: "Complete Control of",
+    title2: "Your Project Finances",
+    desc: "Track project value, credits, expenses and know your profit or loss in real time.",
+    image: "/slider/file_000000002fc4820bb90b325e5747174d.png"
+  },
+  {
+    badge: "MATERIAL MANAGEMENT",
+    title1: "Real-Time Tracking of",
+    title2: "All Your Materials",
+    desc: "Monitor purchases of cement, steel, sand, bricks, and track exactly what's left on site.",
+    image: "/slider/file_00000000497082119908a98892a9f21f.png"
+  },
+  {
+    badge: "PROFITABILITY TRACKING",
+    title1: "Know Your Margins",
+    title2: "Before Project Ends",
+    desc: "Don't wait until completion. Instantly see your profit or loss based on current expenses.",
+    image: "/slider/file_0000000085748207acdfd0368cbf7a30.png"
+  },
+  {
+    badge: "EFFORTLESS INVOICING",
+    title1: "Manage Bills & Invoices",
+    title2: "In One Place",
+    desc: "Generate professional invoices and track payment status without the hassle of paperwork.",
+    image: "/slider/file_0000000092c08211ab84ba16bcd69cd4.png"
+  },
+  {
+    badge: "SECURE & RELIABLE",
+    title1: "Your Data is Safe",
+    title2: "On the Cloud",
+    desc: "Access your project data anytime, anywhere. Secure cloud storage ensures you never lose a record.",
+    image: "/slider/file_00000000f6e48211b75e2874f6f85bfc.png"
+  }
+];
+
 export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,34 +90,10 @@ export default function LandingPage() {
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 6000);
     return () => clearInterval(timer);
   }, [isPaused]);
-
-  const heroSlides = [
-    {
-      badge: "BUILT FOR INDIAN CONTRACTORS",
-      title1: "Complete Control of",
-      title2: "Your Project Finances",
-      desc: "Track project value, credits, expenses and know your profit or loss in real time.",
-      image: "/dashboard-mockup.png"
-    },
-    {
-      badge: "MATERIAL MANAGEMENT",
-      title1: "Real-Time Tracking of",
-      title2: "All Your Materials",
-      desc: "Monitor purchases of cement, steel, sand, bricks, and track exactly what's left on site.",
-      image: "/dashboard-mockup.png"
-    },
-    {
-      badge: "PROFITABILITY TRACKING",
-      title1: "Know Your Margins",
-      title2: "Before Project Ends",
-      desc: "Don't wait until completion. Instantly see your profit or loss based on current expenses.",
-      image: "/dashboard-mockup.png"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-primary text-brandtext-inverse font-sans overflow-x-hidden">
@@ -149,7 +163,7 @@ export default function LandingPage() {
           onMouseLeave={() => setIsPaused(false)}
         >
           <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
               <AnimatePresence mode="wait">
                 <motion.div 
@@ -158,7 +172,7 @@ export default function LandingPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.5 }}
-                  className="max-w-2xl w-full order-2 lg:order-1"
+                  className="max-w-2xl w-full order-2 lg:order-1 lg:col-span-6"
                 >
 
                   <div className="inline-flex items-center space-x-2 border border-gray-600 rounded-full px-3 py-1.5 mb-4 lg:mt-0">
@@ -219,7 +233,7 @@ export default function LandingPage() {
                   <div className="relative w-full sm:w-auto">
                     <div className="absolute inset-0 bg-accent rounded-lg blur opacity-40 animate-pulse"></div>
                     <Link href="/register" className="relative flex justify-center items-center bg-accent hover:bg-accent-600 text-primary px-[clamp(1.5rem,2.5vw,2rem)] py-[clamp(0.75rem,1.2vw,0.875rem)] rounded-lg text-[clamp(0.875rem,1.5vw,1rem)] font-bold transition-all w-full sm:w-auto overflow-hidden group">
-                      <span className="relative z-10 flex items-center">Start 3 Months Free Trial <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" /></span>
+                      <span className="relative z-10 flex items-center">Start 30 Days Free Trial <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" /></span>
                       <div className="absolute inset-0 h-full w-full bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
                     </Link>
                   </div>
@@ -233,7 +247,7 @@ export default function LandingPage() {
                 <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:flex-wrap items-center sm:items-start gap-4 sm:gap-6 text-[clamp(0.6875rem,1.2vw,0.75rem)] text-gray-300 font-medium pb-8 lg:pb-0">
                   <div className="flex items-center gap-2">
                     <Gift className="w-4 h-4 text-white" />
-                    <span>1 Project FREE Forever</span>
+                    <span>Full Access for 30 Days</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-white" />
@@ -254,9 +268,9 @@ export default function LandingPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.5 }}
-                  className="relative w-full flex items-center justify-center lg:justify-end mt-8 lg:mt-0 mb-8 lg:mb-0 order-1 lg:order-2"
+                  className="relative w-full flex items-center justify-center lg:justify-end mt-8 lg:mt-0 mb-8 lg:mb-0 order-1 lg:order-2 lg:col-span-6"
                 >
-                  <img src={heroSlides[currentSlide].image} alt="MySiteBook UI Display" className="w-full lg:w-[130%] lg:max-w-none h-auto max-h-[50vh] lg:max-h-[70vh] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] lg:translate-x-12" />
+                  <img src={heroSlides[currentSlide].image} alt="MySiteBook UI Display" className="w-full rounded-[1.25rem] md:rounded-[1.5rem] h-auto object-cover shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-gray-700/50" />
                 </motion.div>
               </AnimatePresence>
               

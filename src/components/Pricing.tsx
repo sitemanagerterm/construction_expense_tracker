@@ -95,7 +95,7 @@ export default function Pricing() {
           <div className="mb-6 md:mb-0 text-center md:text-left">
             <div className="inline-block bg-accent/20 text-accent px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Launch Offer</div>
             <h3 className="text-white text-2xl font-bold mb-2">30 Days FREE Trial on the Pro Plan.</h3>
-            <p className="text-gray-300 font-medium">Credit Card தேவையில்லை. 30 நாள் முடிந்ததும் Free Plan-க்கு automatically downgrade ஆகிவிடும்.</p>
+            <p className="text-gray-300 font-medium">Credit Card தேவையில்லை. 30 நாட்கள் முடிந்ததும், தொடர்ந்து பயன்படுத்த Pro Plan-ஐ Subscribe செய்ய வேண்டும்.</p>
           </div>
           <Link href="/register" className="shrink-0 bg-accent hover:bg-accent-600 text-[#0B1F4D] font-bold px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-lg whitespace-nowrap">
             Start Free Trial

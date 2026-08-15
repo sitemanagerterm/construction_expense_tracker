@@ -288,3 +288,15 @@ model ExpenseAuditLog {
   
   createdAt   DateTime @default(now())
 }
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  company   String?
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  status    String   @default("NEW") // NEW, READ, REPLIED
+  createdAt DateTime @default(now())
+}

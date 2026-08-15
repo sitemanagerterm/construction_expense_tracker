@@ -295,3 +295,41 @@ export async function changeSuperAdminPassword(currentPassword: string, newPassw
   }
 }
 
+export async function getContactMessages() {
+  await verifySuperAdmin();
+  try {
+    const messages = await prisma.contactMessage.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    return { success: true, messages };
+  } catch (error) {
+    return { success: false, error: "Failed to fetch contact messages" };
+  }
+}
+
+export async function markContactMessageAsRead(id: string) {
+  await verifySuperAdmin();
+  try {
+    await prisma.contactMessage.update({
+      where: { id },
+      data: { status: "READ" }
+    });
+    revalidatePath("/admin/enquiries");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Failed to update message" };
+  }
+}
+
+export async function deleteContactMessage(id: string) {
+  await verifySuperAdmin();
+  try {
+    await prisma.contactMessage.delete({
+      where: { id }
+    });
+    revalidatePath("/admin/enquiries");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Failed to delete message" };
+  }
+}

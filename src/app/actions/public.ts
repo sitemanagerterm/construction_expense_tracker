@@ -19,10 +19,10 @@ export async function getActiveSubscriptionPlans() {
 
 export async function getPublicPlatformSettings() {
   try {
-    if (!prisma.platformSettings) return { success: true, settings: {} };
+    if (!prisma.platformSettings) return { success: true, settings: null };
     const settings = await prisma.platformSettings.findFirst();
-    return { success: true, settings: settings || {} };
+    return { success: true, settings };
   } catch (e) {
-    return { success: false, settings: {} };
+    return { success: false, settings: null };
   }
 }
