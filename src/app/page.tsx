@@ -19,6 +19,7 @@ import Comparison from "@/components/Comparison";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
 import RecentSignups from "@/components/RecentSignups";
+import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 import { getPublicPlatformSettings } from '@/app/actions/public';
 
 // Shared Animation Variants
@@ -97,6 +98,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-primary text-brandtext-inverse font-sans overflow-x-hidden">
+      <WhatsAppFloatingButton phoneNumber={settings.supportPhone} />
 
       {/* 1. Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-primary/95 backdrop-blur border-b border-gray-800">
