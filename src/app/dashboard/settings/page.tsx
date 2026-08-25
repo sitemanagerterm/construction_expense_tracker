@@ -99,6 +99,19 @@ export default async function SettingsPage() {
     console.error("Settings error fetching platform settings:", err);
   }
 
+  let billingHistory: any[] = [];
+  try {
+    if (session?.user?.tenantId) {
+      billingHistory = await prisma.paymentHistory.findMany({
+        where: { tenantId: session.user.tenantId },
+        orderBy: { paymentDate: 'desc' },
+        take: 20,
+      });
+    }
+  } catch (err) {
+    console.error("Settings error fetching billing history:", err);
+  }
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -109,7 +122,7 @@ export default async function SettingsPage() {
       </div>
       
       {user ? (
-        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} supportPhone={supportPhone} supportEmail={supportEmail} />
+        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} supportPhone={supportPhone} supportEmail={supportEmail} razorpayKeyId={process.env.PAYMENT_MODE === 'sandbox' ? (process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID || '') : (process.env.NEXT_PUBLIC_RAZORPAY_LIVE_KEY_ID || '')} billingHistory={billingHistory} />
       ) : (
         <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-4 rounded-xl">Error loading user profile.</div>
       )}

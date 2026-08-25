@@ -3,9 +3,10 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { AlertCircle, Phone, Mail, ChevronDown } from "lucide-react";
+import { AlertCircle, Check, Lock } from "lucide-react";
 import Image from "next/image";
 import LogoutButton from "./LogoutButton";
+import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 
 export default async function ExpiredPage() {
   const session = await getServerSession(authOptions);
@@ -15,104 +16,142 @@ export default async function ExpiredPage() {
   }
 
   const tenant = await prisma.tenant.findUnique({
-    where: { id: session.user.tenantId }
+    where: { id: session.user.tenantId },
+    select: {
+      subscriptionExpiry: true,
+      mobileNo: true,
+      contactPerson: true,
+    },
   });
+
+  // Fetch user's mobile number - try by ID first, fallback to email match
+  const dbUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { id: session.user.id },
+        ...(session.user.email ? [{ email: session.user.email }] : []),
+      ],
+    },
+    select: { mobileNumber: true, name: true },
+  });
+
+  // Prefill info for Razorpay checkout
+  const prefillName = tenant?.contactPerson || dbUser?.name || session.user.name || 'User';
+  const prefillEmail = session.user.email || '';
+  // Use tenant business mobile first, then user's personal mobile
+  const prefillContact = tenant?.mobileNo || dbUser?.mobileNumber || '';
+
+  // DEBUG: Log to server console to verify DB values
+  console.log('[Razorpay Prefill]', { prefillName, prefillEmail, prefillContact, tenantMobile: tenant?.mobileNo, userMobile: dbUser?.mobileNumber });
+
+  // Compute the correct Razorpay public key server-side (reliable env var access)
+  const isSandbox = process.env.PAYMENT_MODE === 'sandbox';
+  const razorpayKeyId = isSandbox
+    ? (process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID || '')
+    : (process.env.NEXT_PUBLIC_RAZORPAY_LIVE_KEY_ID || '');
+
+  console.log('[Razorpay] Mode:', isSandbox ? 'TEST' : 'LIVE', '| Key:', razorpayKeyId);
 
   if (tenant?.subscriptionExpiry && new Date(tenant.subscriptionExpiry) >= new Date()) {
     redirect("/dashboard"); // Redirect back if they renewed
   }
 
-  const settings = await prisma.platformSettings.findFirst();
-
   return (
-    <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 sm:p-12 lg:p-24 overflow-y-auto">
-      <div className="max-w-4xl w-full mx-auto">
-        {/* Header Section */}
-        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
-          <div className="mb-10 sm:mb-12">
-            <Image
-              src="/mysitebook-logo-dark.png"
-              alt="MySiteBook"
-              width={400}
-              height={100}
-              className="h-20 sm:h-24 lg:h-28 w-auto object-contain"
-              priority
-            />
-          </div>
+    <div className="min-h-screen w-full bg-slate-50 flex flex-col p-6 sm:px-12 sm:py-10 overflow-y-auto">
+      {/* Flowing Header with Logo & Logout */}
+      <div className="w-full max-w-6xl mx-auto flex justify-between items-center">
+        <Image
+          src="/mysitebook-logo-dark.png"
+          alt="MySiteBook"
+          width={320}
+          height={80}
+          className="h-14 sm:h-20 w-auto object-contain"
+          priority
+        />
+        <LogoutButton />
+      </div>
 
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-50 text-red-600 rounded-[1.5rem] flex items-center justify-center mb-8 ring-8 ring-red-50/50">
-            <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10" />
+      <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        {/* Left Side: Messaging */}
+        <div className="flex flex-col text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-expense/10 text-expense rounded-full text-xs font-black uppercase tracking-widest mb-3 w-fit mx-auto lg:mx-0 shadow-sm border border-expense/20">
+            <AlertCircle className="w-4 h-4" />
+            Action Required
           </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight mb-6">
-            Subscription Expired
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-primary tracking-tight mb-6 leading-[1.15]">
+            Your workspace is <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-600">currently locked.</span>
           </h1>
-          <p className="text-slate-500 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
-            Your organization's access to MySiteBook has been temporarily suspended because your subscription period has ended.
+          <p className="text-brandtext-secondary text-lg sm:text-xl font-medium leading-relaxed mb-10 max-w-xl mx-auto lg:mx-0">
+            Your subscription period has ended. Renew your plan today to instantly restore access to all your projects, expenses, and financial reports.
           </p>
 
-          {/* Scroll Indicator */}
-          <div className="mt-12 sm:mt-16 animate-bounce text-slate-400 flex flex-col items-center">
-            <span className="text-xs font-semibold uppercase tracking-widest mb-2">Scroll for details</span>
-            <ChevronDown className="w-6 h-6" />
+          <div className="space-y-5">
+            <div className="flex items-center gap-4 text-brandtext font-bold text-lg">
+              <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center shrink-0 shadow-sm">
+                <Check className="w-5 h-5" />
+              </div>
+              Uninterrupted access to your workspace
+            </div>
+            <div className="flex items-center gap-4 text-brandtext font-bold text-lg">
+              <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center shrink-0 shadow-sm">
+                <Check className="w-5 h-5" />
+              </div>
+              All data and history preserved safely
+            </div>
+            <div className="flex items-center gap-4 text-brandtext font-bold text-lg">
+              <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center shrink-0 shadow-sm">
+                <Check className="w-5 h-5" />
+              </div>
+              Premium customer support included
+            </div>
           </div>
         </div>
 
-        {/* Action Section */}
-        <div className="border-t border-slate-100 pt-12 sm:pt-16">
-          <div className="text-center mb-10">
-            <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest mb-4">How to Restore Access</h3>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Please contact the platform administrator to process your renewal. Access will be restored immediately upon payment confirmation.
+        {/* Right Side: Pricing Card */}
+        <div className="relative max-w-md w-full mx-auto lg:ml-auto lg:mr-0">
+          {/* Ambient Glow */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-accent/20 blur-3xl -z-10 rounded-[3rem] translate-y-8 scale-95 opacity-70"></div>
+
+          <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 shadow-2xl ring-1 ring-primary/5 relative overflow-hidden">
+            {/* Top decorative gradient */}
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-accent"></div>
+
+            <div className="mb-10 text-center">
+              <div className="inline-block bg-primary-50 text-primary font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-lg mb-6">Professional Plan</div>
+              <div className="flex items-start justify-center gap-1 mb-2">
+                <span className="text-xl font-bold text-brandtext-light mt-2">₹</span>
+                <span className="text-6xl font-black text-primary tracking-tighter">299</span>
+              </div>
+              <p className="text-base text-brandtext-secondary font-bold">per month</p>
+            </div>
+
+            <div className="space-y-6 mb-10">
+              <div className="h-px w-full bg-slate-100"></div>
+              <div className="bg-primary-50 rounded-2xl p-4 flex items-center gap-4 border border-primary-100">
+                <div className="w-12 h-12 rounded-xl bg-white text-primary flex items-center justify-center shrink-0 shadow-sm">
+                  <Lock className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-black text-primary">Secure Checkout</p>
+                  <p className="text-xs text-primary-500 font-bold mt-0.5">Powered by Razorpay</p>
+                </div>
+              </div>
+            </div>
+
+            <RazorpayCheckoutButton
+              amount={29900}
+              buttonText="Renew Plan Now"
+              className="w-full bg-primary hover:bg-primary-800 text-white font-black py-4 px-8 rounded-2xl transition-all hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 text-lg flex items-center justify-center gap-2"
+              redirectUrl="/dashboard"
+              razorpayKeyId={razorpayKeyId}
+              prefillName={prefillName}
+              prefillEmail={prefillEmail}
+              prefillContact={prefillContact}
+            />
+
+            <p className="text-center text-xs text-brandtext-light font-semibold mt-6 px-4">
+              By renewing, you agree to our Terms of Service & Privacy Policy.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 max-w-3xl mx-auto">
-            {settings?.supportPhone && (
-              <a href={`tel:${settings.supportPhone}`} className="flex items-center gap-5 bg-slate-50 p-6 rounded-3xl border border-slate-100 transition-transform hover:-translate-y-1 hover:shadow-sm">
-                <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                  <Phone className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-[11px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Phone / WhatsApp</p>
-                  <p className="text-lg sm:text-xl font-black text-slate-900 break-all">{settings.supportPhone}</p>
-                </div>
-              </a>
-            )}
-
-            {settings?.supportEmail && (
-              <a href={`mailto:${settings.supportEmail}`} className="flex items-center gap-5 bg-slate-50 p-6 rounded-3xl border border-slate-100 transition-transform hover:-translate-y-1 hover:shadow-sm">
-                <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                  <Mail className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-[11px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Email Support</p>
-                  <p className="text-lg sm:text-xl font-black text-slate-900 break-all">{settings.supportEmail}</p>
-                </div>
-              </a>
-            )}
-          </div>
-
-          {!settings?.supportPhone && !settings?.supportEmail && (
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 text-center max-w-3xl mx-auto mb-10">
-              <p className="text-base sm:text-lg text-slate-600 font-medium">Please contact your administrator directly.</p>
-            </div>
-          )}
-
-          {settings?.offlinePaymentInstructions && (
-            <div className="bg-amber-50/80 border border-amber-200/60 p-8 sm:p-12 rounded-[2rem] max-w-3xl mx-auto mb-12">
-              <h3 className="text-sm font-extrabold text-amber-900 uppercase tracking-widest mb-6 flex items-center justify-center gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-                Payment Instructions
-              </h3>
-              <p className="text-base sm:text-lg text-amber-900/80 whitespace-pre-line leading-relaxed font-medium text-center">
-                {settings.offlinePaymentInstructions}
-              </p>
-            </div>
-          )}
-
-          <div className="flex justify-center pb-8">
-            <LogoutButton />
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { saveTenantRole, deleteTenantRole } from "@/app/actions/roles";
 import { PERMISSIONS_LIST } from "@/components/settings/RoleModal";
 import { useRouter, useSearchParams } from "next/navigation";
 import RoleModal, { RoleData } from "@/components/settings/RoleModal";
+import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 
 type UserData = {
   id: string;
@@ -37,7 +38,7 @@ type UserData = {
 
 // RoleData is now imported from RoleModal
 
-export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO", supportPhone = "", supportEmail = "" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string, supportPhone?: string, supportEmail?: string }) {
+export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO", supportPhone = "", supportEmail = "", razorpayKeyId = "", billingHistory = [] }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string, supportPhone?: string, supportEmail?: string, razorpayKeyId?: string, billingHistory?: any[] }) {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") === "roles" ? "roles" : searchParams.get("tab") === "bank" ? "bank" : "general";
   const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank" | "subscription">(initialTab as "general" | "roles" | "bank" | "subscription" || "general");
@@ -693,13 +694,27 @@ type ValidationErrors = {
               </div>
               
               {plan === 'FREE' ? (
-                <button className="bg-primary-600 hover:bg-primary-700 dark:bg-accent dark:hover:bg-accent-600 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm">
-                  Upgrade Plan
-                </button>
+                <RazorpayCheckoutButton 
+                  amount={29900} 
+                  buttonText="Upgrade to Pro" 
+                  razorpayKeyId={razorpayKeyId}
+                  prefillName={initialUser.tenant?.contactPerson || initialUser.name || ''}
+                  prefillEmail={initialUser.email || ''}
+                  prefillContact={initialUser.mobileNumber || initialUser.tenant?.mobileNo || ''}
+                  redirectUrl="/dashboard/settings?tab=subscription"
+                  className="bg-primary-600 hover:bg-primary-700 dark:bg-accent dark:hover:bg-accent-600 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm"
+                />
               ) : (
-                <button className="bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 font-bold py-2.5 px-6 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                  Manage Billing
-                </button>
+                <RazorpayCheckoutButton 
+                  amount={29900} 
+                  buttonText="Renew Plan"
+                  razorpayKeyId={razorpayKeyId}
+                  prefillName={initialUser.tenant?.contactPerson || initialUser.name || ''}
+                  prefillEmail={initialUser.email || ''}
+                  prefillContact={initialUser.mobileNumber || initialUser.tenant?.mobileNo || ''}
+                  redirectUrl="/dashboard/settings?tab=subscription"
+                  className="bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 font-bold py-2.5 px-6 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                />
               )}
             </div>
             
@@ -744,6 +759,56 @@ type ValidationErrors = {
                   <li className="flex items-center gap-2"><svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg> Custom Roles & Permissions</li>
                   <li className="flex items-center gap-2"><svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
                 </ul>
+              </div>
+            )}
+
+            {/* Billing History */}
+            {billingHistory.length > 0 && (
+              <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-800 relative z-10">
+                <h4 className="font-bold text-gray-900 dark:text-white mb-4">Billing History</h4>
+                <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-slate-700">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-slate-800/60 text-left">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
+                        <th className="px-4 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Plan</th>
+                        <th className="px-4 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Amount</th>
+                        <th className="px-4 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Method</th>
+                        <th className="px-4 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Transaction ID</th>
+                        <th className="px-4 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                      {billingHistory.map((record: any) => (
+                        <tr key={record.id} className="bg-white dark:bg-slate-900/40 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 font-medium">
+                            {new Date(record.paymentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">
+                            {record.planType || 'Monthly'}
+                          </td>
+                          <td className="px-4 py-3 font-bold text-gray-900 dark:text-white">
+                            ₹{record.amount.toLocaleString('en-IN')}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
+                              {record.method}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-500 dark:text-slate-400 font-mono text-xs">
+                            {record.transactionReference || '—'}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+                              Paid
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
