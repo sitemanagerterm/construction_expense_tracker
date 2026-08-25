@@ -12,8 +12,11 @@ interface RazorpayCheckoutButtonProps {
   className?: string;
   redirectUrl?: string;
   razorpayKeyId: string;
-  planDays?: number;   // e.g. 30 for monthly, 90 for quarterly, 365 for yearly
-  planType?: string;   // e.g. 'MONTHLY', 'QUARTERLY', 'YEARLY'
+  planDays?: number;
+  planType?: string;
+  merchantLogo?: string;        // base64 data URI or public absolute URL
+  merchantName?: string;
+  merchantDescription?: string;
   prefillName?: string;
   prefillEmail?: string;
   prefillContact?: string;
@@ -31,6 +34,9 @@ export default function RazorpayCheckoutButton({
   razorpayKeyId,
   planDays = 30,
   planType = 'MONTHLY',
+  merchantLogo = '',
+  merchantName = 'MySiteBook',
+  merchantDescription = 'Subscription Renewal',
   prefillName = 'User',
   prefillEmail = '',
   prefillContact = '',
@@ -70,8 +76,9 @@ export default function RazorpayCheckoutButton({
         key: razorpayKeyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'MySiteBook',
-        description: 'Subscription Renewal',
+        name: merchantName,
+        description: merchantDescription,
+        image: merchantLogo || undefined,
         order_id: orderData.id,
         handler: async function (response: any) {
           // 3. Verify Payment

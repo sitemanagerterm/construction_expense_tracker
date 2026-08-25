@@ -7,6 +7,8 @@ import { AlertCircle, Check, Lock } from "lucide-react";
 import Image from "next/image";
 import LogoutButton from "./LogoutButton";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
+import fs from "fs";
+import path from "path";
 
 export default async function ExpiredPage() {
   const session = await getServerSession(authOptions);
@@ -49,6 +51,16 @@ export default async function ExpiredPage() {
   const razorpayKeyId = isSandbox
     ? (process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID || '')
     : (process.env.NEXT_PUBLIC_RAZORPAY_LIVE_KEY_ID || '');
+
+  // Read logo as base64 for Razorpay modal (works on localhost too)
+  let merchantLogo = '';
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'mysitebook-horizontal-dark.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+    merchantLogo = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  } catch {
+    // fallback: no logo
+  }
 
   console.log('[Razorpay] Mode:', isSandbox ? 'TEST' : 'LIVE', '| Key:', razorpayKeyId);
 
@@ -144,6 +156,9 @@ export default async function ExpiredPage() {
               className="w-full bg-primary hover:bg-primary-800 text-white font-black py-4 px-8 rounded-2xl transition-all hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 text-lg flex items-center justify-center gap-2"
               redirectUrl="/dashboard"
               razorpayKeyId={razorpayKeyId}
+              merchantLogo={merchantLogo}
+              merchantName="MySiteBook"
+              merchantDescription="Pro Plan – Monthly Subscription · ₹299/month"
               prefillName={prefillName}
               prefillEmail={prefillEmail}
               prefillContact={prefillContact}

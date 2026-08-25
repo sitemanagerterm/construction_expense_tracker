@@ -38,10 +38,11 @@ type UserData = {
 
 // RoleData is now imported from RoleModal
 
-export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO", supportPhone = "", supportEmail = "", razorpayKeyId = "", billingHistory = [] }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string, supportPhone?: string, supportEmail?: string, razorpayKeyId?: string, billingHistory?: any[] }) {
+export default function SettingsClientPage({ initialUser, initialRoles = [], plan = "PRO", supportPhone = "", supportEmail = "", razorpayKeyId = "", billingHistory = [], merchantLogo = "" }: { initialUser: UserData, initialRoles?: RoleData[], plan?: string, supportPhone?: string, supportEmail?: string, razorpayKeyId?: string, billingHistory?: any[], merchantLogo?: string }) {
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab") === "roles" ? "roles" : searchParams.get("tab") === "bank" ? "bank" : "general";
-  const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank" | "subscription">(initialTab as "general" | "roles" | "bank" | "subscription" || "general");
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam === "roles" ? "roles" : tabParam === "bank" ? "bank" : tabParam === "subscription" ? "subscription" : "general";
+  const [activeTab, setActiveTab] = useState<"general" | "roles" | "bank" | "subscription">(initialTab);
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [tenantLoading, setTenantLoading] = useState(false);
@@ -698,6 +699,9 @@ type ValidationErrors = {
                   amount={29900} 
                   buttonText="Upgrade to Pro" 
                   razorpayKeyId={razorpayKeyId}
+                  merchantLogo={merchantLogo}
+                  merchantName="MySiteBook"
+                  merchantDescription="Pro Plan – Monthly Subscription · ₹299/month"
                   prefillName={initialUser.tenant?.contactPerson || initialUser.name || ''}
                   prefillEmail={initialUser.email || ''}
                   prefillContact={initialUser.mobileNumber || initialUser.tenant?.mobileNo || ''}
@@ -709,6 +713,9 @@ type ValidationErrors = {
                   amount={29900} 
                   buttonText="Renew Plan"
                   razorpayKeyId={razorpayKeyId}
+                  merchantLogo={merchantLogo}
+                  merchantName="MySiteBook"
+                  merchantDescription="Pro Plan – Monthly Subscription · ₹299/month"
                   prefillName={initialUser.tenant?.contactPerson || initialUser.name || ''}
                   prefillEmail={initialUser.email || ''}
                   prefillContact={initialUser.mobileNumber || initialUser.tenant?.mobileNo || ''}

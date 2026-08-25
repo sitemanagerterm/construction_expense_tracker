@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import SettingsClientPage from "./SettingsClientPage";
 import { getTenantPlan } from "@/lib/subscription";
+import fs from "fs";
+import path from "path";
 
 export const metadata = {
   title: "Settings | MySiteBook",
@@ -112,6 +114,16 @@ export default async function SettingsPage() {
     console.error("Settings error fetching billing history:", err);
   }
 
+  // Read logo as base64 for Razorpay modal
+  let merchantLogo = '';
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'mysitebook-horizontal-dark.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+    merchantLogo = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  } catch {
+    // fallback: no logo
+  }
+
   return (
     <div className="p-4 md:p-8 w-full max-w-7xl mx-auto space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -122,7 +134,7 @@ export default async function SettingsPage() {
       </div>
       
       {user ? (
-        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} supportPhone={supportPhone} supportEmail={supportEmail} razorpayKeyId={process.env.PAYMENT_MODE === 'sandbox' ? (process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID || '') : (process.env.NEXT_PUBLIC_RAZORPAY_LIVE_KEY_ID || '')} billingHistory={billingHistory} />
+        <SettingsClientPage initialUser={user} initialRoles={roles} plan={plan} supportPhone={supportPhone} supportEmail={supportEmail} razorpayKeyId={process.env.PAYMENT_MODE === 'sandbox' ? (process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID || '') : (process.env.NEXT_PUBLIC_RAZORPAY_LIVE_KEY_ID || '')} billingHistory={billingHistory} merchantLogo={merchantLogo} />
       ) : (
         <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-4 rounded-xl">Error loading user profile.</div>
       )}
