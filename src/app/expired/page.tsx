@@ -55,7 +55,7 @@ export default async function ExpiredPage() {
   // Read logo as base64 for Razorpay modal (works on localhost too)
   let merchantLogo = '';
   try {
-    const logoPath = path.join(process.cwd(), 'public', 'icon-192x192.png');
+    const logoPath = path.join(process.cwd(), 'public', 'mysitebook-logo-dark.png');
     const logoBuffer = fs.readFileSync(logoPath);
     merchantLogo = `data:image/png;base64,${logoBuffer.toString('base64')}`;
   } catch {
